@@ -7,14 +7,35 @@ if (navToggle && navDrawer) {
   const setOpen = (open) => {
     navDrawer.setAttribute('data-open', open ? 'true' : 'false');
     navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.classList.toggle('drawer-open', open);
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
   };
   setOpen(false);
   navToggle.addEventListener('click', () => {
     const open = navDrawer.getAttribute('data-open') === 'true';
     setOpen(!open);
   });
+  
+  // Close drawer when clicking a link
   navDrawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setOpen(false)));
-  window.addEventListener('resize', () => { if (window.innerWidth > 900) setOpen(false); });
+  
+  // Close drawer when clicking outside (overlay)
+  document.addEventListener('click', (e) => {
+    if (navDrawer.getAttribute('data-open') === 'true' && 
+        !navDrawer.contains(e.target) && 
+        !navToggle.contains(e.target)) {
+      setOpen(false);
+    }
+  });
+  
+  // Close drawer on window resize to desktop
+  window.addEventListener('resize', () => { 
+    if (window.innerWidth > 992) setOpen(false); 
+  });
 }
 
 /**

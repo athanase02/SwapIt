@@ -4,6 +4,62 @@
    @author: Comprehensive mobile optimization
 ============================================================ */
 
+/* Fix Navigation and Language Switcher Z-Index Issues */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100 !important;
+}
+
+.nav__drawer {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 280px;
+  height: 100vh;
+  background: var(--panel, #11131a);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  transition: left 0.3s ease;
+  z-index: 200 !important;
+  padding: 80px 20px 20px;
+}
+
+.nav__drawer[data-open="true"] {
+  left: 0;
+}
+
+.nav__drawer::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: -1;
+}
+
+.nav__drawer[data-open="true"]::before {
+  opacity: 1;
+  visibility: visible;
+  left: 280px;
+  right: -100vw;
+  width: 100vw;
+}
+
+.language-switcher {
+  z-index: 150 !important;
+}
+
+.language-switcher__dropdown {
+  z-index: 250 !important;
+  position: fixed !important;
+}
+
 /* Base Mobile Fixes */
 @media (max-width: 768px) {
   

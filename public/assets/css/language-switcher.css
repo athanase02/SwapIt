@@ -6,6 +6,7 @@
 .language-switcher {
     position: relative;
     display: inline-block;
+    z-index: 1001;
 }
 
 .language-switcher__button {
@@ -64,7 +65,7 @@
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.3s ease;
-    z-index: 1000;
+    z-index: 10000;
     overflow: hidden;
 }
 
@@ -126,6 +127,11 @@
 
 /* Mobile adjustments */
 @media (max-width: 992px) {
+    .language-switcher {
+        position: relative;
+        z-index: 1001;
+    }
+    
     .language-switcher__button {
         padding: 0.4rem 0.6rem;
         font-size: 0.85rem;
@@ -133,6 +139,20 @@
     
     .language-switcher__flag {
         font-size: 1rem;
+    }
+    
+    .language-switcher__dropdown {
+        position: fixed !important;
+        top: auto !important;
+        bottom: auto !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) translateY(-10px) !important;
+        max-width: 90vw;
+    }
+    
+    .language-switcher__dropdown.visible {
+        transform: translateX(-50%) translateY(0) !important;
     }
 }
 
