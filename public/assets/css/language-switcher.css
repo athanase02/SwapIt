@@ -1,0 +1,165 @@
+/**
+ * Language Switcher Styles
+ * Modern dropdown design with smooth animations
+ */
+
+.language-switcher {
+    position: relative;
+    display: inline-block;
+}
+
+.language-switcher__button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.language-switcher__button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.language-switcher__flag {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.language-switcher__name {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .language-switcher__name {
+        display: inline;
+    }
+}
+
+.language-switcher__icon {
+    font-size: 0.7rem;
+    transition: transform 0.3s ease;
+}
+
+.language-switcher__button[aria-expanded="true"] .language-switcher__icon {
+    transform: rotate(180deg);
+}
+
+.language-switcher__dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    min-width: 200px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.language-switcher__dropdown.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.language-switcher__option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    color: #333;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.language-switcher__option:hover {
+    background: #f5f5f5;
+}
+
+.language-switcher__option.active {
+    background: #f0f4ff;
+    color: #667eea;
+}
+
+.language-switcher__option i {
+    margin-left: auto;
+    font-size: 0.8rem;
+    color: #667eea;
+}
+
+/* Dark theme support */
+[data-theme="dark"] .language-switcher__dropdown {
+    background: #1a1d2e;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .language-switcher__option {
+    color: #fff;
+}
+
+[data-theme="dark"] .language-switcher__option:hover {
+    background: #252940;
+}
+
+[data-theme="dark"] .language-switcher__option.active {
+    background: #2a3055;
+    color: #8b9aff;
+}
+
+/* Mobile adjustments */
+@media (max-width: 992px) {
+    .language-switcher__button {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+    }
+    
+    .language-switcher__flag {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .language-switcher__dropdown {
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%) translateY(-10px);
+    }
+    
+    .language-switcher__dropdown.visible {
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Animation for smooth appearance */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.language-switcher__dropdown.visible {
+    animation: slideDown 0.3s ease;
+}

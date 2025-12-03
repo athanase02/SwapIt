@@ -1,0 +1,618 @@
+<!doctype html>
+<!--
+  Browse Items Page
+  @author Olivier Kwizera - Item browsing interface and filtering UI
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title data-i18n-page-title="browse.pageTitle">Browse Items — SwapIt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="../assets/css/language-switcher.css">
+  <script src="../assets/js/auth-client.js"></script>
+</head>
+<body>
+  <header class="nav" id="siteHeader">
+    <div class="container nav__bar">
+      <a class="logo" href="dashboard.html" style="display:flex;align-items:center;gap:8px"><img src="../assets/images/logo.png" alt="SwapIt Logo" style="width:40px;height:40px;border-radius:50%;object-fit:cover"></a>
+      <nav class="nav__menu" id="mainNavMenu">
+        <!-- Dynamic menu items will be inserted here based on auth state -->
+        <a href="../home.html" data-i18n="nav.home">Home</a>
+        <a href="browse.html" style="border-bottom:2px solid #7ef9ff" data-i18n="nav.browse">Browse</a>
+      </nav>
+      <div class="nav__cta">
+        <div id="languageSwitcher" style="margin-right: 1rem;"></div>
+        <div class="nav__search">
+          <i class="fas fa-search"></i>
+          <input type="search" id="navSearch" data-i18n-placeholder="common.search" placeholder="Search items..." aria-label="Search items">
+        </div>
+        <div class="nav__auth" style="display:flex;gap:16px;align-items:center">
+          <a href="wishlist.html" class="wishlist-widget" style="position:relative;display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#fff">
+            <i class="fas fa-heart" style="font-size:1.3rem;color:#ff7df2"></i>
+            <span style="font-size:0.65rem;font-weight:600;margin-top:2px" data-i18n="nav.wishlist">Wishlist</span>
+            <span id="wishlistCount" style="position:absolute;top:-6px;right:-6px;background:#ff7df2;color:#fff;border-radius:50%;width:18px;height:18px;display:none;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700">0</span>
+          </a>
+          <a href="cart.html" class="cart-widget" style="position:relative;display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#fff">
+            <i class="fas fa-shopping-cart" style="font-size:1.3rem;color:#7ef9ff"></i>
+            <span style="font-size:0.65rem;font-weight:600;margin-top:2px" data-i18n="nav.cart">Cart</span>
+            <span id="cartCount" style="position:absolute;top:-6px;right:-6px;background:#ff7df2;color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700">0</span>
+          </a>
+          <div class="account-dropdown">
+            <button class="btn btn--primary account-dropdown-btn" onclick="toggleAccountDropdown(event)">
+              <i class="fas fa-user"></i>
+              <span data-i18n="nav.account">Account</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="account-dropdown-menu">
+              <a href="login.html"><i class="fas fa-sign-in-alt"></i> <span data-i18n="nav.login">Login</span></a>
+              <a href="signup.html"><i class="fas fa-user-plus"></i> <span data-i18n="nav.signup">Sign Up</span></a>
+            </div>
+          </div>
+        </div>
+        <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <div class="nav__drawer" id="navDrawer" aria-label="Mobile" data-open="false">
+      <a href="/home.html">Home</a>
+      <a href="browse.html">Browse</a>
+      <div class="nav__search">
+        <i class="fas fa-search"></i>
+        <input type="search" placeholder="Search items..." aria-label="Search items">
+      </div>
+      <div class="hero__auth">
+        <a class="btn btn--outline w-100 mb-2" href="login.html">Log in</a>
+        <a class="btn btn--primary w-100" href="signup.html">Sign up</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div style="text-align:center;padding:40px 0 20px;background:linear-gradient(135deg, rgba(126,249,255,0.1), rgba(91,124,254,0.1));border-radius:16px;margin-bottom:2rem">
+        <h1 class="hero__title hero__title--animated" id="browseTitle" data-text="browse.heroLine1|browse.heroLine2" style="font-size:2.5rem;margin:0"></h1>
+        <p style="color:#9aa5c3;margin-top:1rem;font-size:1.1rem" data-i18n="browse.subtitle">Your marketplace for peer-to-peer sharing</p>
+      </div>
+
+      <!-- Filters toolbar -->
+      <div class="split__grid" style="align-items:center;margin-bottom:18px;">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+          <div>
+            <label style="font-weight:700;margin-right:6px" data-i18n="browse.filters.category">Category</label>
+            <select id="filterCategory">
+              <option value="" data-i18n="browse.filters.all">All</option>rowse.filters.all">All</option>
+              <option value="electronics" data-i18n="browse.filters.electronics">Electronics</option>
+              <option value="transport" data-i18n="browse.filters.transport">Transport</option>
+              <option value="books" data-i18n="browse.filters.books">Books</option>
+              <option value="clothing" data-i18n="browse.filters.clothing">Clothing</option>
+              <option value="music" data-i18n="browse.filters.music">Music</option>
+              <option value="home" data-i18n="browse.filters.home">Home</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-weight:700;margin-right:6px" data-i18n="browse.filters.location">Location</label>
+            <select id="filterLocation">
+              <option value="" data-i18n="browse.filters.all">All</option>
+              <option value="Ashesi">Ashesi University, Berekuso</option>
+              <option value="Accra">Accra</option>
+              <option value="Kumasi">Kumasi</option>
+              <option value="Tamale">Tamale</option>
+              <option value="Takoradi">Takoradi</option>
+              <option value="Tema">Tema</option>
+              <option value="Berekuso">Berekuso</option>
+              <option value="Kwabenya">Kwabenya</option>
+              <option value="Madina">Madina</option>
+              <option value="Lapaz">Lapaz</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-weight:700;margin-right:6px" data-i18n="browse.filters.price">Price GHS</label>
+            <input id="filterMin" type="number" data-i18n-placeholder="browse.filters.min" placeholder="Min" style="width:80px;padding:6px;border-radius:8px;border:1px solid #223050"> -
+            <input id="filterMax" type="number" data-i18n-placeholder="browse.filters.max" placeholder="Max" style="width:80px;padding:6px;border-radius:8px;border:1px solid #223050">
+          </div>
+
+          <div>
+            <label style="font-weight:700;margin-right:6px" data-i18n="browse.filters.sort">Sort</label>
+            <select id="sortBy">
+              <option value="recent" data-i18n="browse.filters.mostRecent">Most Recent</option>
+              <option value="price-low" data-i18n="browse.filters.priceLowHigh">Price: Low to High</option>
+              <option value="price-high" data-i18n="browse.filters.priceHighLow">Price: High to Low</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="text-align:right;">
+          <input id="pageSearch" type="search" data-i18n-placeholder="browse.searchPlaceholder" placeholder="Search items by title or description" style="padding:8px 12px;border-radius:10px;border:1px solid #223050;width:320px;"> 
+        </div>
+      </div>
+
+      <div class="cards cards--4" id="itemsGrid">
+        <!-- Items with data attributes for filtering -->
+        <article class="card" data-category="electronics" data-price="50" data-location="Ashesi" data-title="Classroom Projector">
+          <img class="card__thumb" src="../assets/images/projector ashesi.jpg" alt="Projector">
+          <h3>Classroom Projector</h3>
+          <p>HD projector for lectures and presentations at Ashesi.</p>
+          <div class="card__meta">GHS 50/day — Ashesi University, Berekuso</div>
+        </article>
+
+        <article class="card" data-category="transport" data-price="15" data-location="Ashesi" data-title="Campus Bicycle">
+          <img class="card__thumb" src="../assets/images/bicycle.jpeg" alt="Bicycle">
+          <h3>Campus Bicycle</h3>
+          <p>Lightweight bike for moving around Ashesi campus.</p>
+          <div class="card__meta">GHS 15/day — Ashesi University</div>
+        </article>
+
+        <article class="card" data-category="books" data-price="0" data-location="Ashesi" data-title="Textbooks Collection">
+          <img class="card__thumb" src="../assets/images/ashesi textbook.jpg" alt="Textbooks">
+          <h3>Course Textbooks Collection</h3>
+          <p>Programming and engineering textbooks available for short-term borrowing.</p>
+          <div class="card__meta">Free — Ashesi University Library</div>
+        </article>
+
+        <article class="card" data-category="clothing" data-price="80" data-location="Accra" data-title="Kente Cloth Set">
+          <img class="card__thumb" src="../assets/images/kente cloth.jpg" alt="Kente Cloth">
+          <h3>Kente Cloth Set</h3>
+          <p>Traditional Kente cloth set from Accra artisans.</p>
+          <div class="card__meta">GHS 80/day — Accra</div>
+        </article>
+
+        <article class="card" data-category="music" data-price="60" data-location="Kumasi" data-title="Drum Set">
+          <img class="card__thumb" src="../assets/images/drum set.jpg" alt="Drum Set">
+          <h3>Traditional Drum Set</h3>
+          <p>High-quality drum set for performances.</p>
+          <div class="card__meta">GHS 60/day — Kumasi</div>
+        </article>
+
+        <article class="card" data-category="electronics" data-price="20" data-location="Accra" data-title="Portable Speaker">
+          <img class="card__thumb" src="../assets/images/portable speaker.jpg" alt="Speaker">
+          <h3>Portable Bluetooth Speaker</h3>
+          <p>Compact speaker perfect for events and gatherings.</p>
+          <div class="card__meta">GHS 20/day — Accra</div>
+        </article>
+
+        <article class="card" data-category="home" data-price="35" data-location="Accra" data-title="Blender">
+          <img class="card__thumb" src="../assets/images/blender.jpeg" alt="Blender">
+          <h3>Kitchen Blender</h3>
+          <p>High-speed blender for smoothies and meals.</p>
+          <div class="card__meta">GHS 35/day — Accra</div>
+        </article>
+
+        <article class="card" data-category="electronics" data-price="25" data-location="Tamale" data-title="Camera">
+          <img class="card__thumb" src="../assets/images/camera.jpg" alt="Camera">
+          <h3>Digital Camera</h3>
+          <p>DSLR for photography projects and events.</p>
+          <div class="card__meta">GHS 25/day — Tamale</div>
+        </article>
+
+        <article class="card" data-category="home" data-price="40" data-location="Ashesi" data-title="Camping Tent">
+          <img class="card__thumb" src="../assets/images/camping tent.jpg" alt="Tent">
+          <h3>Camping Tent</h3>
+          <p>4-person tent suitable for outings around Berekuso.</p>
+          <div class="card__meta">GHS 40/day — Ashesi/Berekuso</div>
+        </article>
+
+        <article class="card" data-category="electronics" data-price="10" data-location="Accra" data-title="Powerbank">
+          <img class="card__thumb" src="../assets/images/power bank.png" alt="Powerbank">
+          <h3>Powerbank 20,000mAh</h3>
+          <p>Portable charger for phones and small devices.</p>
+          <div class="card__meta">GHS 10/day — Accra</div>
+        </article>
+
+        <article class="card" data-category="electronics" data-price="45" data-location="Ashesi" data-title="Camera+Lens">
+          <img class="card__thumb" src="../assets/images/camera lens.jpeg" alt="Lens">
+          <h3>Camera + Lens Kit</h3>
+          <p>Camera kit suitable for student film projects.</p>
+          <div class="card__meta">GHS 45/day — Ashesi</div>
+        </article>
+
+        <article class="card" data-category="home" data-price="12" data-location="Accra" data-title="Projector+Adapter">
+          <img class="card__thumb" src="../assets/images/adapter.jpg" alt="Adapter">
+          <h3>HDMI Adapter / Cables</h3>
+          <p>Adapters and cables for projectors and laptops.</p>
+          <div class="card__meta">GHS 12/day — Accra</div>
+        </article>
+        <!-- Additional items to ensure categories exist across locations -->
+        <article class="card" data-category="transport" data-price="20" data-location="Accra" data-title="City Bicycle">
+          <img class="card__thumb" src="../assets/images/city bicycle.jpeg" alt="City Bicycle">
+          <h3>City Bicycle</h3>
+          <p>Comfortable city bicycle for short trips around Accra.</p>
+          <div class="card__meta">GHS 20/day — Accra</div>
+        </article>
+
+        <article class="card" data-category="books" data-price="0" data-location="Accra" data-title="Reference+Texts">
+          <img class="card__thumb" src="../assets/images/reference texts.jpg" alt="Reference Texts">
+          <h3>Reference Texts</h3>
+          <p>Collection of university reference books available in Accra.</p>
+          <div class="card__meta">Free — Accra</div>
+        </article>
+
+        <article class="card" data-category="clothing" data-price="25" data-location="Ashesi" data-title="Graduation+Gown">
+          <img class="card__thumb" src="../assets/images/graduation gown.png" alt="Gown">
+          <h3>Graduation Gown</h3>
+          <p>Academic gown available for ceremonies at Ashesi.</p>
+          <div class="card__meta">GHS 25/day — Ashesi University</div>
+        </article>
+
+        <article class="card" data-category="music" data-price="30" data-location="Ashesi" data-title="Portable+Keyboard">
+          <img class="card__thumb" src="../assets/images/portable keyboard.jpeg" alt="Keyboard">
+          <h3>Portable Keyboard</h3>
+          <p>61-key portable keyboard, ideal for rehearsals and lessons on campus.</p>
+          <div class="card__meta">GHS 30/day — Ashesi</div>
+        </article>
+
+        <article class="card" data-category="music" data-price="35" data-location="Accra" data-title="Djembe+Drum">
+          <img class="card__thumb" src="../assets/images/djembe drum.jpg" alt="Djembe Drum">
+          <h3>Djembe Drum</h3>
+          <p>Traditional djembe drum for percussion sessions and events.</p>
+          <div class="card__meta">GHS 35/day — Accra</div>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <div style="height:36px"></div>
+
+  <footer class="sitefoot">
+    <div class="container">
+      <div class="sitefoot__grid">
+        <div class="sitefoot__col">
+          <a class="logo" href="../home.html"><span>SWAP</span>IT</a>
+          <p data-i18n="footer.tagline">Borrow what you need. Lend what you don't. Simple, safe, sustainable.</p>
+          <div class="sitefoot__social">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.linkedin.com" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+
+        <div class="sitefoot__col">
+          <h4 data-i18n="footer.explore">Explore</h4>
+          <ul>
+            <li><a href="../home.html#home" data-i18n="footer.home">Home</a></li>
+            <li><a href="../home.html" data-i18n="footer.howItWorks">How it works</a></li>
+            <li><a href="../home.html#featured" data-i18n="footer.featured">Featured</a></li>
+            <li><a href="browse.html" data-i18n="footer.allListings">All listings</a></li>
+          </ul>
+        </div>
+
+        <div class="sitefoot__col">
+          <h4 data-i18n="footer.company">Company</h4>
+          <ul>
+            <li><a href="../home.html#about-us" data-i18n="footer.aboutUs">About Us</a></li>
+            <li><a href="../home.html" data-i18n="footer.successStories">Success Stories</a></li>
+            <li><a href="../home.html" data-i18n="footer.contact">Contact</a></li>
+            <li><a href="../home.html#faq" data-i18n="footer.faq">FAQ</a></li>
+          </ul>
+        </div>
+
+        <div class="sitefoot__col">
+          <h4 data-i18n="footer.legal">Legal</h4>
+          <ul>
+            <li><a href="#" data-i18n="footer.privacyPolicy">Privacy Policy</a></li>
+            <li><a href="#" data-i18n="footer.termsOfService">Terms of Service</a></li>
+            <li><a href="#" data-i18n="footer.communityGuidelines">Community Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="sitefoot__col">
+          <h4 data-i18n="footer.contact">Contact</h4>
+          <ul>
+            <li><a href="mailto:info@swapit.com"><i class="fas fa-envelope"></i> info@swapit.com</a></li>
+            <li><a href="tel:+25078888888"><i class="fas fa-phone"></i> (250) 78888888</a></li>
+            <li><a href="tel:+23355555555"><i class="fas fa-phone"></i> (233) 55555555</a></li>
+            <li><a href="tel:+2328888888"><i class="fas fa-phone"></i> (232) 8888888</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sitefoot__bottom">
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%">
+          <img src="../assets/images/logo.png" alt="SwapIt Logo" style="width:32px;height:32px;border-radius:50%;object-fit:cover">
+          <small>SwapIt Ltd. &copy; <span data-i18n="footer.rights">All rights reserved</span> <span id="year">2025</span></small>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div id="notification" style="position:fixed;top:80px;right:20px;padding:16px 24px;background:linear-gradient(135deg,#7ef9ff,#5b7cfe);color:#0a0b10;border-radius:12px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.3);transform:translateX(400px);transition:transform 0.3s ease;z-index:10000;display:flex;align-items:center;gap:12px">
+    <i class="fas fa-check-circle" style="font-size:1.2rem;"></i>
+    <span id="notificationText"></span>
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    /**
+     * Update cart badge count
+     */
+    function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem('swapit_cart') || '[]');
+      const cartCount = document.getElementById('cartCount');
+      if (cartCount) {
+        cartCount.textContent = cart.length;
+        if (cart.length > 0) {
+          cartCount.style.display = 'flex';
+        } else {
+          cartCount.style.display = 'none';
+        }
+      }
+    }
+    
+    // Update wishlist count
+    window.updateWishlistCount = function() {
+      const wishlist = JSON.parse(localStorage.getItem('swapit_wishlist') || '[]');
+      const wishlistCount = document.getElementById('wishlistCount');
+      if (wishlistCount) {
+        wishlistCount.textContent = wishlist.length;
+        if (wishlist.length > 0) {
+          wishlistCount.style.display = 'flex';
+        } else {
+          wishlistCount.style.display = 'none';
+        }
+      }
+    };
+    
+    // Show custom notification
+    window.showNotification = function(message) {
+      const notification = document.getElementById('notification');
+      const notificationText = document.getElementById('notificationText');
+      notificationText.textContent = message;
+      notification.style.transform = 'translateX(0)';
+      setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+      }, 3000);
+    };
+    
+    /**
+     * Initialize badge counts on page load
+     */
+    updateCartCount();
+    updateWishlistCount();
+    
+    /**
+     * Update badge counts on storage change (cross-tab sync)
+     */
+    window.addEventListener('storage', () => {
+      updateCartCount();
+      updateWishlistCount();
+    });
+    
+    /**
+     * Typing Animation for Browse Title
+     * Simulates typewriter effect with multiple text lines
+     * Now supports translation keys with proper translation manager
+     */
+    const browseTitle = document.getElementById('browseTitle');
+    if (browseTitle) {
+      let currentTimeout;
+      let lines = [];
+      
+      // Function to get translated text lines
+      function updateBrowseText() {
+        if (window.swapitTranslation) {
+          const textKeys = browseTitle.dataset.text.split('|');
+          lines = textKeys.map(key => {
+            const translation = window.swapitTranslation.t(key);
+            return translation !== key ? translation : key;
+          });
+        }
+      }
+      
+      // Listen for language changes
+      window.addEventListener('languageChanged', () => {
+        if (currentTimeout) {
+          clearTimeout(currentTimeout);
+        }
+        updateBrowseText();
+        startTypingAnimation();
+      });
+      
+      // Start typing animation
+      function startTypingAnimation() {
+        let lineIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let currentLine = '';
+        
+        function typeEffect() {
+          if (lines.length === 0) return;
+          
+          const fullText = lines[lineIndex];
+          
+          if (isDeleting) {
+            currentLine = fullText.substring(0, charIndex - 1);
+            charIndex--;
+          } else {
+            currentLine = fullText.substring(0, charIndex + 1);
+            charIndex++;
+          }
+          
+          // Update the display
+          if (lineIndex === 0) {
+            browseTitle.innerHTML = currentLine;
+          } else {
+            browseTitle.innerHTML = lines[0] + '<br>' + currentLine;
+          }
+          
+          let typingSpeed = 100;
+          
+          if (isDeleting) {
+            typingSpeed = 50;
+          }
+          
+          // When line is complete
+          if (!isDeleting && charIndex === fullText.length) {
+            if (lineIndex === lines.length - 1) {
+              typingSpeed = 3000;
+              isDeleting = true;
+            } else {
+              lineIndex++;
+              charIndex = 0;
+              typingSpeed = 500;
+            }
+          }
+          // When deletion is complete
+          else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            if (lineIndex > 0) {
+              lineIndex = 0;
+            }
+            typingSpeed = 500;
+          }
+          
+          currentTimeout = setTimeout(typeEffect, typingSpeed);
+        }
+        
+        typeEffect();
+      }
+      
+      // Wait for translation manager to initialize
+      const waitForTranslation = setInterval(() => {
+        if (window.swapitTranslation && window.swapitTranslation.isInitialized()) {
+          clearInterval(waitForTranslation);
+          updateBrowseText();
+          startTypingAnimation();
+        }
+      }, 100);
+    }
+    
+    /**
+     * Connect category dropdown to filter system
+     */
+    const categoryDropdown = document.getElementById('categoryDropdown');
+    if (categoryDropdown) {
+      categoryDropdown.addEventListener('change', function() {
+        const filterCategory = document.getElementById('filterCategory');
+        if (filterCategory) {
+          filterCategory.value = this.value;
+          filterCategory.dispatchEvent(new Event('change'));
+        }
+      });
+    }
+    
+    /**
+     * Toggle account dropdown menu visibility
+     */
+    function toggleAccountDropdown(event) {
+      if (event) {
+        event.stopPropagation();
+      }
+      const dropdown = document.querySelector('.account-dropdown');
+      if (dropdown) {
+        dropdown.classList.toggle('active');
+      }
+    }
+    
+    /**
+     * Handle user logout
+     */
+    async function handleLogout(event) {
+      event.preventDefault();
+      try {
+        if (window.swapitAuth) {
+          await window.swapitAuth.signOut();
+          window.location.href = '/pages/login.html';
+        }
+      } catch (error) {
+        console.error('Logout failed:', error);
+        window.location.href = '/pages/login.html';
+      }
+    }
+    
+    /**
+     * Close dropdown when user clicks outside
+     */
+    document.addEventListener('click', function(event) {
+      const dropdown = document.querySelector('.account-dropdown');
+      if (dropdown && !dropdown.contains(event.target)) {
+        dropdown.classList.remove('active');
+      }
+    });
+  </script>
+  <script src="../assets/js/translation.js"></script>
+  <script src="../assets/js/language-switcher.js"></script>
+  <script src="../assets/js/script.js"></script>
+  <script src="../assets/js/cript.js"></script>
+  <script src="../assets/js/browse.js"></script>
+  <script src="../assets/js/cart.js"></script>
+  <script>
+    // Browse page requires authentication - redirect if not logged in
+    async function checkBrowseAccess() {
+      try {
+        // Wait for auth client to be ready with retry logic
+        let retries = 0;
+        while (!window.swapitAuth && retries < 10) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          retries++;
+        }
+
+        if (!window.swapitAuth) {
+          console.log('Auth client not available after retries, redirecting to login...');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Wait for auth initialization to complete
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        const user = await window.swapitAuth.checkSession();
+        const mainNavMenu = document.getElementById('mainNavMenu');
+        
+        if (!user) {
+          // User not authenticated - redirect to login
+          console.log('User not authenticated, redirecting to login...');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // User is authenticated - update navigation menu
+        console.log('User authenticated:', user.email);
+        if (mainNavMenu) {
+          mainNavMenu.innerHTML = `
+            <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span data-i18n="nav.dashboard">Dashboard</span></a>
+            <a href="browse.html" style="border-bottom:2px solid #7ef9ff"><i class="fas fa-search"></i> <span data-i18n="nav.browse">Browse Items</span></a>
+            <a href="add-listing.html"><i class="fas fa-plus-circle"></i> <span data-i18n="nav.addListing">Add Listing</span></a>
+          `;
+          // Apply translations after updating the menu
+          if (window.swapitTranslation) {
+            window.swapitTranslation.applyTranslations();
+          }
+        }
+
+        // Update account dropdown to show only Profile and Logout
+        const accountDropdownMenu = document.querySelector('.account-dropdown-menu');
+        if (accountDropdownMenu) {
+          accountDropdownMenu.innerHTML = `
+            <a href="profile.html"><i class="fas fa-user"></i> <span data-i18n="nav.profile">Profile</span></a>
+            <a href="#" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt"></i> <span data-i18n="nav.logout">Logout</span></a>
+          `;
+          // Apply translations to dropdown as well
+          if (window.swapitTranslation) {
+            window.swapitTranslation.applyTranslations();
+          }
+        }
+      } catch (error) {
+        console.error('Authentication check failed:', error);
+        // On error, redirect to login for safety
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Check authentication when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', checkBrowseAccess);
+    } else {
+      checkBrowseAccess();
+    }
+  </script>
+  <script src="../assets/js/translation.js"></script>
+  <script src="../assets/js/language-switcher.js"></script>
+</body>
+</html>
+

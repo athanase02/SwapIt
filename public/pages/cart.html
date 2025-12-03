@@ -1,0 +1,805 @@
+<!doctype html>
+<!--
+  Shopping Cart Page
+  @author Mabinty Mambu - Shopping cart interface and checkout flow
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title data-i18n-page-title="cart.pageTitle">Cart — SwapIt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="../assets/css/language-switcher.css">
+  <script src="../assets/js/auth-client.js"></script>
+  <style>
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      padding-top: 80px;
+    }
+
+    /* Navigation */
+    .topnav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(17, 19, 26, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #1e2330;
+      z-index: 1000;
+      padding: 1rem 0;
+    }
+
+    .topnav .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .nav-brand img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--brand);
+    }
+
+    /* Page Container */
+    .cart-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .cart-layout {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 2rem;
+    }
+
+    @media (max-width: 968px) {
+      .cart-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Page Header */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    .page-header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .page-header-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, rgba(126, 249, 255, 0.2), rgba(91, 124, 254, 0.2));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: var(--brand);
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+    }
+
+    .cart-count {
+      background: rgba(126, 249, 255, 0.1);
+      color: var(--brand);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      border: 1px solid rgba(126, 249, 255, 0.3);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      animation: fadeInUp 0.6s ease;
+      grid-column: 1 / -1;
+    }
+
+    .empty-state-icon {
+      font-size: 5rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      opacity: 0.5;
+    }
+
+    .empty-state h2 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .empty-state p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Cart Items Section */
+    .cart-items-section {
+      animation: fadeInUp 0.6s ease;
+    }
+
+    .cart-item {
+      background: linear-gradient(180deg, #151824, #0f1118);
+      border: 1px solid #1e2434;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 1.5rem;
+      transition: all 0.3s;
+    }
+
+    .cart-item:hover {
+      border-color: rgba(126, 249, 255, 0.3);
+      box-shadow: 0 4px 16px rgba(126, 249, 255, 0.1);
+    }
+
+    .cart-item-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #0a0b10;
+    }
+
+    .cart-item-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .cart-item-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .cart-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 0.75rem;
+    }
+
+    .cart-item-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .cart-item-location {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .cart-item-location i {
+      color: var(--brand);
+    }
+
+    .cart-item-price {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--brand);
+    }
+
+    .cart-item-price.free {
+      color: var(--brand-mag);
+    }
+
+    .cart-item-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .duration-control {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .duration-control label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .duration-input {
+      width: 80px;
+      padding: 0.5rem;
+      background: rgba(30, 35, 48, 0.6);
+      border: 1px solid #2a2f45;
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .duration-input:focus {
+      outline: none;
+      border-color: var(--brand);
+    }
+
+    .remove-btn {
+      background: rgba(255, 107, 107, 0.1);
+      color: #ff6b6b;
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .remove-btn:hover {
+      background: rgba(255, 107, 107, 0.2);
+      border-color: #ff6b6b;
+    }
+
+    /* Summary Section */
+    .cart-summary-section {
+      position: sticky;
+      top: 100px;
+      animation: fadeInUp 0.6s ease 0.2s both;
+    }
+
+    .cart-summary {
+      background: linear-gradient(180deg, #151824, #0f1118);
+      border: 1px solid #1e2434;
+      border-radius: 16px;
+      padding: 2rem;
+    }
+
+    .summary-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .summary-title i {
+      color: var(--brand);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .summary-row-total {
+      border-top: 2px solid #1e2434;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--brand);
+    }
+
+    .pickup-section {
+      margin: 1.5rem 0;
+      padding: 1.5rem;
+      background: rgba(126, 249, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(126, 249, 255, 0.1);
+    }
+
+    .pickup-section label {
+      display: block;
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .pickup-section input {
+      width: 100%;
+      padding: 0.75rem;
+      background: rgba(30, 35, 48, 0.6);
+      border: 1px solid #2a2f45;
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .pickup-section input:focus {
+      outline: none;
+      border-color: var(--brand);
+    }
+
+    .checkout-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      color: #0a0b10;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 1.5rem;
+    }
+
+    .checkout-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(126, 249, 255, 0.3);
+    }
+
+    .checkout-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .continue-shopping {
+      width: 100%;
+      padding: 0.875rem;
+      background: transparent;
+      color: var(--text);
+      border: 2px solid #2a2f45;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 1rem;
+      transition: all 0.3s;
+    }
+
+    .continue-shopping:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+    }
+
+    .btn {
+      padding: 0.875rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      font-family: inherit;
+    }
+
+    .btn--primary {
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      color: #0a0b10;
+    }
+
+    .btn--primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(126, 249, 255, 0.3);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Footer */
+    .sitefoot {
+      margin-top: 4rem;
+      padding: 2rem 0;
+      border-top: 1px solid #1e2434;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .sitefoot img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="topnav">
+    <div class="container">
+      <a href="dashboard.html" class="nav-brand">
+        <img src="../assets/images/logo.png" alt="SwapIt">
+        <span>SwapIt</span>
+      </a>
+      <div id="languageSwitcher" style="margin-left: auto; margin-right: 2rem;"></div>
+      <ul class="nav-links" id="mainNavMenu">
+        <!-- Dynamic menu items will be inserted here based on auth state -->
+        <li><a href="browse.html"><i class="fas fa-search"></i> <span data-i18n="nav.browse">Browse</span></a></li>
+        <li><a href="add-listing.html"><i class="fas fa-plus-circle"></i> <span data-i18n="nav.addListing">Add Listing</span></a></li>
+        <li><a href="wishlist.html"><i class="fas fa-heart"></i> <span data-i18n="nav.wishlist">Wishlist</span></a></li>
+        <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="cart-container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-header-icon">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <h1 data-i18n="cart.title">Shopping Cart</h1>
+      </div>
+      <div class="cart-count" id="cartTotal">
+        <span>0 items</span>
+      </div>
+    </div>
+
+    <!-- Cart Layout -->
+    <div class="cart-layout" id="cartLayout">
+      <!-- Cart Items will be dynamically loaded -->
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Footer -->
+  <footer class="sitefoot">
+    <div class="container">
+      <img src="../assets/images/logo.png" alt="SwapIt Logo">
+      <small>SwapIt Ltd. &copy; <span data-i18n="footer.rights">All rights reserved</span> <span id="year">2025</span></small>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Toast notification function
+    window.showToast = function(message, type = 'info', title = '') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      
+      const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+      
+      const titles = {
+        success: title || 'Success',
+        error: title || 'Error',
+        warning: title || 'Warning',
+        info: title || 'Info'
+      };
+      
+      toast.innerHTML = `
+        <i class="fas ${icons[type]} toast-icon"></i>
+        <div class="toast-content">
+          <div class="toast-title">${titles[type]}</div>
+          <div class="toast-message">${message}</div>
+        </div>
+      `;
+      
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    };
+
+    /**
+     * Renders the cart items and summary
+     */
+    function renderCart() {
+      const cart = JSON.parse(localStorage.getItem('swapit_cart')||'[]');
+      const layout = document.getElementById('cartLayout');
+      const totalSpan = document.getElementById('cartTotal');
+      
+      // Simple item count display
+      if (cart.length === 1) {
+        totalSpan.textContent = cart.length + ' ' + (window.swapitTranslation?.translations?.cart?.itemsCount?.split('{')[0].trim() || 'article');
+      } else {
+        const baseText = window.swapitTranslation?.translations?.cart?.itemsCount || '{count} articles';
+        totalSpan.textContent = cart.length + ' ' + (window.swapitTranslation?.currentLanguage === 'fr' ? 'articles' : 'items');
+      }
+      
+      if (!cart.length) {
+        const emptyTitle = window.swapitTranslation?.translations?.cart?.emptyTitle || 'Your cart is empty';
+        const emptyMessage = window.swapitTranslation?.translations?.cart?.emptyMessage || 'Add items to your cart to get started!';
+        const browseBtnText = window.swapitTranslation?.translations?.cart?.browseBtnEmpty || 'Browse Items';
+        layout.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <i class="fas fa-shopping-cart"></i>
+            </div>
+            <h2>${emptyTitle}</h2>
+            <p>${emptyMessage}</p>
+            <a href="browse.html" class="btn btn--primary">
+              <i class="fas fa-search"></i>
+              ${browseBtnText}
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      // Create cart items section
+      const itemsSection = document.createElement('div');
+      itemsSection.className = 'cart-items-section';
+      
+      cart.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'cart-item';
+        
+        const days = item.days || 1;
+        const itemTotal = (item.price || 0) * days;
+        
+        const freeText = window.swapitTranslation?.translations?.cart?.free || window.swapitTranslation?.translations?.wishlist?.free || 'Free';
+        const perDayText = window.swapitTranslation?.translations?.wishlist?.perDay || '/day';
+        const durationText = window.swapitTranslation?.translations?.cart?.duration || 'Duration';
+        const daysText = window.swapitTranslation?.translations?.cart?.days || 'days';
+        const totalText = window.swapitTranslation?.translations?.cart?.total || 'Total';
+        const removeText = window.swapitTranslation?.translations?.cart?.remove || 'Remove';
+        const priceDisplay = item.price > 0 ? `GHS ${item.price}${perDayText}` : freeText;
+        
+        itemDiv.innerHTML = `
+          <div class="cart-item-image">
+            <img src="${item.img || 'https://placehold.co/400x300?text=No+Image'}" alt="${item.title}">
+          </div>
+          <div class="cart-item-details">
+            <div class="cart-item-header">
+              <div>
+                <div class="cart-item-title">${item.title}</div>
+                <div class="cart-item-location">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>${item.location || 'Location not specified'}</span>
+                </div>
+              </div>
+              <div class="cart-item-price ${item.price <= 0 ? 'free' : ''}">
+                ${priceDisplay}
+              </div>
+            </div>
+            <div class="cart-item-controls">
+              <div class="duration-control">
+                <label for="days-${index}">${durationText}:</label>
+                <input 
+                  type="number" 
+                  id="days-${index}" 
+                  class="duration-input" 
+                  value="${days}" 
+                  min="1" 
+                  data-index="${index}"
+                >
+                <span style="color: var(--muted);">${daysText}</span>
+              </div>
+              ${item.price > 0 ? `<div style="color: var(--muted); font-weight: 600;">${totalText}: <span style="color: var(--brand);">GHS ${itemTotal.toFixed(2)}</span></div>` : ''}
+              <button class="remove-btn" data-index="${index}">
+                <i class="fas fa-trash"></i>
+                ${removeText}
+              </button>
+            </div>
+          </div>
+        `;
+        
+        itemsSection.appendChild(itemDiv);
+      });
+      
+      // Create summary section
+      const summarySection = document.createElement('div');
+      summarySection.className = 'cart-summary-section';
+      
+      const subtotal = cart.reduce((sum, item) => sum + ((item.price || 0) * (item.days || 1)), 0);
+      
+      const orderSummaryText = window.swapitTranslation?.translations?.cart?.orderSummary || 'Order Summary';
+      const subtotalText = window.swapitTranslation?.translations?.cart?.subtotal?.replace('{count}', cart.length) || `Subtotal (${cart.length} items)`;
+      const serviceFeeText = window.swapitTranslation?.translations?.cart?.serviceFee || 'Service Fee';
+      const totalPriceText = window.swapitTranslation?.translations?.cart?.totalPrice || 'Total';
+      const pickupDateText = window.swapitTranslation?.translations?.cart?.pickupDate || 'Pickup Date & Time';
+      const checkoutText = window.swapitTranslation?.translations?.cart?.checkout || 'Proceed to Checkout';
+      const continueShoppingText = window.swapitTranslation?.translations?.cart?.continueShopping || 'Continue Shopping';
+      
+      summarySection.innerHTML = `
+        <div class="cart-summary">
+          <div class="summary-title">
+            <i class="fas fa-receipt"></i>
+            ${orderSummaryText}
+          </div>
+          <div class="summary-row">
+            <span>${subtotalText}</span>
+            <span>GHS ${subtotal.toFixed(2)}</span>
+          </div>
+          <div class="summary-row">
+            <span>${serviceFeeText}</span>
+            <span>GHS 0.00</span>
+          </div>
+          <div class="summary-row summary-row-total">
+            <span>${totalPriceText}</span>
+            <span>GHS ${subtotal.toFixed(2)}</span>
+          </div>
+          
+          <div class="pickup-section">
+            <label for="pickupAt">
+              <i class="fas fa-calendar-alt"></i>
+              ${pickupDateText}
+            </label>
+            <input 
+              type="datetime-local" 
+              id="pickupAt" 
+              required
+            >
+          </div>
+          
+          <button class="checkout-btn" id="checkoutBtn">
+            <i class="fas fa-lock"></i>
+            ${checkoutText}
+          </button>
+          
+          <a href="browse.html" class="continue-shopping">
+            <i class="fas fa-arrow-left"></i>
+            ${continueShoppingText}
+          </a>
+        </div>
+      `;
+      
+      layout.innerHTML = '';
+      layout.appendChild(itemsSection);
+      layout.appendChild(summarySection);
+      
+      // Attach event handlers
+      document.querySelectorAll('.duration-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const index = parseInt(e.target.dataset.index);
+          const days = Math.max(1, parseInt(e.target.value) || 1);
+          e.target.value = days;
+          
+          const cart = JSON.parse(localStorage.getItem('swapit_cart')||'[]');
+          cart[index].days = days;
+          localStorage.setItem('swapit_cart', JSON.stringify(cart));
+          
+          renderCart();
+        });
+      });
+      
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = parseInt(e.currentTarget.dataset.index);
+          let cart = JSON.parse(localStorage.getItem('swapit_cart')||'[]');
+          const removedItem = cart[index];
+          cart.splice(index, 1);
+          localStorage.setItem('swapit_cart', JSON.stringify(cart));
+          
+          window.showToast(removedItem.title + ' removed from cart', 'success');
+          if (window.updateCartCount) window.updateCartCount();
+          window.dispatchEvent(new Event('storage'));
+          renderCart();
+        });
+      });
+    }
+    
+    // This will be called after translations load
+  </script>
+  <script src="../assets/js/translation.js"></script>
+  <script src="../assets/js/language-switcher.js"></script>
+  <script src="../assets/js/script.js"></script>
+  <script src="../assets/js/cart.js"></script>
+  <script src="../assets/js/cart-checkout.js"></script>
+  <script src="../assets/js/nav-auth-topnav.js"></script>
+  <script>
+    // Initialize cart page after all scripts loaded
+    (async function initCartPage() {
+      try {
+        console.log('Initializing cart page...');
+        
+        // Initialize translation system first
+        if (window.swapitTranslation && !window.swapitTranslation.isInitialized()) {
+          await window.swapitTranslation.init();
+          console.log('Translations initialized');
+        }
+        
+        // Check if renderCart function exists
+        if (typeof renderCart !== 'function') {
+          console.error('renderCart function not found!');
+          return;
+        }
+        
+        // Initial render
+        console.log('Rendering cart...');
+        renderCart();
+        console.log('Cart rendered successfully');
+        
+        // Re-render when localStorage changes
+        window.addEventListener('storage', () => {
+          console.log('Storage changed, re-rendering cart');
+          renderCart();
+        });
+      } catch (error) {
+        console.error('Error initializing cart page:', error);
+      }
+    })();
+  </script>
+</body>
+</html>

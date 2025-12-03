@@ -1,0 +1,925 @@
+<!doctype html>
+<!--
+  SwapIt Landing Page
+  @author Athanase Abayo - Main landing page design and structure
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" href="/assets/images/logo.png" />
+  <title>SwapIt — Shop, Swap, and Save Together</title>
+  <meta name="description" content="Borrow what you need. Lend what you don’t. Simple, safe, sustainable." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/language-switcher.css" />
+</head>
+<body>
+  <header class="nav" id="siteHeader">
+    <div class="container nav__bar">
+      <a class="logo" href="#home" style="display:flex;align-items:center;gap:8px"><img src="assets/images/logo.png" alt="SwapIt Logo" style="width:40px;height:40px;border-radius:50%;object-fit:cover"></a>
+      <nav class="nav__menu" id="mainNavMenu">
+        <!-- Dynamic menu items will be inserted here based on auth state -->
+        <a href="#home" data-i18n="nav.home">Home</a>
+        <a href="#how" data-i18n="nav.how">How it works</a>
+        <a href="#stories" data-i18n="nav.stories">Stories</a>
+        <a href="#about-us" data-i18n="nav.about">About Us</a>
+        <a href="#pricing" data-i18n="nav.pricing">Plans</a>
+        <a href="#news" data-i18n="nav.news">News</a>
+        <a href="#faq" data-i18n="nav.faq">FAQ</a>
+        <a href="#contact" data-i18n="nav.contact">Contact</a>
+      </nav>
+      <div class="nav__cta">
+        <div class="nav__search">
+          <i class="fas fa-search"></i>
+          <input type="search" data-i18n-placeholder="common.search" placeholder="Search items..." aria-label="Search items">
+        </div>
+        <div id="languageSwitcher" style="margin-right: 1rem;"></div>
+        <div class="nav__auth">
+          <div class="account-dropdown">
+            <button class="btn btn--primary account-dropdown-btn" onclick="toggleAccountDropdown(event)">
+              <i class="fas fa-user"></i>
+              <span data-i18n="nav.account">Account</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="account-dropdown-menu">
+              <a href="pages/login.html"><i class="fas fa-sign-in-alt"></i> <span data-i18n="nav.login">Login</span></a>
+              <a href="pages/signup.html"><i class="fas fa-user-plus"></i> <span data-i18n="nav.signup">Sign Up</span></a>
+            </div>
+          </div>
+        </div>
+        <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <div class="nav__drawer" id="navDrawer" aria-label="Mobile" data-open="false">
+      <!-- Dynamic menu items will be inserted here based on auth state -->
+      <a href="#home" data-i18n="nav.home">Home</a>
+      <a href="#how" data-i18n="nav.how">How it works</a>
+      <a href="#stories" data-i18n="nav.stories">Stories</a>
+      <a href="#about-us" data-i18n="nav.about">About Us</a>
+      <a href="#pricing" data-i18n="nav.pricing">Plans</a>
+      <a href="#news" data-i18n="nav.news">News</a>
+      <a href="#faq" data-i18n="nav.faq">FAQ</a>
+      <a href="#contact" data-i18n="nav.contact">Contact</a>
+      <div class="nav__search">
+        <i class="fas fa-search"></i>
+        <input type="search" data-i18n-placeholder="common.search" placeholder="Search items..." aria-label="Search items">
+      </div>
+      <div class="hero__auth">
+        <a class="btn btn--outline w-100 mb-2" href="/login" data-i18n="nav.login">Log in</a>
+        <a class="btn btn--primary w-100" href="/signup" data-i18n="nav.signup">Sign up</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero" id="home">
+    <div class="hero__bg" aria-hidden="true">
+      <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop" alt="" style="width:100%;height:100%;object-fit:cover;filter:blur(4px) saturate(110%);opacity:.28">
+    </div>
+    <div class="container hero__wrap">
+      <h1 class="hero__title hero__title--animated" id="heroTitle" data-text="SHOP, SWAP, AND SAVE|TOGETHER"></h1>
+      <p class="hero__sub" data-i18n="hero.subtitle">SwapIt is your go-to platform for effortless lending and borrowing—where access beats ownership.</p>
+        <div class="hero__actions">
+        <a class="btn btn--primary" href="#" id="browseItemsBtn" data-i18n="hero.browseBtn">Browse items</a>
+        <a class="btn btn--ghost" href="#how" data-i18n="hero.howBtn">How it works</a>
+      </div>
+    </div>
+  </section>
+
+  
+
+  <section class="split" id="about">
+    <div class="container">
+      <div class="stats-section" style="padding: 3rem 0;">
+        <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
+          
+          <div class="stat-item">
+            <div class="stat-icon" style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-users" style="font-size: 1.8rem; color: white;"></i>
+            </div>
+            <div class="stat-number" data-target="500" style="font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">0</div>
+            <div class="stat-label" style="color: var(--muted); font-size: 1rem; font-weight: 500;">Active Users</div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon" style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-box-open" style="font-size: 1.8rem; color: white;"></i>
+            </div>
+            <div class="stat-number" data-target="1200" style="font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">0</div>
+            <div class="stat-label" style="color: var(--muted); font-size: 1rem; font-weight: 500;">Items Shared</div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon" style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-handshake" style="font-size: 1.8rem; color: white;"></i>
+            </div>
+            <div class="stat-number" data-target="850" style="font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">0</div>
+            <div class="stat-label" style="color: var(--muted); font-size: 1rem; font-weight: 500;">Successful Swaps</div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon" style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-star" style="font-size: 1.8rem; color: white;"></i>
+            </div>
+            <div class="stat-number" data-target="98" style="font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">0</div>
+            <div class="stat-label" style="color: var(--muted); font-size: 1rem; font-weight: 500;">Satisfaction Rate (%)</div>
+          </div>
+
+        </div>
+      </div>
+      
+      <div class="split__grid" style="margin-top: 3rem;">
+        <div class="split__col">
+          <h2 data-i18n="hero.unlockTitle">Unlock More. Waste Less. Thrive Better.</h2>
+          <p data-i18n="hero.unlockSubtitle">Discover a world of sharing—borrow, lend, or rent exactly what you need, when you need it.</p>
+          <ul class="checks">
+            <li data-i18n="hero.benefit1">Secure, simple transactions</li>
+            <li data-i18n="hero.benefit2">Community reviews & ratings</li>
+            <li data-i18n="hero.benefit3">No hidden fees</li>
+          </ul>
+        </div>
+        <div class="split__col">
+          <img src="https://images.unsplash.com/photo-1556745757-8d76bdb6984b?q=80&w=1400&auto=format&fit=crop" alt="">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="container">
+      <p class="eyebrow center" data-i18n="how.eyebrow">How it works</p>
+      <h2 class="section__title" data-i18n="how.title">Share more, own less</h2>
+      <div class="cards cards--4 cards--equal">
+        <article class="card"><img class="card__thumb" src="assets/images/discover.jpg" alt=""><h3 data-i18n="how.discover">Discover</h3><p data-i18n="how.discoverDesc">Explore great items around you, from tools to tech to treasures, all available to borrow or rent.
+</p></article>
+        <article class="card"><img class="card__thumb" src="assets/images/request.jpg" alt=""><h3 data-i18n="how.request">Request</h3><p data-i18n="how.requestDesc"> Found something you like? Send a quick request and agree on when and how you'll get it.
+</p></article>
+        <article class="card"><img class="card__thumb" src="assets/images/approve.jpg" alt=""><h3 data-i18n="how.approve">Approve</h3><p data-i18n="how.approveDesc">The owner reviews your request, and once approved, you're good to go!
+</p></article>
+        <article class="card"><img class="card__thumb" src="assets/images/return.jpg" alt=""><h3 data-i18n="how.return">Return & Rate</h3><p data-i18n="how.returnDesc"> Return the item with care, leave a rating, and build your trusted SwapIt reputation</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="featured">
+    <div class="container">
+      <p class="eyebrow center" data-i18n="featured.eyebrow">Featured Items</p>
+      <h2 class="section__title" data-i18n="featured.title">Popular on SwapIt</h2>
+    </div>
+    <div class="featured-items-container">
+      <div class="featured-items">
+        <!-- Projector (Ashesi Classroom) -->
+        <article class="featured-item" data-category="electronics">
+          <div class="featured-item__image">
+            <img src="assets/images/projector ashesi.jpg" alt="Projector Ashesi">
+            <span class="condition-badge" data-i18n="featured.condition.good">Good</span>
+          </div>
+          <div class="featured-item__content">
+            <h3 data-i18n="featured.items.projector.title">Classroom Projector</h3>
+            <p data-i18n="featured.items.projector.description">HD projector suitable for lectures and student presentations—available on Ashesi campus.</p>
+            <div class="featured-item__meta">
+              <span class="price">GHS 50<span data-i18n="featured.perDay">/day</span></span>
+              <span class="location">📍 <span data-i18n="featured.items.projector.location">Ashesi University, Berekuso</span></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Campus Bicycle (Ashesi) -->
+        <article class="featured-item" data-category="transport">
+          <div class="featured-item__image">
+            <img src="assets/images/bicycle.jpeg" alt="Campus Bicycle">
+            <span class="condition-badge" data-i18n="featured.condition.used">Used</span>
+          </div>
+          <div class="featured-item__content">
+            <h3 data-i18n="featured.items.bicycle.title">Campus Bicycle</h3>
+            <p data-i18n="featured.items.bicycle.description">Lightweight bicycle perfect for moving around Ashesi campus and nearby areas.</p>
+            <div class="featured-item__meta">
+              <span class="price">GHS 15<span data-i18n="featured.perDay">/day</span></span>
+              <span class="location">📍 <span data-i18n="featured.items.bicycle.location">Ashesi University, Berekuso</span></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Textbooks Collection (Ashesi Library) -->
+        <article class="featured-item" data-category="books">
+          <div class="featured-item__image">
+            <img src="assets/images/ashesi textbook.jpg" alt="Textbooks Ashesi">
+            <span class="condition-badge free" data-i18n="featured.free">Free</span>
+          </div>
+          <div class="featured-item__content">
+            <h3 data-i18n="featured.items.textbooks.title">Course Textbooks Collection</h3>
+            <p data-i18n="featured.items.textbooks.description">Set of programming and engineering textbooks available for short-term borrowing at Ashesi.</p>
+            <div class="featured-item__meta">
+              <span class="price" data-i18n="featured.free">Free</span>
+              <span class="location">📍 <span data-i18n="featured.items.textbooks.location">Ashesi University Library</span></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Kente Cloth Set (Accra) -->
+        <article class="featured-item" data-category="clothing">
+          <div class="featured-item__image">
+            <img src="assets/images/kente cloth.jpg" alt="Kente Cloth">
+            <span class="condition-badge" data-i18n="featured.condition.new">New</span>
+          </div>
+          <div class="featured-item__content">
+            <h3 data-i18n="featured.items.kente.title">Kente Cloth Set</h3>
+            <p data-i18n="featured.items.kente.description">Traditional Kente cloth set ideal for ceremonies and cultural events. Sourced from Accra artisans.</p>
+            <div class="featured-item__meta">
+              <span class="price">GHS 80<span data-i18n="featured.perDay">/day</span></span>
+              <span class="location">📍 <span data-i18n="featured.items.kente.location">Accra</span></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Drum Set (Kumasi) -->
+        <article class="featured-item" data-category="music">
+          <div class="featured-item__image">
+            <img src="assets/images/drum set.jpg" alt="Drum Set">
+            <span class="condition-badge" data-i18n="featured.condition.likeNew">Like New</span>
+          </div>
+          <div class="featured-item__content">
+            <h3 data-i18n="featured.items.drums.title">Traditional Drum Set</h3>
+            <p data-i18n="featured.items.drums.description">High-quality drum set used for performances and practice. Popular with local bands.</p>
+            <div class="featured-item__meta">
+              <span class="price">GHS 60<span data-i18n="featured.perDay">/day</span></span>
+              <span class="location">📍 <span data-i18n="featured.items.drums.location">Kumasi</span></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- DSLR Camera -->
+        <article class="featured-item" data-category="electronics">
+          <div class="featured-item__image">
+            <img src="https://images.unsplash.com/photo-1502920917128-1aa500764cbd?q=80&w=800&auto=format&fit=crop" alt="DSLR Camera">
+            <span class="condition-badge" data-i18n="featured.condition.likeNew">Like New</span>
+          </div>
+          <div class="featured-item__content">
+            <h3 data-i18n="featured.items.camera.title">Canon DSLR Camera</h3>
+            <p data-i18n="featured.items.camera.description">Professional camera with lens kit, perfect for photography students and event coverage.</p>
+            <div class="featured-item__meta">
+              <span class="price">GHS 100<span data-i18n="featured.perDay">/day</span></span>
+              <span class="location">📍 <span data-i18n="featured.items.camera.location">Ashesi University</span></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Laptop Stand -->
+        <article class="featured-item" data-category="electronics">
+          <div class="featured-item__image">
+            <img src="https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?q=80&w=800&auto=format&fit=crop" alt="Laptop Stand">
+            <span class="condition-badge" data-i18n="featured.condition.good">Good</span>
+          </div>
+          <div class="featured-item__content">
+            <h3 data-i18n="featured.items.laptopStand.title">Adjustable Laptop Stand</h3>
+            <p data-i18n="featured.items.laptopStand.description">Ergonomic laptop stand for comfortable studying and working. Great for long study sessions.</p>
+            <div class="featured-item__meta">
+              <span class="price">GHS 10<span data-i18n="featured.perDay">/day</span></span>
+              <span class="location">📍 <span data-i18n="featured.items.laptopStand.location">Ashesi University, Berekuso</span></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Camping Tent -->
+        <article class="featured-item" data-category="home">
+          <div class="featured-item__image">
+            <img src="https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?q=80&w=800&auto=format&fit=crop" alt="Camping Tent">
+            <span class="condition-badge" data-i18n="featured.condition.good">Good</span>
+          </div>
+          <div class="featured-item__content">
+            <h3 data-i18n="featured.items.tent.title">4-Person Camping Tent</h3>
+            <p data-i18n="featured.items.tent.description">Spacious tent ideal for weekend camping trips and outdoor adventures with friends.</p>
+            <div class="featured-item__meta">
+              <span class="price">GHS 40<span data-i18n="featured.perDay">/day</span></span>
+              <span class="location">📍 <span data-i18n="featured.items.tent.location">Accra</span></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Guitar -->
+        <article class="featured-item" data-category="music">
+          <div class="featured-item__image">
+            <img src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=800&auto=format&fit=crop" alt="Acoustic Guitar">
+            <span class="condition-badge" data-i18n="featured.condition.used">Used</span>
+          </div>
+          <div class="featured-item__content">
+            <h3 data-i18n="featured.items.guitar.title">Acoustic Guitar</h3>
+            <p data-i18n="featured.items.guitar.description">Classic acoustic guitar perfect for practice, performances, and music club sessions.</p>
+            <div class="featured-item__meta">
+              <span class="price">GHS 25<span data-i18n="featured.perDay">/day</span></span>
+              <span class="location">📍 <span data-i18n="featured.items.guitar.location">Ashesi University</span></span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="container">
+      <div class="featured-items__actions">
+        <a href="/pages/browse.html" class="btn btn--primary" data-i18n="featured.viewAll">View All Items</a>
+      </div>
+    </div>
+  </section>
+
+    <section class="section" id="stories">
+    <div class="container">
+      <h2 class="section__title" data-i18n="stories.title">Success Stories from Our Community</h2>
+      <div class="stories-container">
+        <div class="stories-flow">
+          <!-- Story 1: Ashesi student -->
+          <div class="story-card">
+            <img class="story-background" src="assets/images/testimonials.jpg" alt="">
+            <div class="story-content">
+              <p class="story-text" data-i18n="stories.testimonials.story1.text">“SwapIt helped me borrow a projector for a group presentation at Ashesi — the process was quick and everyone on campus was supportive.”</p>
+              <div class="story-author">
+                <div class="author-avatar">
+                  <img src="assets/images/testimonials.jpg" alt="Aisha Mensah">
+                </div>
+                <div class="author-info">
+                  <h4 class="author-name" data-i18n="stories.testimonials.story1.name">Aisha Mensah</h4>
+                  <p class="author-title" data-i18n="stories.testimonials.story1.title">Ashesi Student | Borrower</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Story 2: Lender in Accra -->
+          <div class="story-card">
+            <img class="story-background" src="assets/images/testimonials.jpg" alt="">
+            <div class="story-content">
+              <p class="story-text" data-i18n="stories.testimonials.story2.text">“I lend my kente cloth and small instruments to students in Accra. SwapIt made it easy to connect and earn a little extra.”</p>
+              <div class="story-author">
+                <div class="author-avatar">
+                  <img src="assets/images/testimonials.jpg" alt="Kwame Boateng">
+                </div>
+                <div class="author-info">
+                  <h4 class="author-name" data-i18n="stories.testimonials.story2.name">Kwame Boateng</h4>
+                  <p class="author-title" data-i18n="stories.testimonials.story2.title">Lender — Accra</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Story 3: Library volunteer -->
+          <div class="story-card">
+            <img class="story-background" src="assets/images/testimonials.jpg" alt="">
+            <div class="story-content">
+              <p class="story-text" data-i18n="stories.testimonials.story3.text">“We share textbooks across departments — students at Ashesi borrowed what they needed during exam week.”</p>
+              <div class="story-author">
+                <div class="author-avatar">
+                  <img src="assets/images/testimonials.jpg" alt="Efua Agyapong">
+                </div>
+                <div class="author-info">
+                  <h4 class="author-name" data-i18n="stories.testimonials.story3.name">Efua Agyapong</h4>
+                  <p class="author-title" data-i18n="stories.testimonials.story3.title">Library Volunteer — Ashesi</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Story 4: Music teacher, Kumasi -->
+          <div class="story-card">
+            <img class="story-background" src="assets/images/testimonials.jpg" alt="">
+            <div class="story-content">
+              <p class="story-text" data-i18n="stories.testimonials.story4.text">“I lend traditional drums for cultural events around Kumasi and it's great to see students reconnect with our music.”</p>
+              <div class="story-author">
+                <div class="author-avatar">
+                  <img src="assets/images/testimonials.jpg" alt="Kofi Mensah">
+                </div>
+                <div class="author-info">
+                  <h4 class="author-name" data-i18n="stories.testimonials.story4.name">Kofi Mensah</h4>
+                  <p class="author-title" data-i18n="stories.testimonials.story4.title">Music Teacher — Kumasi</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Us: Team section (moved here) -->
+  <section class="section" id="about-us">
+    <div class="container">
+      <h2 class="section__title" data-i18n="aboutUs.title">About Us</h2>
+      <p class="center" style="color:var(--muted);margin-bottom:26px" data-i18n="aboutUs.subtitle">Meet the people building SwapIt — community-first, simple, and local.</p>
+
+      <div class="team-grid">
+        <article class="member">
+          <div class="member__photo">
+            <img src="assets/images/Otto.png" alt="Jordan Avery">
+            <a class="member__social" href="https://www.linkedin.com/in/athanase002/" target="_blank" rel="noopener noreferrer" aria-label="Athanase Abayo on LinkedIn">LinkedIn</a>
+          </div>
+          <h3>Athanase Abayo</h3>
+          <p class="muted" data-i18n="aboutUs.teamLead">Team Lead & Backend Architect — System architecture and authentication.</p>
+        </article>
+
+        <article class="member">
+          <div class="member__photo">
+            <img src="assets/images/victoria.png" alt="Victoria Ocran">
+            <a class="member__social" href="https://www.linkedin.com/in/victoria-ama-nyonator/" target="_blank" rel="noopener noreferrer" aria-label="Victoria Ama Nyonator on LinkedIn">LinkedIn</a>
+          </div>
+          <h3>Victoria Ama Nyonator</h3>
+          <p class="muted" data-i18n="aboutUs.frontend">Frontend Developer & UI/UX Specialist — User interface design and forms.</p>
+        </article>
+
+        <article class="member">
+          <div class="member__photo">
+            <img src="assets/images/olivier.png" alt="Olivier Kwizera">
+            <a class="member__social" href="https://www.linkedin.com/in/olivier-kwizera/" target="_blank" rel="noopener noreferrer" aria-label="Olivier Kwizera on LinkedIn">LinkedIn</a>
+          </div>
+          <h3>Olivier Kwizera</h3>
+          <p class="muted" data-i18n="aboutUs.security">Security Engineer & Frontend Developer — Application security and filtering.</p>
+        </article>
+
+        <article class="member">
+          <div class="member__photo">
+            <img src="assets/images/mambu.png" alt="Mabinty Mambu">
+            <a class="member__social" href="https://www.linkedin.com/in/mabinty-mambu/" target="_blank" rel="noopener noreferrer" aria-label="Mabinty Mambu on LinkedIn">LinkedIn</a>
+          </div>
+          <h3>Mabinty Mambu</h3>
+          <p class="muted" data-i18n="aboutUs.backend">Backend Developer & User Management Specialist — User profiles and wishlist.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+  <section class="section" id="pricing">
+    <div class="container">
+      <h2 class="section__title" data-i18n="pricing.title">Plans for every way you share</h2>
+      <p class="center" style="color:var(--muted);margin-bottom:3rem;max-width:700px;margin-left:auto;margin-right:auto" data-i18n="pricing.subtitle">Choose the plan that fits your sharing goals. Unlock powerful features, build trust in the community, and make the most of SwapIt.</p>
+      
+      <div class="pricing">
+        <div class="plan">
+          <h3 data-i18n="pricing.community.name">Community</h3>
+          <p style="min-height:80px" data-i18n="pricing.community.desc">Perfect for getting started. Connect with neighbors, share items locally, and build your reputation—completely free.</p>
+          <div class="price" data-i18n="pricing.community.price">$0<span data-i18n="pricing.community.perMonth">/mo</span></div>
+          <ul style="text-align:left;margin:1.5rem 0;padding:0 1rem;list-style:none;color:var(--muted);font-size:0.9rem">
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.community.feature1">✓ Browse all items</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.community.feature2">✓ Basic messaging</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.community.feature3">✓ Community reviews</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.community.feature4">✓ Profile customization</li>
+          </ul>
+          <a class="btn btn--primary" href="/signup" data-i18n="pricing.community.button">Join free</a>
+        </div>
+        
+        <div class="plan plan--highlight">
+          <h3 data-i18n="pricing.starter.name">Starter</h3>
+          <p style="min-height:80px" data-i18n="pricing.starter.desc">Ideal for active sharers. Get priority visibility, advanced search filters, and verified badges to build trust faster.</p>
+          <div class="price" data-i18n="pricing.starter.price">$20<span>/mo</span></div>
+          <ul style="text-align:left;margin:1.5rem 0;padding:0 1rem;list-style:none;color:var(--muted);font-size:0.9rem">
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.starter.feature1">✓ Everything in Community</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.starter.feature2">✓ Priority listing placement</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.starter.feature3">✓ Verified badge</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.starter.feature4">✓ Advanced filters & alerts</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.starter.feature5">✓ Extended item insurance</li>
+          </ul>
+          <a class="btn btn--primary" href="/signup" data-i18n="pricing.starter.button">Get started</a>
+        </div>
+        
+        <div class="plan">
+          <h3 data-i18n="pricing.pro.name">Pro</h3>
+          <p style="min-height:80px" data-i18n="pricing.pro.desc">For power users and frequent lenders. Earn more with analytics, unlimited listings, and premium support for scaling your sharing business.</p>
+          <div class="price" data-i18n="pricing.pro.price">$50<span>/mo</span></div>
+          <ul style="text-align:left;margin:1.5rem 0;padding:0 1rem;list-style:none;color:var(--muted);font-size:0.9rem">
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.pro.feature1">✓ Everything in Starter</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.pro.feature2">✓ Unlimited listings</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.pro.feature3">✓ Performance analytics</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.pro.feature4">✓ Premium support (24/7)</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.pro.feature5">✓ Custom branding options</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.pro.feature6">✓ Lower platform fees</li>
+          </ul>
+          <a class="btn btn--primary" href="/signup" data-i18n="pricing.pro.button">Upgrade</a>
+        </div>
+        
+        <div class="plan">
+          <h3 data-i18n="pricing.business.name">Business</h3>
+          <p style="min-height:80px" data-i18n="pricing.business.desc">Tailored solutions for organizations, rental companies, and institutions. Get custom integrations, dedicated account management, and enterprise features.</p>
+          <div class="price" data-i18n="pricing.business.price">Custom</div>
+          <ul style="text-align:left;margin:1.5rem 0;padding:0 1rem;list-style:none;color:var(--muted);font-size:0.9rem">
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.business.feature1">✓ Everything in Pro</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.business.feature2">✓ API access & integrations</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.business.feature3">✓ Dedicated account manager</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.business.feature4">✓ Multi-user team accounts</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.business.feature5">✓ Custom contracts & SLA</li>
+            <li style="margin-bottom:0.5rem" data-i18n="pricing.business.feature6">✓ White-label options</li>
+          </ul>
+          <a class="btn btn--ghost" href="#contact" data-i18n="pricing.business.button">Connect</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="news" style="background: linear-gradient(180deg, transparent 0%, rgba(102, 126, 234, 0.03) 100%);">
+    <div class="container">
+      <p class="eyebrow center" data-i18n="news.eyebrow">Latest Updates</p>
+      <h2 class="section__title" data-i18n="news.title">News & Updates</h2>
+      <p class="center" style="color:var(--muted);margin-bottom:3rem;max-width:700px;margin-left:auto;margin-right:auto" data-i18n="news.subtitle">Stay updated with our latest innovations and achievements</p>
+      
+      <div class="news-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;margin-top:3rem">
+        
+        <article class="news-card" style="background:var(--card-bg);border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);transition:transform 0.3s ease,box-shadow 0.3s ease">
+          <div class="news-image" style="width:100%;height:200px;overflow:hidden">
+            <img src="assets/images/ashesi-campus.jpg" 
+                 alt="Ashesi University Campus" 
+                 style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s ease">
+          </div>
+          <div style="padding:1.5rem">
+            <div class="news-date" style="display:flex;align-items:center;gap:0.5rem;color:#667eea;font-size:0.9rem;margin-bottom:1rem">
+              <i class="fas fa-calendar-alt"></i>
+              <span data-i18n="news.articles.ashesi.date">October 2025</span>
+            </div>
+            <h3 style="font-size:1.3rem;margin-bottom:1rem;color:var(--text)" data-i18n="news.articles.ashesi.title">SwapIt Partners with Ashesi University</h3>
+            <p style="color:var(--muted);line-height:1.6;margin-bottom:1.5rem" data-i18n="news.articles.ashesi.description">We're excited to announce our partnership with Ashesi University to provide students with easy access to textbooks, equipment, and campus resources.</p>
+            <a href="pages/news-ashesi-partnership.html" target="_blank" class="news-link" style="color:#667eea;font-weight:600;display:inline-flex;align-items:center;gap:0.5rem;transition:gap 0.3s ease">
+              <span data-i18n="news.readMore">Read More</span> <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+
+        <article class="news-card" style="background:var(--card-bg);border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);transition:transform 0.3s ease,box-shadow 0.3s ease">
+          <div class="news-image" style="width:100%;height:200px;overflow:hidden">
+            <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=800&auto=format&fit=crop" 
+                 alt="Mobile App Interface" 
+                 style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s ease">
+          </div>
+          <div style="padding:1.5rem">
+            <div class="news-date" style="display:flex;align-items:center;gap:0.5rem;color:#667eea;font-size:0.9rem;margin-bottom:1rem">
+              <i class="fas fa-calendar-alt"></i>
+              <span data-i18n="news.articles.mobileApp.date">September 2025</span>
+            </div>
+            <h3 style="font-size:1.3rem;margin-bottom:1rem;color:var(--text)" data-i18n="news.articles.mobileApp.title">New Mobile App Launched</h3>
+            <p style="color:var(--muted);line-height:1.6;margin-bottom:1.5rem" data-i18n="news.articles.mobileApp.description">Successfully launched our mobile application for iOS and Android, making it easier than ever to browse, borrow, and manage your SwapIt transactions on the go.</p>
+            <a href="pages/news-mobile-app.html" target="_blank" class="news-link" style="color:#667eea;font-weight:600;display:inline-flex;align-items:center;gap:0.5rem;transition:gap 0.3s ease">
+              <span data-i18n="news.readMore">Read More</span> <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+
+        <article class="news-card" style="background:var(--card-bg);border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);transition:transform 0.3s ease,box-shadow 0.3s ease">
+          <div class="news-image" style="width:100%;height:200px;overflow:hidden">
+            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=800&auto=format&fit=crop" 
+                 alt="Community Celebration" 
+                 style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s ease">
+          </div>
+          <div style="padding:1.5rem">
+            <div class="news-date" style="display:flex;align-items:center;gap:0.5rem;color:#667eea;font-size:0.9rem;margin-bottom:1rem">
+              <i class="fas fa-calendar-alt"></i>
+              <span data-i18n="news.articles.milestone.date">August 2025</span>
+            </div>
+            <h3 style="font-size:1.3rem;margin-bottom:1rem;color:var(--text)" data-i18n="news.articles.milestone.title">500+ Active Community Members!</h3>
+            <p style="color:var(--muted);line-height:1.6;margin-bottom:1.5rem" data-i18n="news.articles.milestone.description">We've reached a major milestone with over 500 active users sharing items across Ghana. Thank you for being part of our growing community!</p>
+            <a href="pages/news-500-users.html" target="_blank" class="news-link" style="color:#667eea;font-weight:600;display:inline-flex;align-items:center;gap:0.5rem;transition:gap 0.3s ease">
+              <span data-i18n="news.readMore">Read More</span> <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq"><div class="container">
+    <h2 class="section__title">Your top questions</h2>
+    <div class="faq">
+      <details><summary>How do I borrow?</summary><p>
+You can browse through the listed items on our platform and send a request to borrow. Once the owner approves, we’ll facilitate the exchange by confirming pickup or delivery details. Payment or deposit (if required) will be processed securely through our system.
+</p></details>
+      <details><summary>Is it free?</summary><p>Creating an account and browsing is free. However, small service fees may apply when you borrow or lend an item—these cover platform maintenance, verification, and support services. All costs will be shown clearly before confirming any transaction.
+</p></details>
+      <details><summary>How to lend?</summary><p>Simply create a listing by uploading clear photos, adding a short description, and setting your lending terms (such as duration and price). Once approved, your item will appear for borrowers to request. You’ll receive notifications when someone is interested.
+</p></details>
+      <details><summary>What about damage?</summary><p>We encourage both parties to inspect items before and after each transaction. If damage occurs, our support team will review the situation and mediate a fair resolution. Depending on the agreement, repair or replacement costs may be covered by the borrower or through our protection policy.</p></details>
+    </div>
+  </div></section>
+
+  <section class="section" id="contact">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;padding:0">
+        <div class="contact__form">
+          <p class="eyebrow" data-i18n="contact.eyebrow">Need help? Let's chat.</p>
+          <h2 data-i18n="contact.title">Get in touch</h2>
+          <form class="form" id="supportForm">
+            <label for="contactName" data-i18n="contact.name">Name</label>
+            <input type="text" id="contactName" name="name" data-i18n-placeholder="contact.namePlaceholder" placeholder="Enter your name" required style="padding:12px 16px;border-radius:10px;border:1px solid #1e2434;background:#11131a;color:#fff;margin-bottom:1rem">
+            <label for="contactEmail" data-i18n="contact.email">Email</label>
+            <input type="email" id="contactEmail" name="email" data-i18n-placeholder="contact.emailPlaceholder" placeholder="Enter your email" required style="padding:12px 16px;border-radius:10px;border:1px solid #1e2434;background:#11131a;color:#fff;margin-bottom:1rem">
+            <button class="btn btn--primary" type="submit" data-i18n="contact.submitBtn">Submit</button>
+            <p class="form__status" id="formStatus" role="status"></p>
+          </form>
+        </div>
+        <div class="newsletter" style="background:transparent;padding:0;border:none">
+          <div><h3 data-i18n="contact.newsletter.title">Stay connected</h3><p style="color:var(--muted)" data-i18n="contact.newsletter.subtitle">Tips and updates.</p></div>
+          <form class="newsletter__form" id="newsletterForm" style="margin-top:2rem;display:flex;gap:10px;width:100%">
+            <input type="email" name="email" data-i18n-placeholder="contact.newsletter.placeholder" placeholder="Email" required style="flex:1;padding:12px 16px;border-radius:10px;border:1px solid #1e2434;background:#11131a;color:#fff">
+            <button class="btn btn--primary" style="white-space:nowrap" data-i18n="contact.newsletter.subscribeBtn">Subscribe</button>
+            <span class="form__status" id="newsStatus"></span>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+ <!-- FOOTER -->
+  <footer class="sitefoot">
+    <div class="container">
+      <div class="sitefoot__grid">
+        <div class="sitefoot__col">
+          <a class="logo" href="#"><span>SWAP</span>IT</a>
+          <p data-i18n="footer.tagline">Borrow what you need. Lend what you don't. Simple, safe, sustainable.</p>
+          <div class="sitefoot__social">
+            <a href="https://www.facebook.com" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.twitter.com" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.linkedin.com" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+
+        <div class="sitefoot__col">
+          <h4 data-i18n="footer.explore">Explore</h4>
+          <ul>
+            <li><a href="#home" data-i18n="footer.home">Home</a></li>
+            <li><a href="#how" data-i18n="footer.howItWorks">How it works</a></li>
+            <li><a href="#featured" data-i18n="footer.featured">Browse items</a></li>
+            <li><a href="browse.html" data-i18n="footer.allListings">All listings</a></li>
+          </ul>
+        </div>
+
+        <div class="sitefoot__col">
+          <h4 data-i18n="footer.company">Company</h4>
+          <ul>
+            <li><a href="#about-us" data-i18n="footer.aboutUs">About Us</a></li>
+            <li><a href="#stories" data-i18n="footer.successStories">Success Stories</a></li>
+            <li><a href="#contact" data-i18n="footer.contact">Contact</a></li>
+            <li><a href="#faq" data-i18n="footer.faq">FAQ</a></li>
+          </ul>
+        </div>
+
+        <div class="sitefoot__col">
+          <h4 data-i18n="footer.legal">Legal</h4>
+          <ul>
+            <li><a href="#" data-i18n="footer.privacyPolicy">Privacy Policy</a></li>
+            <li><a href="#" data-i18n="footer.termsOfService">Terms of Service</a></li>
+            <li><a href="#" data-i18n="footer.communityGuidelines">Community Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="sitefoot__col">
+          <h4 data-i18n="footer.contact">Contact</h4>
+          <ul>
+            <li><a href="mailto:info@swapit.com"><i class="fas fa-envelope"></i> info@swapit.com</a></li>
+            <li><a href="tel:+25078888888"><i class="fas fa-phone"></i> (250) 78888888</a></li>
+            <li><a href="tel:+23355555555"><i class="fas fa-phone"></i> (233) 55555555</a></li>
+            <li><a href="tel:+2328888888"><i class="fas fa-phone"></i> (232) 8888888</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sitefoot__bottom">
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%">
+          <img src="assets/images/logo.png" alt="SwapIt Logo" style="width:32px;height:32px;border-radius:50%;object-fit:cover">
+          <small>SwapIt Ltd. &copy; <span data-i18n="footer.rights">All rights reserved</span> <span id="year">2025</span></small>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/translation.js"></script>
+  <script src="assets/js/language-switcher.js"></script>
+  <script src="assets/js/auth-client.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    /**
+     * Animated Statistics Counter
+     * Counts from 0 to target number with easing animation
+     */
+    function animateCounter(element, target, duration = 2000) {
+      let startTime = null;
+      const start = 0;
+      
+      function updateCounter(currentTime) {
+        if (!startTime) startTime = currentTime;
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for smooth animation
+        const easeOutQuad = progress * (2 - progress);
+        const current = Math.floor(easeOutQuad * target);
+        
+        element.textContent = current;
+        
+        if (progress < 1) {
+          requestAnimationFrame(updateCounter);
+        } else {
+          element.textContent = target;
+        }
+      }
+      
+      requestAnimationFrame(updateCounter);
+    }
+    
+    /**
+     * Intersection Observer to trigger counters when visible
+     */
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const statNumbers = entry.target.querySelectorAll('.stat-number');
+          statNumbers.forEach(stat => {
+            const target = parseInt(stat.getAttribute('data-target'));
+            animateCounter(stat, target);
+          });
+          statsObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    
+    // Observe the stats section
+    const statsSection = document.querySelector('.stats-section');
+    if (statsSection) {
+      statsObserver.observe(statsSection);
+    }
+    
+    // Typing Animation with Translation Support
+    const heroTitle = document.getElementById('heroTitle');
+    let lines = [];
+    let lineIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let currentLine = '';
+    let typingInterval = null;
+
+    // Function to update hero text based on current language
+    function updateHeroText() {
+      if (window.swapitTranslation) {
+        const title1 = window.swapitTranslation.t('hero.title1');
+        const title2 = window.swapitTranslation.t('hero.title2');
+        lines = [title1, title2];
+      } else {
+        lines = heroTitle.dataset.text.split('|');
+      }
+      // Reset animation
+      lineIndex = 0;
+      charIndex = 0;
+      isDeleting = false;
+      currentLine = '';
+    }
+
+    // Listen for language changes
+    window.addEventListener('languageChanged', () => {
+      updateHeroText();
+    });
+
+    // Initialize lines
+    updateHeroText();
+
+    function typeEffect() {
+      const fullText = lines[lineIndex];
+      
+      if (isDeleting) {
+        currentLine = fullText.substring(0, charIndex - 1);
+        charIndex--;
+      } else {
+        currentLine = fullText.substring(0, charIndex + 1);
+        charIndex++;
+      }
+      
+      // Update the display
+      if (lineIndex === 0) {
+        heroTitle.innerHTML = currentLine;
+      } else {
+        heroTitle.innerHTML = lines[0] + '<br>' + currentLine;
+      }
+      
+      let typingSpeed = 100;
+      
+      if (isDeleting) {
+        typingSpeed = 50;
+      }
+      
+      // When line is complete
+      if (!isDeleting && charIndex === fullText.length) {
+        // If it's the last line, pause longer then start deleting
+        if (lineIndex === lines.length - 1) {
+          typingSpeed = 3000; // Pause at end
+          isDeleting = true;
+        } else {
+          // Move to next line
+          lineIndex++;
+          charIndex = 0;
+          typingSpeed = 500; // Pause between lines
+        }
+      }
+      // When deletion is complete
+      else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        // Go back to first line if we're past it
+        if (lineIndex > 0) {
+          lineIndex = 0;
+        }
+        typingSpeed = 500;
+      }
+      
+      setTimeout(typeEffect, typingSpeed);
+    }
+    
+    // Start the animation after translations are ready
+    function startTypingAnimation() {
+      if (window.swapitTranslation && window.swapitTranslation.isInitialized()) {
+        updateHeroText();
+        setTimeout(typeEffect, 500);
+      } else {
+        setTimeout(startTypingAnimation, 100);
+      }
+    }
+    startTypingAnimation();
+    
+    /**
+     * News Card Hover Effect with Image Zoom
+     */
+    const newsCards = document.querySelectorAll('.news-card');
+    newsCards.forEach(card => {
+      const image = card.querySelector('.news-image img');
+      
+      card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-8px)';
+        this.style.boxShadow = '0 8px 24px rgba(102, 126, 234, 0.15)';
+        if (image) {
+          image.style.transform = 'scale(1.1)';
+        }
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+        if (image) {
+          image.style.transform = 'scale(1)';
+        }
+      });
+    });
+    
+    const newsLinks = document.querySelectorAll('.news-link');
+    newsLinks.forEach(link => {
+      link.addEventListener('mouseenter', function() {
+        this.style.gap = '0.8rem';
+      });
+      
+      link.addEventListener('mouseleave', function() {
+        this.style.gap = '0.5rem';
+      });
+    });
+
+    /**
+     * Handle Browse Items Button Click
+     * Redirects to browse page if authenticated, otherwise to login
+     */
+    const browseItemsBtn = document.getElementById('browseItemsBtn');
+    if (browseItemsBtn) {
+      browseItemsBtn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        
+        try {
+          // Wait for auth client to be ready with retry logic
+          let retries = 0;
+          while (!window.swapitAuth && retries < 10) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            retries++;
+          }
+
+          if (!window.swapitAuth) {
+            console.log('Auth client not available, redirecting to login...');
+            window.location.href = 'pages/login.html';
+            return;
+          }
+
+          // Wait a bit more for auth initialization
+          await new Promise(resolve => setTimeout(resolve, 200));
+
+          const user = await window.swapitAuth.checkSession();
+          
+          if (user) {
+            // User is authenticated - go to browse page
+            console.log('User authenticated, going to browse page');
+            window.location.href = 'pages/browse.html';
+          } else {
+            // User not authenticated - redirect to login
+            console.log('User not authenticated, redirecting to login');
+            window.location.href = 'pages/login.html';
+          }
+        } catch (error) {
+          console.error('Authentication check failed:', error);
+          // On error, redirect to login
+          window.location.href = 'pages/login.html';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
+

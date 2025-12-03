@@ -1,0 +1,479 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "search": "Search",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "home": "Home",
+    "how": "How it works",
+    "stories": "Stories",
+    "about": "About Us",
+    "pricing": "Plans",
+    "news": "News",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "browse": "Browse items",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "cart": "Cart",
+    "wishlist": "Wishlist",
+    "addListing": "Add Listing",
+    "logout": "Logout",
+    "login": "Log in",
+    "signup": "Sign up",
+    "account": "Account"
+  },
+  "hero": {
+    "title1": "SHOP, SWAP, AND SAVE",
+    "title2": "TOGETHER",
+    "subtitle": "SwapIt is your go-to platform for effortless lending and borrowing—where access beats ownership.",
+    "browseBtn": "Browse items",
+    "howBtn": "How it works",
+    "unlockTitle": "Unlock More. Waste Less. Thrive Better.",
+    "unlockSubtitle": "Discover a world of sharing—borrow, lend, or rent exactly what you need, when you need it.",
+    "benefit1": "Secure, simple transactions",
+    "benefit2": "Community reviews & ratings",
+    "benefit3": "No hidden fees"
+  },
+  "auth": {
+    "welcomeBack": "Welcome back",
+    "loginSubtitle": "Log in to access your SwapIt account",
+    "createAccount": "Create your account",
+    "signupSubtitle": "Join SwapIt and start sharing today",
+    "email": "Email",
+    "emailPlaceholder": "you@ashesi.edu.gh",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "First name",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "loginBtn": "Log in",
+    "signupBtn": "Sign up",
+    "continueWith": "Or continue with",
+    "continueWithGoogle": "Continue with Google",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signupLink": "Sign up",
+    "loginLink": "Log in",
+    "loggingIn": "Logging in...",
+    "signingUp": "Creating account...",
+    "resetPassword": "Reset Password",
+    "resetSubtitle": "Enter your email to receive a password reset link",
+    "sendResetLink": "Send Reset Link",
+    "backToLogin": "Back to login"
+  },
+  "how": {
+    "eyebrow": "How it works",
+    "title": "Share more, own less",
+    "discover": "Discover",
+    "discoverDesc": "Explore great items around you, from tools to tech to treasures, all available to borrow or rent.",
+    "request": "Request",
+    "requestDesc": "Found something you like? Send a quick request and agree on when and how you'll get it.",
+    "approve": "Approve",
+    "approveDesc": "The owner reviews your request, and once approved, you're good to go!",
+    "return": "Return & Rate",
+    "returnDesc": "Return the item with care, leave a rating, and build your trusted SwapIt reputation"
+  },
+  "featured": {
+    "eyebrow": "Featured Items",
+    "title": "Popular on SwapIt",
+    "viewAll": "View all items",
+    "perDay": "/day",
+    "free": "Free",
+    "condition": {
+      "new": "New",
+      "likeNew": "Like New",
+      "good": "Good",
+      "used": "Used"
+    },
+    "items": {
+      "projector": {
+        "title": "Classroom Projector",
+        "description": "HD projector suitable for lectures and student presentations—available on Ashesi campus.",
+        "location": "Ashesi University, Berekuso"
+      },
+      "bicycle": {
+        "title": "Campus Bicycle",
+        "description": "Lightweight bicycle perfect for moving around Ashesi campus and nearby areas.",
+        "location": "Ashesi University, Berekuso"
+      },
+      "textbooks": {
+        "title": "Course Textbooks Collection",
+        "description": "Set of programming and engineering textbooks available for short-term borrowing at Ashesi.",
+        "location": "Ashesi University Library"
+      },
+      "kente": {
+        "title": "Kente Cloth Set",
+        "description": "Traditional Kente cloth set ideal for ceremonies and cultural events. Sourced from Accra artisans.",
+        "location": "Accra"
+      },
+      "drums": {
+        "title": "Traditional Drum Set",
+        "description": "High-quality drum set used for performances and practice. Popular with local bands.",
+        "location": "Kumasi"
+      },
+      "camera": {
+        "title": "Canon DSLR Camera",
+        "description": "Professional camera with lens kit, perfect for photography students and event coverage.",
+        "location": "Ashesi University"
+      },
+      "laptopStand": {
+        "title": "Adjustable Laptop Stand",
+        "description": "Ergonomic laptop stand for comfortable studying and working. Great for long study sessions.",
+        "location": "Ashesi University, Berekuso"
+      },
+      "tent": {
+        "title": "4-Person Camping Tent",
+        "description": "Spacious tent ideal for weekend camping trips and outdoor adventures with friends.",
+        "location": "Accra"
+      },
+      "guitar": {
+        "title": "Acoustic Guitar",
+        "description": "Classic acoustic guitar perfect for practice, performances, and music club sessions.",
+        "location": "Ashesi University"
+      }
+    }
+  },
+  "stories": {
+    "title": "Success Stories from Our Community",
+    "testimonials": {
+      "story1": {
+        "text": "\"SwapIt helped me borrow a projector for a group presentation at Ashesi—the process was quick and everyone on campus was supportive.\"",
+        "name": "Aisha Mensah",
+        "title": "Ashesi Student | Borrower"
+      },
+      "story2": {
+        "text": "\"I lend my kente cloth and small instruments to students in Accra. SwapIt made it easy to connect and earn a little extra.\"",
+        "name": "Kwame Boateng",
+        "title": "Lender — Accra"
+      },
+      "story3": {
+        "text": "\"We share textbooks across departments—students at Ashesi borrowed what they needed during exam week.\"",
+        "name": "Efua Agyapong",
+        "title": "Library Volunteer — Ashesi"
+      },
+      "story4": {
+        "text": "\"I lend traditional drums for cultural events around Kumasi and it's great to see students reconnect with our music.\"",
+        "name": "Kofi Mensah",
+        "title": "Music Teacher — Kumasi"
+      }
+    }
+  },
+  "aboutUs": {
+    "title": "About Us",
+    "subtitle": "Meet the people building SwapIt - community-first, simple, and local.",
+    "teamLead": "Team Lead & Backend Architect — System architecture and authentication.",
+    "frontend": "Frontend Developer & UI/UX Specialist — User interface design and forms.",
+    "security": "Security Engineer & Frontend Developer — Application security and filtering.",
+    "backend": "Backend Developer & User Management Specialist — User profiles and wishlist."
+  },
+  "pricing": {
+    "title": "Plans for every way you share",
+    "subtitle": "Choose the plan that fits your sharing goals. Unlock powerful features, build trust in the community, and make the most of SwapIt.",
+    "community": {
+      "name": "Community",
+      "desc": "Perfect for getting started. Connect with neighbors, share items locally, and build your reputation—completely free.",
+      "price": "$0",
+      "perMonth": "/mo",
+      "feature1": "Browse all items",
+      "feature2": "Basic messaging",
+      "feature3": "Community reviews",
+      "feature4": "Profile customization",
+      "button": "Join free"
+    },
+    "starter": {
+      "name": "Starter",
+      "desc": "Ideal for active sharers. Get priority visibility, advanced search filters, and verified badges to build trust faster.",
+      "price": "$20",
+      "feature1": "Everything in Community",
+      "feature2": "Priority listing placement",
+      "feature3": "Verified badge",
+      "feature4": "Advanced filters & alerts",
+      "feature5": "Extended item insurance",
+      "button": "Get started"
+    },
+    "pro": {
+      "name": "Pro",
+      "desc": "For power users and frequent lenders. Earn more with analytics, unlimited listings, and premium support for scaling your sharing business.",
+      "price": "$50",
+      "feature1": "Everything in Starter",
+      "feature2": "Unlimited listings",
+      "feature3": "Performance analytics",
+      "feature4": "Premium support (24/7)",
+      "feature5": "Custom branding options",
+      "feature6": "Lower platform fees",
+      "button": "Upgrade"
+    },
+    "business": {
+      "name": "Business",
+      "desc": "Tailored solutions for organizations, rental companies, and institutions. Get custom integrations, dedicated account management, and enterprise features.",
+      "price": "Custom",
+      "feature1": "Everything in Pro",
+      "feature2": "API access & integrations",
+      "feature3": "Dedicated account manager",
+      "feature4": "Multi-user team accounts",
+      "feature5": "Custom contracts & SLA",
+      "feature6": "White-label options",
+      "button": "Connect"
+    }
+  },
+  "news": {
+    "eyebrow": "Latest Updates",
+    "title": "News & Updates",
+    "subtitle": "Stay updated with our latest innovations and achievements",
+    "readMore": "Read More",
+    "articles": {
+      "ashesi": {
+        "date": "October 2025",
+        "title": "SwapIt Partners with Ashesi University",
+        "description": "We're excited to announce our partnership with Ashesi University to provide students with easy access to textbooks, equipment, and campus resources."
+      },
+      "mobileApp": {
+        "date": "September 2025",
+        "title": "New Mobile App Launched",
+        "description": "Successfully launched our mobile application for iOS and Android, making it easier than ever to browse, borrow, and manage your SwapIt transactions on the go."
+      },
+      "milestone": {
+        "date": "August 2025",
+        "title": "500+ Active Community Members!",
+        "description": "We've reached a major milestone with over 500 active users sharing items across Ghana. Thank you for being part of our growing community!"
+      }
+    }
+  },
+  "faq": {
+    "title": "Your top questions",
+    "q1": "How do I borrow?",
+    "a1": "You can browse through the listed items on our platform and send a request to borrow. Once the owner approves, we'll facilitate the exchange by confirming pickup or delivery details. Payment or deposit (if required) will be processed securely through our system.",
+    "q2": "Is it free?",
+    "a2": "Creating an account and browsing is free. However, small service fees may apply when you borrow or lend an item—these cover platform maintenance, verification, and support services. All costs will be shown clearly before confirming any transaction.",
+    "q3": "How to lend?",
+    "a3": "Simply create a listing by uploading clear photos, adding a short description, and setting your lending terms (such as duration and price). Once approved, your item will appear for borrowers to request. You'll receive notifications when someone is interested.",
+    "q4": "What about damage?",
+    "a4": "We encourage both parties to inspect items before and after each transaction. If damage occurs, our support team will review the situation and mediate a fair resolution. Depending on the agreement, repair or replacement costs may be covered by the borrower or through our protection policy."
+  },
+  "contact": {
+    "eyebrow": "Need help? Let's chat.",
+    "title": "Get in touch",
+    "name": "Name",
+    "namePlaceholder": "Enter your name",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "submitBtn": "Submit",
+    "newsletter": {
+      "title": "Stay connected",
+      "subtitle": "Tips and updates.",
+      "placeholder": "Email",
+      "subscribeBtn": "Subscribe"
+    }
+  },
+  "footer": {
+    "tagline": "Borrow what you need. Lend what you don't. Simple, safe, sustainable.",
+    "explore": "Explore",
+    "home": "Home",
+    "howItWorks": "How it works",
+    "featured": "Featured",
+    "allListings": "All listings",
+    "company": "Company",
+    "aboutUs": "About Us",
+    "successStories": "Success Stories",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "communityGuidelines": "Community Guidelines",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "guidelines": "Community Guidelines",
+    "rights": "All rights reserved",
+    "dashboard": "Dashboard",
+    "myDashboard": "My Dashboard",
+    "browseItems": "Browse Items",
+    "addListing": "Add Listing",
+    "myProfile": "My Profile",
+    "myItems": "My Items",
+    "wishlist": "Wishlist",
+    "cart": "Cart",
+    "myListings": "My Listings",
+    "recentActivity": "Recent Activity"
+  },
+  "dashboard": {
+    "welcome": "Welcome back!",
+    "activity": "Here's what's happening with your account today",
+    "newListing": "New Listing",
+    "activeListings": "Active Listings",
+    "totalBorrows": "Total Borrows",
+    "itemsLent": "Items Lent",
+    "yourRating": "Your Rating",
+    "yourListings": "Your Listings",
+    "noListings": "You don't have any listings yet",
+    "createFirstListing": "Create Your First Listing",
+    "recentActivity": "Recent Activity",
+    "noActivity": "No activity yet",
+    "startActivity": "Start creating listings or browsing items!",
+    "myListings": "My Listings",
+    "borrowRequests": "Borrow Requests",
+    "myBorrows": "My Borrows",
+    "stats": "Statistics",
+    "quickActions": "Quick Actions"
+  },
+  "browse": {
+    "pageTitle": "Browse Items — SwapIt",
+    "title": "Browse Items",
+    "heroLine1": "DISCOVER AMAZING ITEMS",
+    "heroLine2": "BORROW, LEND, THRIVE",
+    "subtitle": "Your marketplace for peer-to-peer sharing",
+    "searchPlaceholder": "Search items by title or description",
+    "filters": {
+      "category": "Category",
+      "location": "Location",
+      "price": "Price GHS",
+      "sort": "Sort",
+      "all": "All",
+      "electronics": "Electronics",
+      "transport": "Transport",
+      "books": "Books",
+      "clothing": "Clothing",
+      "music": "Music",
+      "home": "Home",
+      "min": "Min",
+      "max": "Max",
+      "mostRecent": "Most Recent",
+      "priceLowHigh": "Price: Low to High",
+      "priceHighLow": "Price: High to Low"
+    },
+    "filter": "Filter",
+    "condition": "Condition",
+    "priceRange": "Price Range",
+    "sortBy": "Sort by",
+    "noResults": "No items found",
+    "addToCart": "Add to cart"
+  },
+  "profile": {
+    "pageTitle": "Profile — SwapIt",
+    "title": "My Profile",
+    "backToDashboard": "Back to Dashboard",
+    "verifiedMember": "Verified Member",
+    "memberSince": "Member since 2024",
+    "stats": {
+      "listings": "Listings",
+      "borrows": "Borrows",
+      "rating": "Rating"
+    },
+    "personalInfo": {
+      "title": "Personal Information",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "emailCannotChange": "Email cannot be changed",
+      "phone": "Phone Number",
+      "phonePlaceholder": "+233 XX XXX XXXX",
+      "location": "Location",
+      "locationPlaceholder": "Your location",
+      "saveChanges": "Save Changes"
+    },
+    "notifications": {
+      "title": "Notification Preferences",
+      "emailNotifications": "Email notifications for new borrow requests",
+      "reminders": "Reminders for upcoming returns",
+      "weeklySummary": "Weekly summary of activity"
+    },
+    "security": {
+      "title": "Account Security",
+      "changePassword": "Change Password"
+    },
+    "editProfile": "Edit Profile",
+    "reputation": "Reputation",
+    "reviews": "Reviews",
+    "listings": "Listings",
+    "transactions": "Transactions"
+  },
+  "cart": {
+    "pageTitle": "Cart — SwapIt",
+    "title": "Shopping Cart",
+    "itemsCount": "{count} item{count, plural, =1 {} other {s}}",
+    "emptyTitle": "Your cart is empty",
+    "emptyMessage": "Add items to your cart to get started!",
+    "browseBtnEmpty": "Browse Items",
+    "duration": "Duration",
+    "days": "days",
+    "total": "Total",
+    "remove": "Remove",
+    "orderSummary": "Order Summary",
+    "subtotal": "Subtotal ({count} items)",
+    "serviceFee": "Service Fee",
+    "totalPrice": "Total",
+    "pickupDate": "Pickup Date & Time",
+    "checkout": "Proceed to Checkout",
+    "continueShopping": "Continue Shopping"
+  },
+  "wishlist": {
+    "pageTitle": "Wishlist — SwapIt",
+    "title": "My Wishlist",
+    "itemsCount": "{count} item{count, plural, =1 {} other {s}}",
+    "emptyTitle": "Your wishlist is empty",
+    "emptyMessage": "Start browsing and save items you love for later!",
+    "browseBtnEmpty": "Browse Items",
+    "addToCart": "Add to Cart",
+    "free": "Free",
+    "perDay": "/day",
+    "clearAll": "Clear All",
+    "continueBrowsing": "Continue Browsing"
+  },
+  "addListing": {
+    "pageTitle": "Add Listing — SwapIt",
+    "title": "Create a New Listing",
+    "subtitle": "Share your items with the SwapIt community and start earning today!",
+    "form": {
+      "itemTitle": "Item Title",
+      "titlePlaceholder": "e.g., Canon DSLR Camera with 50mm Lens",
+      "titleHelper": "Give your item a clear, descriptive title that buyers will love",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe your item's condition, features, and any important details that buyers should know...",
+      "descriptionHelper": "Provide detailed information to help borrowers understand your item",
+      "category": "Category",
+      "selectCategory": "Select a category",
+      "categories": {
+        "electronics": " Electronics",
+        "transport": " Transport",
+        "books": " Books & Education",
+        "clothing": " Clothing & Fashion",
+        "music": " Music & Instruments",
+        "sports": " Sports & Outdoors",
+        "home": " Home & Garden",
+        "tools": " Tools & Equipment",
+        "other": " Other"
+      },
+      "price": "Price (GHS/day)",
+      "priceHelper": "Set to 0 for free lending",
+      "location": "Pickup Location",
+      "locationPlaceholder": "e.g., Ashesi University, Berekuso",
+      "locationHelper": "Where can borrowers pick up this item?",
+      "itemPhoto": "Item Photo",
+      "uploadText": "Click to upload or drag and drop",
+      "chooseImage": "Choose Image",
+      "imageHelper": "JPG, PNG or GIF (Max 5MB)",
+      "createListing": "Create Listing"
+    },
+    "tips": {
+      "title": "Tips for a Great Listing",
+      "tip1": "Use a clear, well-lit photo showing the item's condition",
+      "tip2": "Be honest about any wear or damage to build trust",
+      "tip3": "Set competitive prices by checking similar listings",
+      "tip4": "Respond quickly to messages for better ratings"
+    }
+  }
+}

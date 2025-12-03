@@ -1,0 +1,224 @@
+/* Flowing Stories Section */
+.stories-container {
+    overflow: hidden;
+    position: relative;
+    padding: 2rem 0;
+    width: 100%;
+}
+
+.stories-flow {
+    display: flex;
+    gap: 20px;
+    padding: 1rem;
+    margin: 0;
+    width: max-content;
+    animation: scroll 30s linear infinite;
+}
+
+.story-card {
+    flex: 0 0 400px;
+    background: linear-gradient(180deg, #151824, #0f1118);
+    border: 1px solid #1e2434;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: 0 0 0 1px #1e2434, 0 6px 26px #00000066;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    opacity: 0;
+    animation: slideIn 0.6s ease forwards;
+}
+
+.story-content {
+    position: relative;
+    z-index: 1;
+}
+
+.story-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.15;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.story-card:hover .story-background {
+    transform: scale(1.05);
+}
+
+.story-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    position: relative;
+    font-style: italic;
+}
+
+.story-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.author-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.author-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.author-info {
+    flex: 1;
+}
+
+.author-name {
+    color: #fff;
+    font-weight: 600;
+    margin: 0;
+}
+
+.author-title {
+    color: #cfd6ff;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* Animation keyframes */
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-420px * 3)); }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Hover effects */
+.story-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 32px #00000080;
+}
+
+/* Animation delay for each story */
+.story-card:nth-child(1) { animation-delay: 0.1s; }
+.story-card:nth-child(2) { animation-delay: 0.2s; }
+.story-card:nth-child(3) { animation-delay: 0.3s; }
+.story-card:nth-child(4) { animation-delay: 0.4s; }
+.story-card:nth-child(5) { animation-delay: 0.5s; }
+.story-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .story-card {
+        flex: 0 0 350px;
+    }
+}
+
+@media (max-width: 992px) {
+    .story-card {
+        flex: 0 0 320px;
+        padding: 1.25rem;
+    }
+    .story-text {
+        font-size: 1.05rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .stories-container {
+        padding: 1rem 0;
+    }
+    .stories-flow {
+        gap: 15px;
+        padding: 0.5rem;
+    }
+    .story-card {
+        flex: 0 0 300px;
+        padding: 1.25rem;
+    }
+    .story-text {
+        font-size: 1rem;
+        margin-bottom: 1.25rem;
+    }
+    .author-avatar {
+        width: 45px;
+        height: 45px;
+    }
+}
+
+@media (max-width: 600px) {
+    .story-card {
+        flex: 0 0 280px;
+    }
+    .stories-flow {
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stories-container {
+        padding: 0.75rem 0;
+    }
+    .stories-flow {
+        gap: 10px;
+        padding: 0.25rem;
+    }
+    .story-card {
+        flex: 0 0 260px;
+        padding: 1rem;
+    }
+    .story-text {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+    .author-avatar {
+        width: 40px;
+        height: 40px;
+    }
+    .author-name {
+        font-size: 0.95rem;
+    }
+    .author-title {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .story-card {
+        flex: 0 0 240px;
+        padding: 0.9rem;
+    }
+    .story-text {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 320px) {
+    .story-card {
+        flex: 0 0 220px;
+    }
+    .story-text {
+        font-size: 0.85rem;
+    }
+    .author-avatar {
+        width: 36px;
+        height: 36px;
+    }
+}

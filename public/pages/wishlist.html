@@ -1,0 +1,595 @@
+<!doctype html>
+<!--
+  Wishlist Page
+  @author Mabinty Mambu - Wishlist management interface
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title data-i18n-page-title="wishlist.pageTitle">Wishlist — SwapIt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="../assets/css/language-switcher.css">
+  <style>
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      padding-top: 80px;
+    }
+
+    /* Navigation */
+    .topnav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(17, 19, 26, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #1e2330;
+      z-index: 1000;
+      padding: 1rem 0;
+    }
+
+    .topnav .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .nav-brand img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--brand);
+    }
+
+    /* Page Container */
+    .wishlist-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Page Header */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    .page-header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .page-header-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, rgba(255, 125, 242, 0.2), rgba(126, 249, 255, 0.2));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: var(--brand-mag);
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff7df2, #7ef9ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+    }
+
+    .wishlist-count {
+      background: rgba(255, 125, 242, 0.1);
+      color: var(--brand-mag);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 125, 242, 0.3);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    .empty-state-icon {
+      font-size: 5rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      opacity: 0.5;
+    }
+
+    .empty-state h2 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .empty-state p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Wishlist Grid */
+    .wishlist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+      animation: fadeInUp 0.6s ease 0.2s both;
+    }
+
+    @media (max-width: 768px) {
+      .wishlist-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Wishlist Card */
+    .wishlist-card {
+      background: linear-gradient(180deg, #151824, #0f1118);
+      border: 1px solid #1e2434;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .wishlist-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(126, 249, 255, 0.1);
+      border-color: rgba(126, 249, 255, 0.3);
+    }
+
+    .wishlist-card-image {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+      background: #0a0b10;
+    }
+
+    .wishlist-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+
+    .wishlist-card:hover .wishlist-card-image img {
+      transform: scale(1.05);
+    }
+
+    .wishlist-card-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255, 125, 242, 0.9);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .wishlist-card-badge.free {
+      background: rgba(126, 249, 255, 0.9);
+      color: #0a0b10;
+    }
+
+    .wishlist-card-content {
+      padding: 1.5rem;
+    }
+
+    .wishlist-card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .wishlist-card-location {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .wishlist-card-location i {
+      color: var(--brand);
+    }
+
+    .wishlist-card-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      font-family: inherit;
+      flex: 1;
+    }
+
+    .btn--primary {
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      color: #0a0b10;
+    }
+
+    .btn--primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(126, 249, 255, 0.3);
+    }
+
+    .btn--danger {
+      background: rgba(255, 107, 107, 0.1);
+      color: #ff6b6b;
+      border: 1px solid rgba(255, 107, 107, 0.3);
+    }
+
+    .btn--danger:hover {
+      background: rgba(255, 107, 107, 0.2);
+      border-color: #ff6b6b;
+    }
+
+    .btn--secondary {
+      background: transparent;
+      border: 2px solid #2a2f45;
+      color: var(--text);
+    }
+
+    .btn--secondary:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+    }
+
+    /* Actions Bar */
+    .actions-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid #1e2434;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Footer */
+    .sitefoot {
+      margin-top: 4rem;
+      padding: 2rem 0;
+      border-top: 1px solid #1e2434;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .sitefoot img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="topnav">
+    <div class="container">
+      <a href="dashboard.html" class="nav-brand">
+        <img src="../assets/images/logo.png" alt="SwapIt">
+        <span>SwapIt</span>
+      </a>
+      <div id="languageSwitcher" style="margin-left: auto; margin-right: 2rem;"></div>
+      <ul class="nav-links" id="mainNavMenu">
+        <!-- Dynamic menu items will be inserted here based on auth state -->
+        <li><a href="browse.html"><i class="fas fa-search"></i> <span data-i18n="nav.browse">Browse</span></a></li>
+        <li><a href="add-listing.html"><i class="fas fa-plus-circle"></i> <span data-i18n="nav.addListing">Add Listing</span></a></li>
+        <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> <span data-i18n="nav.cart">Cart</span></a></li>
+        <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="wishlist-container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-header-icon">
+          <i class="fas fa-heart"></i>
+        </div>
+        <h1 data-i18n="wishlist.title">My Wishlist</h1>
+      </div>
+      <div class="wishlist-count" id="wishlistTotal">
+        <span>0 items</span>
+      </div>
+    </div>
+
+    <!-- Wishlist Content -->
+    <div id="wishlistContent">
+      <!-- Dynamic content will be loaded here -->
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar" id="actionsBar" style="display: none;">
+      <div>
+        <button class="btn btn--danger" id="clearWishlistBtn">
+          <i class="fas fa-trash-alt"></i>
+          <span data-i18n="wishlist.clearAll">Clear All</span>
+        </button>
+      </div>
+      <a href="browse.html" class="btn btn--secondary">
+        <i class="fas fa-search"></i>
+        <span data-i18n="wishlist.continueBrowsing">Continue Browsing</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Footer -->
+  <footer class="sitefoot">
+    <div class="container">
+      <img src="../assets/images/logo.png" alt="SwapIt Logo">
+      <small>SwapIt Ltd. &copy; <span data-i18n="footer.rights">All rights reserved</span> <span id="year">2025</span></small>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Toast notification function
+    window.showToast = function(message, type = 'info', title = '') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      
+      const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+      
+      const titles = {
+        success: title || 'Success',
+        error: title || 'Error',
+        warning: title || 'Warning',
+        info: title || 'Info'
+      };
+      
+      toast.innerHTML = `
+        <i class="fas ${icons[type]} toast-icon"></i>
+        <div class="toast-content">
+          <div class="toast-title">${titles[type]}</div>
+          <div class="toast-message">${message}</div>
+        </div>
+      `;
+      
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    };
+
+    /**
+     * Renders the wishlist items from localStorage
+     */
+    function renderWishlist() {
+      const wishlist = JSON.parse(localStorage.getItem('swapit_wishlist')||'[]');
+      const container = document.getElementById('wishlistContent');
+      const totalSpan = document.getElementById('wishlistTotal');
+      const actionsBar = document.getElementById('actionsBar');
+      
+      // Simple item count display
+      if (wishlist.length === 1) {
+        totalSpan.textContent = wishlist.length + ' ' + (window.swapitTranslation?.currentLanguage === 'fr' ? 'article' : 'item');
+      } else {
+        totalSpan.textContent = wishlist.length + ' ' + (window.swapitTranslation?.currentLanguage === 'fr' ? 'articles' : 'items');
+      }
+      
+      if (!wishlist.length) {
+        actionsBar.style.display = 'none';
+        const emptyTitle = window.swapitTranslation?.translations?.wishlist?.emptyTitle || 'Your wishlist is empty';
+        const emptyMessage = window.swapitTranslation?.translations?.wishlist?.emptyMessage || 'Start browsing and save items you love for later!';
+        const browseBtnText = window.swapitTranslation?.translations?.wishlist?.browseBtnEmpty || 'Browse Items';
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <i class="fas fa-heart-broken"></i>
+            </div>
+            <h2>${emptyTitle}</h2>
+            <p>${emptyMessage}</p>
+            <a href="browse.html" class="btn btn--primary" style="display: inline-flex;">
+              <i class="fas fa-search"></i>
+              ${browseBtnText}
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      actionsBar.style.display = 'flex';
+      
+      const grid = document.createElement('div');
+      grid.className = 'wishlist-grid';
+      
+      wishlist.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'wishlist-card';
+        
+        const freeText = window.swapitTranslation?.translations?.wishlist?.free || 'Free';
+        const perDayText = window.swapitTranslation?.translations?.wishlist?.perDay || '/day';
+        const addToCartText = window.swapitTranslation?.translations?.wishlist?.addToCart || 'Add to Cart';
+        const priceDisplay = item.price > 0 ? `GHS ${item.price}${perDayText}` : freeText;
+        
+        card.innerHTML = `
+          <div class="wishlist-card-image">
+            <img src="${item.img || 'https://placehold.co/400x300?text=No+Image'}" alt="${item.title}">
+            <div class="wishlist-card-badge ${item.price <= 0 ? 'free' : ''}">
+              ${priceDisplay}
+            </div>
+          </div>
+          <div class="wishlist-card-content">
+            <div class="wishlist-card-title">${item.title}</div>
+            <div class="wishlist-card-location">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>${item.location || 'Location not specified'}</span>
+            </div>
+            <div class="wishlist-card-actions">
+              <button class="btn btn--primary add-to-cart-btn" data-index="${index}">
+                <i class="fas fa-shopping-cart"></i>
+                ${addToCartText}
+              </button>
+              <button class="btn btn--danger remove-btn" data-index="${index}">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        `;
+        
+        grid.appendChild(card);
+      });
+      
+      container.innerHTML = '';
+      container.appendChild(grid);
+      
+      // Attach event handlers
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = parseInt(e.currentTarget.dataset.index);
+          let wishlist = JSON.parse(localStorage.getItem('swapit_wishlist')||'[]');
+          const removedItem = wishlist[index];
+          wishlist.splice(index, 1);
+          localStorage.setItem('swapit_wishlist', JSON.stringify(wishlist));
+          
+          window.showToast(removedItem.title + ' removed from wishlist', 'success');
+          if (window.updateWishlistCount) window.updateWishlistCount();
+          window.dispatchEvent(new Event('storage'));
+          renderWishlist();
+        });
+      });
+      
+      document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = parseInt(e.currentTarget.dataset.index);
+          const wishlist = JSON.parse(localStorage.getItem('swapit_wishlist')||'[]');
+          const item = wishlist[index];
+          
+          const cart = JSON.parse(localStorage.getItem('swapit_cart')||'[]');
+          const exists = cart.find(c=>c.id === item.id);
+          if (exists) {
+            exists.qty = (exists.qty||1) + 1;
+            window.showToast(item.title + ' quantity increased in cart', 'success');
+          } else {
+            item.qty = 1;
+            cart.push(item);
+            window.showToast(item.title + ' added to cart!', 'success');
+          }
+          localStorage.setItem('swapit_cart', JSON.stringify(cart));
+          
+          if (window.updateCartCount) window.updateCartCount();
+          window.dispatchEvent(new Event('storage'));
+        });
+      });
+    }
+
+    // Clear wishlist button
+    document.getElementById('clearWishlistBtn')?.addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear your entire wishlist?')) {
+        localStorage.setItem('swapit_wishlist', '[]');
+        window.showToast('Wishlist cleared', 'info');
+        if (window.updateWishlistCount) window.updateWishlistCount();
+        renderWishlist();
+      }
+    });
+    
+    // Initial render
+    renderWishlist();
+    
+    // Re-render when localStorage changes
+    window.addEventListener('storage', renderWishlist);
+  </script>
+  <script src="../assets/js/translation.js"></script>
+  <script src="../assets/js/language-switcher.js"></script>
+  <script src="../assets/js/script.js"></script>
+  <script src="../assets/js/cart.js"></script>
+  <script src="../assets/js/nav-auth-topnav.js"></script>
+</body>
+</html>

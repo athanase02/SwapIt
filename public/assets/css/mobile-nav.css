@@ -1,0 +1,67 @@
+/* Mobile Navigation */
+@media (max-width: 992px) {
+  /* Hide desktop navigation menu */
+  .nav__menu {
+    display: none;
+  }
+  
+  /* Hide desktop search */
+  .nav__cta .nav__search {
+    display: none;
+  }
+
+  /* Show search in drawer with full width */
+  .nav__drawer .nav__search {
+    display: flex !important;
+    width: 100%;
+    margin: 1rem 0;
+  }
+
+  .nav__drawer .nav__search input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  /* Show auth buttons in drawer vertically */
+  .nav__drawer .nav__auth {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+    margin-top: 1rem;
+  }
+  
+  .nav__drawer .nav__auth .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav__cta .nav__auth {
+    display: none;
+  }
+  
+  .nav__drawer {
+    padding: 1rem;
+  }
+}
+
+/* Utility Classes */
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+/* Button Variations */
+.btn--outline {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.btn--outline:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+}

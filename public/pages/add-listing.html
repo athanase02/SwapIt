@@ -1,0 +1,734 @@
+<!doctype html>
+<!--
+  Add Listing Page
+  @author Victoria Ama Nyonator - Create listing form and UI
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title data-i18n-page-title="addListing.pageTitle">Add Listing — SwapIt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="../assets/css/language-switcher.css">
+  <script src="../assets/js/auth-client.js"></script>
+  <style>
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      padding-top: 80px;
+    }
+
+    /* Navigation */
+    .topnav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(17, 19, 26, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #1e2330;
+      z-index: 1000;
+      padding: 1rem 0;
+    }
+
+    .topnav .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .nav-brand img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--brand);
+    }
+
+    /* Page Container */
+    .add-listing-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Page Header */
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+      color: var(--muted);
+      font-size: 1.1rem;
+    }
+
+    .page-header .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Form Card */
+    .form-card {
+      background: linear-gradient(180deg, #151824, #0f1118);
+      border: 1px solid #1e2434;
+      border-radius: 20px;
+      padding: 3rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      animation: fadeInUp 0.6s ease 0.2s both;
+    }
+
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 1.8rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .form-group label i {
+      margin-right: 8px;
+      color: var(--brand);
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      background: rgba(30, 35, 48, 0.6);
+      border: 1px solid #2a2f45;
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 1rem;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--brand);
+      background: rgba(30, 35, 48, 0.8);
+      box-shadow: 0 0 0 3px rgba(126, 249, 255, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .helper-text {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+    }
+
+    /* Two Column Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Image Upload Section */
+    .image-upload-section {
+      background: rgba(30, 35, 48, 0.4);
+      border: 2px dashed #2a2f45;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .image-upload-section:hover {
+      border-color: var(--brand);
+      background: rgba(126, 249, 255, 0.05);
+    }
+
+    .image-upload-section.has-image {
+      border-style: solid;
+      border-color: var(--brand);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      color: var(--brand);
+      margin-bottom: 1rem;
+    }
+
+    .upload-text {
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .file-input-wrapper input[type="file"] {
+      display: none;
+    }
+
+    .file-input-button {
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      color: #0a0b10;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+      display: inline-block;
+    }
+
+    .file-input-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .image-preview-container {
+      margin-top: 1.5rem;
+      display: none;
+      position: relative;
+    }
+
+    .image-preview-container.active {
+      display: block;
+    }
+
+    .image-preview {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid var(--brand);
+    }
+
+    .remove-image {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 107, 107, 0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+    }
+
+    .remove-image:hover {
+      transform: scale(1.1);
+    }
+
+    /* Form Actions */
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid #1e2434;
+    }
+
+    .btn {
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      font-family: inherit;
+    }
+
+    .btn--primary {
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      color: #0a0b10;
+      flex: 1;
+    }
+
+    .btn--primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(126, 249, 255, 0.3);
+    }
+
+    .btn--secondary {
+      background: transparent;
+      border: 2px solid #2a2f45;
+      color: var(--text);
+    }
+
+    .btn--secondary:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+    }
+
+    /* Tips Section */
+    .tips-section {
+      background: rgba(126, 249, 255, 0.05);
+      border-left: 4px solid var(--brand);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .tips-section h3 {
+      color: var(--brand);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tips-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .tips-section li {
+      color: var(--muted);
+      padding: 0.5rem 0;
+      display: flex;
+      align-items: start;
+      gap: 10px;
+    }
+
+    .tips-section li i {
+      color: var(--brand);
+      margin-top: 4px;
+    }
+
+    /* Loading State */
+    .loading {
+      pointer-events: none;
+      opacity: 0.6;
+      position: relative;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 30px;
+      height: 30px;
+      border: 3px solid var(--brand);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      transform: translate(-50%, -50%);
+    }
+
+    @keyframes spin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Footer */
+    .sitefoot {
+      margin-top: 4rem;
+      padding: 2rem 0;
+      border-top: 1px solid #1e2434;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .sitefoot img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="topnav">
+    <div class="container">
+      <a href="dashboard.html" class="nav-brand">
+        <img src="../assets/images/logo.png" alt="SwapIt">
+        <span>SwapIt</span>
+      </a>
+      <div id="languageSwitcher" style="margin-left: auto; margin-right: 2rem;"></div>
+      <ul class="nav-links" id="mainNavMenu">
+        <!-- Dynamic menu items will be inserted here based on auth state -->
+        <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
+        <li><a href="browse.html"><i class="fas fa-search"></i> <span data-i18n="nav.browse">Browse</span></a></li>
+        <li><a href="wishlist.html"><i class="fas fa-heart"></i> <span data-i18n="nav.wishlist">Wishlist</span></a></li>
+        <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> <span data-i18n="nav.cart">Cart</span></a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="add-listing-container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="icon">
+        <i class="fas fa-plus-circle"></i>
+      </div>
+      <h1 data-i18n="addListing.title">Create a New Listing</h1>
+      <p data-i18n="addListing.subtitle">Share your items with the SwapIt community and start earning today!</p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+      <form id="listingForm">
+        <!-- Item Title -->
+        <div class="form-group">
+          <label for="title">
+            <i class="fas fa-tag"></i>
+            <span data-i18n="addListing.form.itemTitle">Item Title</span> *
+          </label>
+          <input 
+            id="title" 
+            type="text" 
+            required 
+            data-i18n-placeholder="addListing.form.titlePlaceholder"
+            placeholder="e.g., Canon DSLR Camera with 50mm Lens"
+            maxlength="100"
+          >
+          <p class="helper-text" data-i18n="addListing.form.titleHelper">Give your item a clear, descriptive title that buyers will love</p>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description">
+            <i class="fas fa-align-left"></i>
+            <span data-i18n="addListing.form.description">Description</span> *
+          </label>
+          <textarea 
+            id="description" 
+            required 
+            data-i18n-placeholder="addListing.form.descriptionPlaceholder"
+            placeholder="Describe your item's condition, features, and any important details that buyers should know..."
+            maxlength="1000"
+          ></textarea>
+          <p class="helper-text" data-i18n="addListing.form.descriptionHelper">Provide detailed information to help borrowers understand your item</p>
+        </div>
+
+        <!-- Category and Price -->
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="category">
+              <i class="fas fa-folder"></i>
+              <span data-i18n="addListing.form.category">Category</span> *
+            </label>
+            <select id="category" required>
+              <option value="" data-i18n="addListing.form.selectCategory">Select a category</option>
+              <option value="electronics" data-i18n="addListing.form.categories.electronics">📱 Electronics</option>
+              <option value="transport" data-i18n="addListing.form.categories.transport">🚗 Transport</option>
+              <option value="books" data-i18n="addListing.form.categories.books">📚 Books & Education</option>
+              <option value="clothing" data-i18n="addListing.form.categories.clothing">👕 Clothing & Fashion</option>
+              <option value="music" data-i18n="addListing.form.categories.music">🎵 Music & Instruments</option>
+              <option value="sports" data-i18n="addListing.form.categories.sports">⚽ Sports & Outdoors</option>
+              <option value="home" data-i18n="addListing.form.categories.home">🏠 Home & Garden</option>
+              <option value="tools" data-i18n="addListing.form.categories.tools">🔧 Tools & Equipment</option>
+              <option value="other" data-i18n="addListing.form.categories.other">📦 Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="price">
+              <i class="fas fa-dollar-sign"></i>
+              <span data-i18n="addListing.form.price">Price (GHS/day)</span> *
+            </label>
+            <input 
+              id="price" 
+              type="number" 
+              min="0" 
+              step="0.01" 
+              required 
+              placeholder="0.00"
+            >
+            <p class="helper-text" data-i18n="addListing.form.priceHelper">Set to 0 for free lending</p>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div class="form-group">
+          <label for="location">
+            <i class="fas fa-map-marker-alt"></i>
+            <span data-i18n="addListing.form.location">Pickup Location</span> *
+          </label>
+          <input 
+            id="location" 
+            type="text" 
+            required 
+            data-i18n-placeholder="addListing.form.locationPlaceholder"
+            placeholder="e.g., Ashesi University, Berekuso"
+          >
+          <p class="helper-text" data-i18n="addListing.form.locationHelper">Where can borrowers pick up this item?</p>
+        </div>
+
+        <!-- Image Upload -->
+        <div class="form-group">
+          <label>
+            <i class="fas fa-camera"></i>
+            <span data-i18n="addListing.form.itemPhoto">Item Photo</span>
+          </label>
+          <div class="image-upload-section" id="uploadSection">
+            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+            <p class="upload-text" data-i18n="addListing.form.uploadText">Click to upload or drag and drop</p>
+            <div class="file-input-wrapper">
+              <label class="file-input-button" for="imageInput">
+                <i class="fas fa-image"></i> <span data-i18n="addListing.form.chooseImage">Choose Image</span>
+              </label>
+              <input id="imageInput" type="file" accept="image/*">
+            </div>
+            <p class="helper-text" style="margin-top: 1rem;">JPG, PNG or GIF (Max 5MB)</p>
+          </div>
+          
+          <div class="image-preview-container" id="previewContainer">
+            <img id="imagePreview" class="image-preview" alt="Preview">
+            <button type="button" class="remove-image" id="removeImage">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="tips-section">
+          <h3>
+            <i class="fas fa-lightbulb"></i>
+            <span data-i18n="addListing.tips.title">Tips for a Great Listing</span>
+          </h3>
+          <ul>
+            <li>
+              <i class="fas fa-check"></i>
+              <span data-i18n="addListing.tips.tip1">Use a clear, well-lit photo showing the item's condition</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span data-i18n="addListing.tips.tip2">Be honest about any wear or damage to build trust</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span data-i18n="addListing.tips.tip3">Set competitive prices by checking similar listings</span>
+            </li>
+            <li>
+              <i class="fas fa-check"></i>
+              <span data-i18n="addListing.tips.tip4">Respond quickly to messages for better ratings</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button class="btn btn--primary" type="submit" id="submitBtn">
+            <i class="fas fa-check"></i>
+            <span data-i18n="addListing.form.createListing">Create Listing</span>
+          </button>
+          <a href="dashboard.html" class="btn btn--secondary">
+            <i class="fas fa-times"></i>
+            <span data-i18n="common.cancel">Cancel</span>
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Footer -->
+  <footer class="sitefoot">
+    <div class="container">
+      <img src="../assets/images/logo.png" alt="SwapIt Logo">
+      <small>SwapIt Ltd. &copy; <span data-i18n="footer.rights">All rights reserved</span> <span id="year">2025</span></small>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Toast notification function
+    window.showToast = function(message, type = 'info', title = '') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      
+      const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+      
+      const titles = {
+        success: title || 'Success',
+        error: title || 'Error',
+        warning: title || 'Warning',
+        info: title || 'Info'
+      };
+      
+      toast.innerHTML = `
+        <i class="fas ${icons[type]} toast-icon"></i>
+        <div class="toast-content">
+          <div class="toast-title">${titles[type]}</div>
+          <div class="toast-message">${message}</div>
+        </div>
+      `;
+      
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    };
+
+    // Image upload handling
+    const imageInput = document.getElementById('imageInput');
+    const uploadSection = document.getElementById('uploadSection');
+    const previewContainer = document.getElementById('previewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const removeImageBtn = document.getElementById('removeImage');
+
+    imageInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          window.showToast('Image is too large. Please choose an image under 5MB.', 'error', 'Upload Failed');
+          e.target.value = '';
+          return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          window.showToast('Please choose an image file (JPG, PNG, GIF)', 'error', 'Invalid File Type');
+          e.target.value = '';
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imagePreview.src = e.target.result;
+          uploadSection.classList.add('has-image');
+          previewContainer.classList.add('active');
+          window.showToast('Image uploaded successfully!', 'success');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    removeImageBtn.addEventListener('click', function() {
+      imageInput.value = '';
+      imagePreview.src = '';
+      uploadSection.classList.remove('has-image');
+      previewContainer.classList.remove('active');
+      window.showToast('Image removed', 'info');
+    });
+
+    // Drag and drop support
+    uploadSection.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      this.style.borderColor = 'var(--brand)';
+      this.style.background = 'rgba(126, 249, 255, 0.1)';
+    });
+
+    uploadSection.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      this.style.borderColor = '#2a2f45';
+      this.style.background = 'rgba(30, 35, 48, 0.4)';
+    });
+
+    uploadSection.addEventListener('drop', function(e) {
+      e.preventDefault();
+      this.style.borderColor = '#2a2f45';
+      this.style.background = 'rgba(30, 35, 48, 0.4)';
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        imageInput.files = files;
+        imageInput.dispatchEvent(new Event('change'));
+      }
+    });
+  </script>
+  <script src="../assets/js/translation.js"></script>
+  <script src="../assets/js/language-switcher.js"></script>
+  <script src="../assets/js/add-listing.js"></script>
+  <script src="../assets/js/nav-auth-topnav.js"></script>
+</body>
+</html>

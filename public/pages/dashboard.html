@@ -1,0 +1,774 @@
+<!doctype html>
+<!--
+  User Dashboard Page
+  @author Athanase Abayo - Dashboard layout and user statistics
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title data-i18n-page-title="dashboard.welcome">Dashboard — SwapIt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="../assets/css/language-switcher.css" />
+  <script src="../assets/js/auth-client.js"></script>
+  <style>
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      padding-top: 80px;
+    }
+
+    /* Navigation */
+    .topnav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(17, 19, 26, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #1e2330;
+      z-index: 1000;
+      padding: 1rem 0;
+    }
+
+    .topnav .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .nav-brand img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-links a:hover {
+      color: var(--brand);
+    }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--brand);
+      object-fit: cover;
+    }
+
+    /* Dashboard Container */
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Welcome Section */
+    .welcome-section {
+      background: linear-gradient(135deg, #1a1d2e, #151824);
+      border: 1px solid #1e2434;
+      border-radius: 20px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    .welcome-content h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .welcome-content p {
+      color: var(--muted);
+      font-size: 1.1rem;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      animation: fadeInUp 0.6s ease 0.2s both;
+    }
+
+    .stat-card {
+      background: linear-gradient(180deg, #151824, #0f1118);
+      border: 1px solid #1e2434;
+      border-radius: 16px;
+      padding: 2rem;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(126, 249, 255, 0.1);
+      border-color: rgba(126, 249, 255, 0.3);
+    }
+
+    .stat-card-icon {
+      width: 50px;
+      height: 50px;
+      background: rgba(126, 249, 255, 0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--brand);
+      margin-bottom: 1rem;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--brand);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Section Card */
+    .section-card {
+      background: linear-gradient(180deg, #151824, #0f1118);
+      border: 1px solid #1e2434;
+      border-radius: 16px;
+      padding: 2rem;
+      animation: fadeInUp 0.6s ease 0.4s both;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title i {
+      color: var(--brand);
+    }
+
+    /* Listing Card */
+    .listing-card {
+      background: rgba(30, 35, 48, 0.4);
+      border: 1px solid #2a2f45;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 1.5rem;
+      transition: all 0.3s;
+    }
+
+    .listing-card:hover {
+      border-color: rgba(126, 249, 255, 0.3);
+      background: rgba(30, 35, 48, 0.6);
+    }
+
+    .listing-card-image {
+      width: 100px;
+      height: 100px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #0a0b10;
+    }
+
+    .listing-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .listing-card-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .listing-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .listing-card-meta {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .listing-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .listing-status.active {
+      background: rgba(126, 249, 255, 0.1);
+      color: var(--brand);
+    }
+
+    .listing-status.pending {
+      background: rgba(255, 215, 0, 0.1);
+      color: #ffd700;
+    }
+
+    .listing-card-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Activity Item */
+    .activity-item {
+      display: flex;
+      gap: 1rem;
+      padding: 1.25rem;
+      border-bottom: 1px solid #1e2434;
+      transition: background 0.5s;
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-item:hover {
+      background: rgba(126, 249, 255, 0.03);
+    }
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.2rem;
+    }
+
+    .activity-icon.success {
+      background: rgba(126, 249, 255, 0.1);
+      color: var(--brand);
+    }
+
+    .activity-icon.star {
+      background: rgba(255, 215, 0, 0.1);
+      color: #ffd700;
+    }
+
+    .activity-icon.info {
+      background: rgba(91, 124, 254, 0.1);
+      color: #5b7cfe;
+    }
+
+    .activity-content {
+      flex: 1;
+    }
+
+    .activity-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: var(--text);
+    }
+
+    .activity-description {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .activity-time {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.875rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+
+    .btn--primary {
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      color: #0a0b10;
+    }
+
+    .btn--primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(126, 249, 255, 0.3);
+    }
+
+    .btn--secondary {
+      background: transparent;
+      border: 2px solid #2a2f45;
+      color: var(--text);
+    }
+
+    .btn--secondary:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+    }
+
+    .btn--sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    .btn--danger {
+      background: rgba(255, 107, 107, 0.1);
+      color: #ff6b6b;
+      border: 1px solid rgba(255, 107, 107, 0.3);
+    }
+
+    .btn--danger:hover {
+      background: rgba(255, 107, 107, 0.2);
+      border-color: #ff6b6b;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Footer */
+    .sitefoot {
+      margin-top: 4rem;
+      padding: 3rem 0 2rem;
+      border-top: 1px solid #1e2434;
+      color: var(--muted);
+    }
+
+    .sitefoot__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .sitefoot__col h4 {
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .sitefoot__col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sitefoot__col ul li {
+      margin-bottom: 0.75rem;
+    }
+
+    .sitefoot__col ul li a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .sitefoot__col ul li a:hover {
+      color: var(--brand);
+    }
+
+    .sitefoot__col .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      text-decoration: none;
+      color: var(--text);
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+
+    .sitefoot__col .logo span:first-child {
+      color: var(--brand);
+    }
+
+    .sitefoot__col p {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .sitefoot__social {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .sitefoot__social a {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(126, 249, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--brand);
+      transition: all 0.3s;
+    }
+
+    .sitefoot__social a:hover {
+      background: var(--brand);
+      color: #0a0b10;
+      transform: translateY(-2px);
+    }
+
+    .sitefoot__bottom {
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid #1e2434;
+    }
+
+    .sitefoot__bottom img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="topnav">
+    <div class="container">
+      <a href="dashboard.html" class="nav-brand">
+        <img src="../assets/images/logo.png" alt="SwapIt">
+        <span>SwapIt</span>
+      </a>
+      <div id="languageSwitcher" style="margin-right: auto; margin-left: 1rem;"></div>
+      <ul class="nav-links" id="mainNavMenu">
+        <!-- Dynamic menu items will be inserted here based on auth state -->
+        <li><a href="browse.html"><i class="fas fa-search"></i> <span data-i18n="nav.browse">Browse</span></a></li>
+        <li><a href="add-listing.html"><i class="fas fa-plus-circle"></i> <span data-i18n="nav.addListing">Add Listing</span></a></li>
+      </ul>
+      <div class="nav-user">
+        <a href="wishlist.html">
+          <i class="fas fa-heart"></i>
+        </a>
+        <a href="cart.html">
+          <i class="fas fa-shopping-cart"></i>
+        </a>
+        <a href="profile.html">
+          <img src="../assets/images/logo.png" alt="User" class="user-avatar" id="userAvatar">
+        </a>
+        <button class="btn btn--danger btn--sm" id="logoutBtn">
+          <i class="fas fa-sign-out-alt"></i> <span data-i18n="nav.logout">Logout</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+      <div class="welcome-content">
+        <h1 id="welcomeTitle" data-i18n="dashboard.welcome">Welcome back!</h1>
+        <p id="welcomeText" data-i18n="dashboard.activity">Here's what's happening with your account today</p>
+      </div>
+      <div class="quick-actions">
+        <a href="add-listing.html" class="btn btn--primary">
+          <i class="fas fa-plus"></i>
+          <span data-i18n="dashboard.newListing">New Listing</span>
+        </a>
+        <a href="profile.html" class="btn btn--secondary">
+          <i class="fas fa-user"></i>
+          <span data-i18n="dashboard.newListing">Profile</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <i class="fas fa-box"></i>
+        </div>
+        <div class="stat-number" id="activeListings">0</div>
+        <div class="stat-label" data-i18n="dashboard.activeListings">Active Listings</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <i class="fas fa-handshake"></i>
+        </div>
+        <div class="stat-number" id="totalBorrows">0</div>
+        <div class="stat-label" data-i18n="dashboard.totalBorrows">Total Borrows</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <i class="fas fa-gift"></i>
+        </div>
+        <div class="stat-number" id="itemsLent">0</div>
+        <div class="stat-label" data-i18n="dashboard.itemsLent">Items Lent</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="stat-number" id="userRating">5.0</div>
+        <div class="stat-label" data-i18n="dashboard.yourRating">Your Rating</div>
+      </div>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+      <!-- Your Listings Section -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fas fa-list"></i>
+            <span data-i18n="dashboard.yourListings">Your Listings</span>
+          </div>
+          <a href="add-listing.html" class="btn btn--secondary btn--sm">
+            <i class="fas fa-plus"></i>
+            <span data-i18n="common.add">Add New</span>
+          </a>
+        </div>
+        <div id="listingsContainer">
+          <!-- Dynamic listings will be loaded here -->
+          <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <p data-i18n="dashboard.noListings">You don't have any listings yet</p>
+            <a href="add-listing.html" class="btn btn--primary" style="margin-top: 1rem;">
+              <i class="fas fa-plus"></i>
+              <span data-i18n="dashboard.createFirstListing">Create Your First Listing</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity Section -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fas fa-clock"></i>
+            <span data-i18n="dashboard.recentActivity">Recent Activity</span>
+          </div>
+        </div>
+        <div id="activityContainer">
+          <!-- Activities will be dynamically loaded here -->
+          <div class="empty-state" style="padding: 2rem 1rem;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; opacity: 0.5; margin-bottom: 0.5rem;"></i>
+            <p style="color: #9aa5c3;" data-i18n="common.loading">Loading your activities...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Footer -->
+  <footer class="sitefoot">
+    <div class="container">
+      <div class="sitefoot__grid">
+        <div class="sitefoot__col">
+          <a class="logo" href="dashboard.html"><span>SWAP</span>IT</a>
+          <p data-i18n="footer.tagline">Borrow what you need. Lend what you don't. Simple, safe, sustainable.</p>
+          <div class="sitefoot__social">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.linkedin.com" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+
+        <div class="sitefoot__col">
+          <h4 data-i18n="footer.dashboard">Dashboard</h4>
+          <ul>
+            <li><a href="dashboard.html" data-i18n="footer.myDashboard">My Dashboard</a></li>
+            <li><a href="browse.html" data-i18n="footer.browseItems">Browse Items</a></li>
+            <li><a href="add-listing.html" data-i18n="footer.addListing">Add Listing</a></li>
+            <li><a href="profile.html" data-i18n="footer.myProfile">My Profile</a></li>
+          </ul>
+        </div>
+
+        <div class="sitefoot__col">
+          <h4 data-i18n="footer.myItems">My Items</h4>
+          <ul>
+            <li><a href="wishlist.html" data-i18n="footer.wishlist">Wishlist</a></li>
+            <li><a href="cart.html" data-i18n="footer.cart">Cart</a></li>
+            <li><a href="dashboard.html#listings" data-i18n="footer.myListings">My Listings</a></li>
+            <li><a href="dashboard.html#activity" data-i18n="footer.recentActivity">Recent Activity</a></li>
+          </ul>
+        </div>
+
+        <div class="sitefoot__col">
+          <h4 data-i18n="footer.contact">Contact</h4>
+          <ul>
+            <li><a href="mailto:info@swapit.com"><i class="fas fa-envelope"></i> info@swapit.com</a></li>
+            <li><a href="tel:+25078888888"><i class="fas fa-phone"></i> (250) 78888888</a></li>
+            <li><a href="tel:+23355555555"><i class="fas fa-phone"></i> (233) 55555555</a></li>
+            <li><a href="tel:+2328888888"><i class="fas fa-phone"></i> (232) 8888888</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sitefoot__bottom">
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%">
+          <img src="../assets/images/logo.png" alt="SwapIt Logo" style="width:32px;height:32px;border-radius:50%;object-fit:cover">
+          <small>SwapIt Ltd. &copy; <span data-i18n="footer.rights">All rights reserved</span> <span id="year">2025</span></small>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Toast notification function
+    window.showToast = function(message, type = 'info', title = '') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      
+      const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+      
+      const titles = {
+        success: title || 'Success',
+        error: title || 'Error',
+        warning: title || 'Warning',
+        info: title || 'Info'
+      };
+      
+      toast.innerHTML = `
+        <i class="fas ${icons[type]} toast-icon"></i>
+        <div class="toast-content">
+          <div class="toast-title">${titles[type]}</div>
+          <div class="toast-message">${message}</div>
+        </div>
+      `;
+      
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    };
+  </script>
+  <script src="../assets/js/translation.js"></script>
+  <script src="../assets/js/language-switcher.js"></script>
+  <script src="../assets/js/dashboard.js"></script>
+  <script src="../assets/js/nav-auth-topnav.js"></script>
+</body>
+</html>

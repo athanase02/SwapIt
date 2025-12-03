@@ -1,0 +1,294 @@
+<!doctype html>
+<!--
+  User Profile Page
+  @author Olivier Kwizera - Profile display and editing interface
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title data-i18n-page-title="profile.pageTitle">Profile — SwapIt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="../assets/css/language-switcher.css">
+  <script src="../assets/js/auth-client.js"></script>
+  <style>
+    .profile-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .profile-header {
+      background: linear-gradient(180deg, #151824, #0f1118);
+      border: 1px solid #1e2434;
+      border-radius: 16px;
+      padding: 40px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    .avatar-section {
+      position: relative;
+    }
+    .avatar-img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #7ef9ff;
+      box-shadow: 0 8px 24px rgba(126, 249, 255, 0.2);
+    }
+    .avatar-upload-btn {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      color: #0a0b10;
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+      font-size: 1.2rem;
+    }
+    .avatar-upload-btn:hover {
+      transform: scale(1.1);
+    }
+    .profile-info {
+      flex: 1;
+    }
+    .profile-name {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .profile-email {
+      color: #9aa5c3;
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+    }
+    .profile-stats {
+      display: flex;
+      gap: 24px;
+      margin-top: 20px;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #7ef9ff;
+    }
+    .stat-label {
+      font-size: 0.875rem;
+      color: #9aa5c3;
+    }
+    .profile-section {
+      background: #11131a;
+      border: 1px solid #1e2434;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .form-field {
+      margin-bottom: 20px;
+    }
+    .form-field label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #ecf1ff;
+    }
+    .form-field input {
+      width: 100%;
+      padding: 12px 16px;
+      background: #0a0b10;
+      border: 1px solid #1e2434;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+    }
+    .form-field input:focus {
+      outline: none;
+      border-color: #7ef9ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" style="padding:48px 24px">
+    <div id="languageSwitcher" style="position:absolute;top:20px;right:20px;"></div>
+    <div class="profile-container">
+      <div style="margin-bottom:2rem">
+        <a href="dashboard.html" style="color:#7ef9ff;text-decoration:none;display:inline-flex;align-items:center;gap:8px">
+          <i class="fas fa-arrow-left"></i> <span data-i18n="profile.backToDashboard">Back to Dashboard</span>
+        </a>
+      </div>
+
+      <div class="profile-header">
+        <div class="avatar-section">
+          <img id="avatar" class="avatar-img" src="" alt="Profile Avatar" style="display:none;">
+          <label for="avatarInput" class="avatar-upload-btn">
+            <i class="fas fa-camera"></i>
+          </label>
+          <input id="avatarInput" type="file" accept="image/*" style="display:none">
+        </div>
+        <div class="profile-info">
+          <h1 class="profile-name" id="profileName"></h1>
+          <p class="profile-email" id="profileEmail"></p>
+          <div style="display:flex;gap:8px">
+            <span style="background:rgba(126,249,255,0.1);color:#7ef9ff;padding:6px 14px;border-radius:6px;font-size:0.875rem">
+              <i class="fas fa-star"></i> <span data-i18n="profile.verifiedMember">Verified Member</span>
+            </span>
+            <span style="background:rgba(91,124,254,0.1);color:#5b7cfe;padding:6px 14px;border-radius:6px;font-size:0.875rem" data-i18n="profile.memberSince">Member since 2024</span>
+              Member since 2024
+            </span>
+          </div>
+          <div class="profile-stats">
+            <div class="stat-item">
+              <div class="stat-number">5</div>
+              <div class="stat-label" data-i18n="profile.stats.listings">Listings</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">12</div>
+              <div class="stat-label" data-i18n="profile.stats.borrows">Borrows</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">4.8</div>
+              <div class="stat-label" data-i18n="profile.stats.rating">Rating</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">
+          <i class="fas fa-user-edit"></i>
+          <span data-i18n="profile.personalInfo.title">Personal Information</span>
+        </h2>
+        <div class="form-field">
+          <label for="fullName" data-i18n="profile.personalInfo.fullName">Full Name</label>
+          <input type="text" id="fullName" value="">
+        </div>
+        <div class="form-field">
+          <label for="email" data-i18n="profile.personalInfo.email">Email Address</label>
+          <input type="email" id="email" value="" readonly style="background:#0a0b10;opacity:0.6">
+          <p style="color:#9aa5c3;font-size:0.875rem;margin-top:4px" data-i18n="profile.personalInfo.emailCannotChange">Email cannot be changed</p>
+        </div>
+        <div class="form-field">
+          <label for="phone" data-i18n="profile.personalInfo.phone">Phone Number</label>
+          <input type="tel" id="phone" value="+233 24 123 4567" data-i18n-placeholder="profile.personalInfo.phonePlaceholder" placeholder="+233 XX XXX XXXX">
+        </div>
+        <div class="form-field">
+          <label for="location" data-i18n="profile.personalInfo.location">Location</label>
+          <input type="text" id="location" value="Ashesi University, Berekuso" data-i18n-placeholder="profile.personalInfo.locationPlaceholder" placeholder="Your location">
+        </div>
+        <button id="saveProfile" class="btn btn--primary" style="padding:12px 32px">
+          <i class="fas fa-save"></i> <span data-i18n="profile.personalInfo.saveChanges">Save Changes</span>
+        </button>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">
+          <i class="fas fa-bell"></i>
+          <span data-i18n="profile.notifications.title">Notification Preferences</span>
+        </h2>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <label style="display:flex;align-items:center;gap:12px;cursor:pointer">
+            <input type="checkbox" checked style="width:20px;height:20px">
+            <span data-i18n="profile.notifications.emailNotifications">Email notifications for new borrow requests</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:12px;cursor:pointer">
+            <input type="checkbox" checked style="width:20px;height:20px">
+            <span data-i18n="profile.notifications.reminders">Reminders for upcoming returns</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:12px;cursor:pointer">
+            <input type="checkbox" style="width:20px;height:20px">
+            <span data-i18n="profile.notifications.weeklySummary">Weekly summary of activity</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">
+          <i class="fas fa-shield-alt"></i>
+          <span data-i18n="profile.security.title">Account Security</span>
+        </h2>
+        <button class="btn btn--ghost">
+          <i class="fas fa-key"></i> <span data-i18n="profile.security.changePassword">Change Password</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="sitefoot">
+    <div class="container">
+      <div class="sitefoot__bottom">
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%">
+          <img src="../assets/images/logo.png" alt="SwapIt Logo" style="width:32px;height:32px;border-radius:50%;object-fit:cover">
+          <small>SwapIt Ltd. &copy; <span data-i18n="footer.rights">All rights reserved</span> <span id="year">2025</span></small>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Toast notification function
+    window.showToast = function(message, type = 'info', title = '') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      
+      const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+      };
+      
+      const titles = {
+        success: title || 'Success',
+        error: title || 'Error',
+        warning: title || 'Warning',
+        info: title || 'Info'
+      };
+      
+      toast.innerHTML = `
+        <i class="fas ${icons[type]} toast-icon"></i>
+        <div class="toast-content">
+          <div class="toast-title">${titles[type]}</div>
+          <div class="toast-message">${message}</div>
+        </div>
+      `;
+      
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    };
+  </script>
+  <script src="../assets/js/translation.js"></script>
+  <script src="../assets/js/language-switcher.js"></script>
+  <script src="../assets/js/profile.js"></script>
+</body>
+</html>
