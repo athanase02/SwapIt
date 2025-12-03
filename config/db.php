@@ -11,17 +11,20 @@
 // Database configuration
 // Database name: SI2025 (SwapIt 2025)
 
-// FOR LOCAL DEVELOPMENT:
-// $host = "localhost";
-// $username = "root";
-// $password = "";
-// $database = "SI2025";
-
-// FOR SCHOOL SERVER (Update these values!):
-$host = "localhost";
-$username = "root"; 
-$password = ""; 
-$database = "SI2025";
+// Check if running on Render (environment variables are set)
+if (getenv('DB_HOST')) {
+    // Production configuration (Render)
+    $host = getenv('DB_HOST');
+    $username = getenv('DB_USERNAME');
+    $password = getenv('DB_PASSWORD');
+    $database = getenv('DB_NAME') ?: 'SI2025';
+} else {
+    // Local development configuration
+    $host = "localhost";
+    $username = "root"; 
+    $password = ""; 
+    $database = "SI2025";
+}
 
 // Create connection
 $conn = new mysqli($host, $username, $password);
