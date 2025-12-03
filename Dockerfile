@@ -18,8 +18,8 @@ WORKDIR /app
 # Copy application files
 COPY . .
 
-# Expose port
+# Expose port (Render uses PORT env variable)
 EXPOSE 10000
 
-# Start command will be overridden by render-start.sh
-CMD ["php", "-S", "0.0.0.0:10000", "-t", "public"]
+# Start PHP server (using PORT from environment or default to 10000)
+CMD php -S 0.0.0.0:${PORT:-10000} -t public

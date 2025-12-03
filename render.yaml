@@ -3,8 +3,6 @@ services:
     name: swapit
     env: docker
     plan: free
-    buildCommand: bash render-build.sh
-    startCommand: bash render-start.sh
     envVars:
       - key: DB_HOST
         sync: false
