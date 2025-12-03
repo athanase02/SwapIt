@@ -1,0 +1,367 @@
+/* ============================================================
+   MOBILE RESPONSIVENESS ENHANCEMENTS
+   Ensures the app works perfectly on all mobile devices
+   @author: Comprehensive mobile optimization
+============================================================ */
+
+/* Base Mobile Fixes */
+@media (max-width: 768px) {
+  
+  /* Prevent horizontal scroll */
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+  
+  /* Fix container padding on mobile */
+  .container {
+    padding: 0 16px !important;
+    max-width: 100%;
+  }
+  
+  /* Navigation fixes */
+  .nav__menu {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .nav__menu a {
+    font-size: 1rem;
+    padding: 12px 16px;
+  }
+  
+  /* Hero section */
+  .hero {
+    padding: 40px 0 !important;
+  }
+  
+  .hero h1 {
+    font-size: 2rem !important;
+    line-height: 1.2 !important;
+  }
+  
+  .hero p {
+    font-size: 1rem !important;
+  }
+  
+  /* CTA buttons */
+  .cta-buttons {
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100%;
+  }
+  
+  .cta-buttons a,
+  .cta-buttons button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
+  /* Grid layouts */
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  /* Feature cards */
+  .feature-card,
+  .how-card,
+  .pricing-card {
+    padding: 20px !important;
+  }
+  
+  /* Images */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Forms */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevents iOS zoom */
+    width: 100% !important;
+  }
+  
+  /* Modals and popups */
+  .modal-content {
+    width: 95% !important;
+    max-width: 95% !important;
+    margin: 10px !important;
+  }
+  
+  /* Tables */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Toast notifications */
+  .toast-container {
+    right: 16px !important;
+    left: 16px !important;
+    top: 16px !important;
+  }
+  
+  .toast {
+    min-width: auto !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Small Mobile Phones */
+@media (max-width: 480px) {
+  
+  .container {
+    padding: 0 12px !important;
+  }
+  
+  .hero h1 {
+    font-size: 1.75rem !important;
+  }
+  
+  .hero p {
+    font-size: 0.95rem !important;
+  }
+  
+  /* Reduce font sizes */
+  h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  h3 {
+    font-size: 1.25rem !important;
+  }
+  
+  p {
+    font-size: 0.9rem !important;
+  }
+  
+  /* Smaller cards */
+  .feature-card,
+  .how-card,
+  .pricing-card {
+    padding: 16px !important;
+  }
+}
+
+/* Landscape Mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  
+  .hero {
+    padding: 20px 0 !important;
+  }
+  
+  .hero h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  .nav {
+    position: relative !important;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  
+  /* Larger touch targets */
+  button,
+  a {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+  }
+  
+  /* Remove hover effects */
+  a:hover,
+  button:hover {
+    text-decoration: none;
+  }
+  
+  /* Better tap feedback */
+  button:active,
+  a:active {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+}
+
+/* Tablet Adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  
+  .container {
+    max-width: 90%;
+  }
+  
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Fix for very small screens */
+@media (max-width: 360px) {
+  
+  .container {
+    padding: 0 8px !important;
+  }
+  
+  .hero h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  button,
+  .btn {
+    font-size: 0.85rem !important;
+    padding: 10px 14px !important;
+  }
+}
+
+/* Dashboard specific fixes */
+@media (max-width: 768px) {
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    height: 100vh;
+    width: 280px;
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+  
+  .sidebar.active {
+    left: 0;
+  }
+  
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+  
+  .sidebar.active + .sidebar-overlay {
+    display: block;
+  }
+}
+
+/* Profile page mobile fixes */
+@media (max-width: 768px) {
+  
+  .profile-header {
+    flex-direction: column !important;
+    text-align: center !important;
+  }
+  
+  .profile-avatar {
+    margin: 0 auto 16px !important;
+  }
+  
+  .profile-stats {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  
+  .profile-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .profile-tab {
+    white-space: nowrap;
+  }
+}
+
+/* Authentication pages mobile */
+@media (max-width: 768px) {
+  
+  .auth-container {
+    padding: 20px 16px !important;
+  }
+  
+  .auth-box {
+    padding: 24px 20px !important;
+  }
+  
+  .auth-image {
+    display: none !important;
+  }
+}
+
+/* Browse/Listings page mobile */
+@media (max-width: 768px) {
+  
+  .filters {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  
+  .filter-group {
+    width: 100% !important;
+  }
+  
+  .listings-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .listing-card {
+    max-width: 100% !important;
+  }
+}
+
+/* Cart page mobile */
+@media (max-width: 768px) {
+  
+  .cart-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .cart-items {
+    order: 1;
+  }
+  
+  .cart-summary {
+    order: 2;
+    position: sticky;
+    bottom: 0;
+    background: var(--panel);
+    padding: 16px;
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* Prevent text size adjustment on iOS */
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .nav {
+    padding-top: env(safe-area-inset-top);
+  }
+}
