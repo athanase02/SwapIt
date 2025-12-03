@@ -14,6 +14,20 @@ error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
+// Set up custom error handler for fatal errors
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'error' => 'Server error occurred',
+            'message' => 'An internal error occurred. Please check server logs.',
+            'debug' => isset($_GET['debug']) ? $error['message'] : null
+        ]);
+    }
+});
+
 // Configure session to persist across page navigation
 // Security: Session cookies configured for maximum security
 ini_set('session.cookie_lifetime', 86400); // 24 hours
