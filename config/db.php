@@ -64,60 +64,68 @@ if (getenv('DATABASE_URL')) {
         die("Database connection failed: " . $e->getMessage());
     }
 } else {
-    // Local MySQL
+    // Local MySQL using PDO
     $host = "localhost";
     $username = "root"; 
     $password = ""; 
     $database = "SI2025";
     
-    $conn = new mysqli($host, $username, $password);
-    
-    if ($conn->connect_error) {
-        error_log("MySQL connection failed: " . $conn->connect_error);
+    try {
+        $conn = new PDO("mysql:host=$host", $username, $password);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        
+        // Create database if doesn't exist
+        $conn->exec("CREATE DATABASE IF NOT EXISTS $database");
+        $conn->exec("USE $database");
+        
+        error_log("SwapIt: Connected to MySQL database");
+        
+        // Create tables for MySQL
+        $conn->exec("CREATE TABLE IF NOT EXISTS users (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            password_hash VARCHAR(255) NOT NULL,
+            full_name VARCHAR(255) NOT NULL,
+            avatar_url TEXT,
+            phone VARCHAR(20),
+            google_id VARCHAR(255),
+            is_verified BOOLEAN DEFAULT FALSE,
+            is_active BOOLEAN DEFAULT TRUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        
+        $conn->exec("CREATE TABLE IF NOT EXISTS profiles (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            user_id INT NOT NULL UNIQUE,
+            full_name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            phone VARCHAR(20),
+            bio TEXT,
+            avatar_url TEXT,
+            location VARCHAR(255),
+            rating_average DECIMAL(3,2) DEFAULT 5.00,
+            total_reviews INT DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        
+        error_log("SwapIt: MySQL tables initialized");
+        
+    } catch (PDOException $e) {
+        error_log("MySQL connection failed: " . $e->getMessage());
         if (strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false) {
             header('Content-Type: application/json');
             echo json_encode([
                 'success' => false,
-                'error' => 'Database connection failed'
+                'error' => 'Database connection failed',
+                'details' => $e->getMessage()
             ]);
             exit;
         }
-        die("Connection failed: " . $conn->connect_error);
+        die("Connection failed: " . $e->getMessage());
     }
-    
-    $conn->query("CREATE DATABASE IF NOT EXISTS $database");
-    $conn->select_db($database);
-    $conn->set_charset("utf8mb4");
-    
-    // Create tables for MySQL
-    $conn->query("CREATE TABLE IF NOT EXISTS users (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        password_hash VARCHAR(255) NOT NULL,
-        full_name VARCHAR(255) NOT NULL,
-        avatar_url TEXT,
-        phone VARCHAR(20),
-        google_id VARCHAR(255),
-        is_verified BOOLEAN DEFAULT FALSE,
-        is_active BOOLEAN DEFAULT TRUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-    
-    $conn->query("CREATE TABLE IF NOT EXISTS profiles (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        user_id INT NOT NULL UNIQUE,
-        full_name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL,
-        phone VARCHAR(20),
-        bio TEXT,
-        avatar_url TEXT,
-        location VARCHAR(255),
-        rating_average DECIMAL(3,2) DEFAULT 5.00,
-        total_reviews INT DEFAULT 0,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 }
 ?>

@@ -334,7 +334,7 @@ class UserService {
 
     /**
      * Initialize user service with database connection
-     * @param mysqli $conn - Database connection
+     * @param PDO $conn - Database connection
      * @author Athanase Abayo
      */
     public function __construct($conn) {
@@ -349,14 +349,9 @@ class UserService {
      */
     public function findByEmail($email) {
         $stmt = $this->conn->prepare("SELECT id, email, password_hash, full_name, avatar_url FROM users WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows === 1) {
-            return $result->fetch_assoc();
-        }
-        return null;
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+        return $user ?: null;
     }
 
     /**
@@ -367,14 +362,9 @@ class UserService {
      */
     public function findById($userId) {
         $stmt = $this->conn->prepare("SELECT id, email, full_name, avatar_url FROM users WHERE id = ?");
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows === 1) {
-            return $result->fetch_assoc();
-        }
-        return null;
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch();
+        return $user ?: null;
     }
 
     /**
@@ -388,19 +378,17 @@ class UserService {
      */
     public function createUser($email, $passwordHash, $fullName) {
         // Begin transaction
-        $this->conn->begin_transaction();
+        $this->conn->beginTransaction();
         
         try {
             // Insert into users table
             $stmt = $this->conn->prepare("INSERT INTO users (email, password_hash, full_name) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $email, $passwordHash, $fullName);
-            $stmt->execute();
-            $userId = $this->conn->insert_id;
+            $stmt->execute([$email, $passwordHash, $fullName]);
+            $userId = $this->conn->lastInsertId();
             
             // Create profile
             $stmt = $this->conn->prepare("INSERT INTO profiles (user_id, full_name, email) VALUES (?, ?, ?)");
-            $stmt->bind_param("iss", $userId, $fullName, $email);
-            $stmt->execute();
+            $stmt->execute([$userId, $fullName, $email]);
             
             $this->conn->commit();
             return $userId;
@@ -419,18 +407,15 @@ class UserService {
      */
     public function updateProfile($userId, $updates) {
         $fields = [];
-        $types = "";
         $params = [];
         
         if (isset($updates['avatar_url'])) {
             $fields[] = "avatar_url = ?";
-            $types .= "s";
             $params[] = $updates['avatar_url'];
         }
         
         if (isset($updates['full_name'])) {
             $fields[] = "full_name = ?";
-            $types .= "s";
             $params[] = $updates['full_name'];
         }
         
@@ -439,13 +424,10 @@ class UserService {
         }
         
         $sql = "UPDATE users SET " . implode(", ", $fields) . " WHERE id = ?";
-        $types .= "i";
         $params[] = $userId;
         
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param($types, ...$params);
-        
-        return $stmt->execute();
+        return $stmt->execute($params);
     }
 }
 
