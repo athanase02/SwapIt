@@ -7,7 +7,7 @@
  */
 
 // Check if running on Render with PostgreSQL
-if (getenv('DATABASE_URL')) {
+if (getenv('DATABASE_URL') && extension_loaded('pdo_pgsql')) {
     // Render PostgreSQL connection string
     $databaseUrl = getenv('DATABASE_URL');
     
