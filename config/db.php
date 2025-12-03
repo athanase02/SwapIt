@@ -9,7 +9,7 @@
  */
 
 // Database configuration
-// Database name: SI2025 (SwapIt 2025)
+// Database name: SI2025 (SwapIt 2025) for local, swapit_db for production
 
 // Check if running on Render (environment variables are set)
 if (getenv('DB_HOST')) {
@@ -17,7 +17,7 @@ if (getenv('DB_HOST')) {
     $host = getenv('DB_HOST');
     $username = getenv('DB_USERNAME');
     $password = getenv('DB_PASSWORD');
-    $database = getenv('DB_NAME') ?: 'SI2025';
+    $database = getenv('DB_NAME') ?: 'swapit_db';
 } else {
     // Local development configuration
     $host = "localhost";

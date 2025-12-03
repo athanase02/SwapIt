@@ -1,8 +1,8 @@
 services:
   - type: web
     name: swapit
-    runtime: php
-    env: php
+    env: docker
+    plan: free
     buildCommand: bash render-build.sh
     startCommand: bash render-start.sh
     envVars:
@@ -13,7 +13,7 @@ services:
       - key: DB_PASSWORD
         sync: false
       - key: DB_NAME
-        value: SI2025
+        value: swapit_db
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
@@ -23,5 +23,6 @@ services:
 
 databases:
   - name: swapit-db
-    databaseName: SI2025
+    databaseName: swapit_db
     user: swapit_user
+    plan: free

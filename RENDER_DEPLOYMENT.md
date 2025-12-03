@@ -21,9 +21,11 @@
 3. Connect your GitHub repository: `https://github.com/athanase02/SwapIt`
 4. Configure the service:
    - **Name**: `swapit`
-   - **Runtime**: `PHP`
+   - **Environment**: `Docker`
    - **Build Command**: `bash render-build.sh`
    - **Start Command**: `bash render-start.sh`
+   
+Alternatively, Render will auto-detect the `render.yaml` file and configure everything automatically.
 
 ### 3. Configure Environment Variables
 Add the following environment variables in your Render service settings:
@@ -33,7 +35,7 @@ Add the following environment variables in your Render service settings:
 DB_HOST=<your-database-host>
 DB_USERNAME=<your-database-user>
 DB_PASSWORD=<your-database-password>
-DB_NAME=SI2025
+DB_NAME=swapit_db
 ```
 
 #### Google OAuth Configuration
