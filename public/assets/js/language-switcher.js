@@ -124,7 +124,20 @@ class LanguageSwitcher {
     toggleDropdown() {
         console.log('Toggle dropdown clicked, current state:', this.dropdownVisible);
         this.dropdownVisible = !this.dropdownVisible;
-        this.render();
+        
+        // Update dropdown visibility without full re-render
+        const dropdown = this.container.querySelector('.language-switcher__dropdown');
+        const button = this.container.querySelector('.language-switcher__button');
+        
+        if (dropdown && button) {
+            if (this.dropdownVisible) {
+                dropdown.classList.add('visible');
+                button.setAttribute('aria-expanded', 'true');
+            } else {
+                dropdown.classList.remove('visible');
+                button.setAttribute('aria-expanded', 'false');
+            }
+        }
     }
 
     /**
@@ -133,7 +146,13 @@ class LanguageSwitcher {
     hideDropdown() {
         if (this.dropdownVisible) {
             this.dropdownVisible = false;
-            this.render();
+            const dropdown = this.container.querySelector('.language-switcher__dropdown');
+            const button = this.container.querySelector('.language-switcher__button');
+            
+            if (dropdown && button) {
+                dropdown.classList.remove('visible');
+                button.setAttribute('aria-expanded', 'false');
+            }
         }
     }
 
