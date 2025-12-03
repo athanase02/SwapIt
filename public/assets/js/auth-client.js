@@ -75,12 +75,31 @@ class SwapItAuth {
                 credentials: 'include'
             });
 
-            const data = await response.json();
+            // Check if response is OK
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Get response text first to check if it's valid JSON
+            const text = await response.text();
+            if (!text || text.trim() === '') {
+                throw new Error('Server returned empty response');
+            }
+
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.error('Invalid JSON response:', text.substring(0, 500));
+                throw new Error('Server returned invalid response. Please check server logs.');
+            }
+
             if (data.success) {
                 this.user = data.user;
             }
             return data;
         } catch (error) {
+            console.error('Signup error:', error);
             return { success: false, message: error.message };
         }
     }
@@ -109,7 +128,25 @@ class SwapItAuth {
                 credentials: 'include'
             });
 
-            const data = await response.json();
+            // Check if response is OK
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Get response text first to check if it's valid JSON
+            const text = await response.text();
+            if (!text || text.trim() === '') {
+                throw new Error('Server returned empty response');
+            }
+
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.error('Invalid JSON response:', text.substring(0, 500));
+                throw new Error('Server returned invalid response. Please check server logs.');
+            }
+
             if (data.success) {
                 this.user = data.user;
                 console.log('Login successful');

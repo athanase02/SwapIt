@@ -31,13 +31,17 @@ $conn = new mysqli($host, $username, $password);
 
 // Check connection
 if ($conn->connect_error) {
+    // Log error for debugging
+    error_log("Database connection failed: " . $conn->connect_error);
+    
     // For API requests, return JSON error instead of dying
     if (strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false) {
         header('Content-Type: application/json');
         echo json_encode([
             'success' => false, 
             'error' => 'Database connection failed',
-            'details' => 'Please ensure MySQL is running and credentials are correct'
+            'details' => 'Unable to connect to database. Please check configuration.',
+            'debug' => getenv('DB_HOST') ? 'Using environment variables' : 'Using localhost'
         ]);
         exit;
     } else {
@@ -46,8 +50,24 @@ if ($conn->connect_error) {
 }
 
 // Try to create database if it doesn't exist
-$conn->query("CREATE DATABASE IF NOT EXISTS $database");
-$conn->select_db($database);
+$createDb = $conn->query("CREATE DATABASE IF NOT EXISTS $database");
+if (!$createDb) {
+    error_log("Failed to create database: " . $conn->error);
+}
+
+// Select database
+if (!$conn->select_db($database)) {
+    error_log("Failed to select database: " . $conn->error);
+    if (strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false) {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'error' => 'Database not found',
+            'details' => 'Database does not exist and could not be created'
+        ]);
+        exit;
+    }
+}
 
 // Set charset to ensure proper handling of special characters
 $conn->set_charset("utf8mb4");

@@ -19,8 +19,9 @@ ini_set('log_errors', 1);
 ini_set('session.cookie_lifetime', 86400); // 24 hours
 ini_set('session.cookie_path', '/');
 ini_set('session.cookie_httponly', 1); // Prevent XSS attacks on session cookies
-ini_set('session.cookie_secure', 0); // Set to 1 in production with HTTPS
-ini_set('session.cookie_samesite', 'Strict'); // CSRF protection
+// Set secure cookie only if HTTPS is available
+ini_set('session.cookie_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 1 : 0);
+ini_set('session.cookie_samesite', 'Lax'); // Changed from Strict to Lax for better compatibility
 session_start();
 
 // Security Headers - OWASP #5: Security Misconfiguration
