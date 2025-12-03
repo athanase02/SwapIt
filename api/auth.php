@@ -9,6 +9,11 @@
  * @version 2.0
  */
 
+// Prevent PHP errors from breaking JSON output
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
 // Configure session to persist across page navigation
 // Security: Session cookies configured for maximum security
 ini_set('session.cookie_lifetime', 86400); // 24 hours
@@ -26,7 +31,7 @@ header('X-Frame-Options: DENY'); // Prevent clickjacking
 header('X-XSS-Protection: 1; mode=block'); // Enable XSS filter
 header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:;"); // OWASP #8: Content Security Policy
 
-require_once dirname(__DIR__) . '/config/db_with_fallback.php';
+require_once dirname(__DIR__) . '/config/db.php';
 
 /**
  * Security Event Logger
