@@ -4,31 +4,62 @@
  * Handles item listing creation, updates, and activity tracking
  * 
  * @author Athanase Abayo - Core architecture and activity logging
- * @version 1.0
+ * @version 2.0 - Simplified for deployment
  */
 
 session_start();
 header('Content-Type: application/json');
 
-require_once dirname(__DIR__) . '/config/db_with_fallback.php';
+require_once dirname(__DIR__) . '/config/db.php';
 
-/**
- * Activity Logger
- * Logs all user activities to database for tracking and analytics
- */
-class ActivityLogger {
-    private $conn;
-    
-    public function __construct($connection) {
-        $this->conn = $connection;
+// Check if user is authenticated
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'error' => 'Authentication required']);
+    exit;
+}
+
+$userId = $_SESSION['user_id'];
+$action = $_GET['action'] ?? $_POST['action'] ?? '';
+
+try {
+    switch ($action) {
+        case 'get_recent_activities':
+            // Return empty activities (feature not yet implemented)
+            echo json_encode([
+                'success' => true,
+                'activities' => []
+            ]);
+            break;
+            
+        case 'get_categories':
+            // Return basic categories
+            echo json_encode([
+                'success' => true,
+                'categories' => [
+                    ['id' => 1, 'name' => 'Electronics'],
+                    ['id' => 2, 'name' => 'Books'],
+                    ['id' => 3, 'name' => 'Sports'],
+                    ['id' => 4, 'name' => 'Clothing'],
+                    ['id' => 5, 'name' => 'Other']
+                ]
+            ]);
+            break;
+            
+        default:
+            echo json_encode([
+                'success' => false,
+                'error' => 'Invalid action or feature not yet available'
+            ]);
+            break;
     }
-    
-    /**
-     * Log user activity to database
-     * @param int $userId - User ID performing the action
-     * @param string $action - Action performed (e.g., 'create_listing', 'add_to_cart')
-     * @param string $entityType - Type of entity (e.g., 'item', 'transaction')
-     * @param int $entityId - ID of the entity
+} catch (Exception $e) {
+    error_log("Listings API Error: " . $e->getMessage());
+    echo json_encode([
+        'success' => false,
+        'error' => 'An error occurred. Please try again later.'
+    ]);
+}
+?>
      * @param array $details - Additional details as JSON
      */
     public function log($userId, $action, $entityType = null, $entityId = null, $details = []) {
