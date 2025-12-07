@@ -1,0 +1,13 @@
+# Exclude local testing files from Render deployment
+public/auto-login.html
+public/quick-login.php
+public/test-session.php
+public/test-messages-requests.html
+
+# Development files
+*.md
+.vscode/
+.git/
+docs/
+RUN_POPULATE_SCRIPT.md
+MESSAGES_REQUESTS_FIX.md
