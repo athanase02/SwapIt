@@ -159,13 +159,11 @@ class MessagingService {
              FROM messages m
              JOIN users sender ON m.sender_id = sender.id
              JOIN users receiver ON m.receiver_id = receiver.id
-             WHERE m.conversation_id = ? 
-               AND (m.is_deleted_by_sender = 0 OR m.sender_id != ?)
-               AND (m.is_deleted_by_receiver = 0 OR m.receiver_id != ?)
+             WHERE m.conversation_id = ?
              ORDER BY m.created_at DESC
              LIMIT ? OFFSET ?"
         );
-        $stmt->execute([$conversationId, $userId, $userId, $limit, $offset]);
+        $stmt->execute([$conversationId, $limit, $offset]);
         $messages = $stmt->fetchAll();
         
         // Mark unread messages as read
