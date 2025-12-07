@@ -1,14 +1,116 @@
-<!DOCTYPE html>
+<!doctype html>
+<!--
+  Requests Page
+  @author SwapIt Team - Borrow request management interface
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Requests - SwapIt</title>
+    <title data-i18n-page-title="requests.pageTitle">My Requests — SwapIt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/language-switcher.css">
     <link rel="stylesheet" href="../assets/css/requests.css">
+    <style>
+        body {
+            background: var(--bg);
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        /* Navigation */
+        .topnav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(17, 19, 26, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #1e2330;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .topnav .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-brand img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--brand);
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem 4rem;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Navigation -->
+    <nav class="topnav">
+        <div class="container">
+            <a href="dashboard.html" class="nav-brand">
+                <img src="../assets/images/logo.png" alt="SwapIt">
+                <span>SwapIt</span>
+            </a>
+            <div id="languageSwitcher" style="margin-left: auto; margin-right: 2rem;"></div>
+            <ul class="nav-links" id="mainNavMenu">
+                <li><a href="browse.html"><i class="fas fa-search"></i> <span data-i18n="nav.browse">Browse</span></a></li>
+                <li><a href="messages.html"><i class="fas fa-comments"></i> <span data-i18n="nav.messages">Messages</span></a></li>
+                <li><a href="requests.html" class="active"><i class="fas fa-exchange-alt"></i> <span data-i18n="nav.requests">Requests</span></a></li>
+                <li><a href="add-listing.html"><i class="fas fa-plus-circle"></i> <span data-i18n="nav.addListing">Add Listing</span></a></li>
+                <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> <span data-i18n="nav.cart">Cart</span></a></li>
+                <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
         <div class="requests-page">
             <div class="page-header">
                 <h1>My Borrow Requests</h1>
@@ -84,94 +186,55 @@
         </div>
     </div>
 
-    <!-- Request Detail Modal -->
-    <div id="requestDetailModal" class="modal">
-        <div class="modal-content modal-large">
-            <div class="modal-header">
-                <h3>Request Details</h3>
-                <button class="modal-close" id="closeDetailModal">&times;</button>
+    <!-- Footer -->
+    <footer class="sitefoot">
+        <div class="container">
+            <div class="sitefoot__grid">
+                <div class="sitefoot__col">
+                    <h4 data-i18n="footer.about">About SwapIt</h4>
+                    <ul>
+                        <li><a href="../home.html#about-us" data-i18n="footer.ourStory">Our Story</a></li>
+                        <li><a href="../home.html#how" data-i18n="footer.howItWorks">How It Works</a></li>
+                        <li><a href="../home.html#contact" data-i18n="footer.contactUs">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="sitefoot__col">
+                    <h4 data-i18n="footer.myItems">My Items</h4>
+                    <ul>
+                        <li><a href="wishlist.html" data-i18n="footer.wishlist">Wishlist</a></li>
+                        <li><a href="cart.html" data-i18n="footer.cart">Cart</a></li>
+                        <li><a href="dashboard.html" data-i18n="footer.myListings">My Listings</a></li>
+                        <li><a href="messages.html" data-i18n="footer.messages">Messages</a></li>
+                    </ul>
+                </div>
+
+                <div class="sitefoot__col">
+                    <h4 data-i18n="footer.contact">Contact</h4>
+                    <ul>
+                        <li><a href="mailto:info@swapit.com"><i class="fas fa-envelope"></i> info@swapit.com</a></li>
+                        <li><a href="tel:+25078888888"><i class="fas fa-phone"></i> (250) 78888888</a></li>
+                        <li><a href="tel:+23355555555"><i class="fas fa-phone"></i> (233) 55555555</a></li>
+                        <li><a href="tel:+2328888888"><i class="fas fa-phone"></i> (232) 8888888</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="modal-body" id="requestDetailContent">
-                <!-- Request details will be loaded here -->
-            </div>
-        </div>
-    </div>
 
-    <!-- Schedule Meeting Modal -->
-    <div id="scheduleMeetingModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Schedule Meeting</h3>
-                <button class="modal-close" id="closeMeetingModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="scheduleMeetingForm">
-                    <input type="hidden" id="meetingRequestId">
-                    
-                    <div class="form-group">
-                        <label for="meetingType">Meeting Type *</label>
-                        <select id="meetingType" required>
-                            <option value="">Select type...</option>
-                            <option value="pickup">Pickup</option>
-                            <option value="return">Return</option>
-                            <option value="discussion">Discussion</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="meetingDate">Date *</label>
-                        <input type="date" id="meetingDate" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="meetingTime">Time *</label>
-                        <input type="time" id="meetingTime" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="meetingLocation">Location *</label>
-                        <input type="text" id="meetingLocation" placeholder="Enter meeting location" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="meetingNotes">Additional Notes</label>
-                        <textarea id="meetingNotes" rows="3" placeholder="Any additional information..."></textarea>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" id="cancelMeeting">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Schedule Meeting</button>
-                    </div>
-                </form>
+            <div class="sitefoot__bottom">
+                <div style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%">
+                    <img src="../assets/images/logo.png" alt="SwapIt Logo" style="width:32px;height:32px;border-radius:50%;object-fit:cover">
+                    <small>SwapIt Ltd. &copy; <span data-i18n="footer.rights">All rights reserved</span> <span id="year">2025</span></small>
+                </div>
             </div>
         </div>
-    </div>
+    </footer>
 
-    <!-- Reject Request Modal -->
-    <div id="rejectRequestModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Reject Request</h3>
-                <button class="modal-close" id="closeRejectModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="rejectRequestForm">
-                    <input type="hidden" id="rejectRequestId">
-                    
-                    <div class="form-group">
-                        <label for="rejectionReason">Reason for rejection *</label>
-                        <textarea id="rejectionReason" rows="4" placeholder="Please provide a reason..." required></textarea>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" id="cancelReject">Cancel</button>
-                        <button type="submit" class="btn btn-danger">Reject Request</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+    <script src="../assets/js/translation.js"></script>
+    <script src="../assets/js/language-switcher.js"></script>
+    <script src="../assets/js/nav-auth-topnav.js"></script>
     <script src="../assets/js/request-manager.js"></script>
     <script>
         // Initialize request manager when page loads

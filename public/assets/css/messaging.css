@@ -2,12 +2,14 @@
 
 .messaging-container {
     display: flex;
-    height: calc(100vh - 100px);
+    height: calc(100vh - 180px);
+    min-height: 600px;
     max-height: 800px;
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    margin-bottom: 2rem;
 }
 
 /* Conversations Sidebar */
