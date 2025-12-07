@@ -16,14 +16,14 @@ $results = [
 ];
 
 try {
-    // Check connection
-    if (!isset($pdo)) {
+    // Check connection - config/db.php uses $conn variable
+    if (!isset($conn)) {
         throw new Exception("Database connection not available");
     }
 
     // 1. Create conversations table
     try {
-        $pdo->exec("
+        $conn->exec("
             CREATE TABLE IF NOT EXISTS conversations (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 user1_id INT NOT NULL,
@@ -49,7 +49,7 @@ try {
 
     // 2. Create messages table
     try {
-        $pdo->exec("
+        $conn->exec("
             CREATE TABLE IF NOT EXISTS messages (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 conversation_id INT NOT NULL,
@@ -80,7 +80,7 @@ try {
 
     // 3. Create borrow_requests table
     try {
-        $pdo->exec("
+        $conn->exec("
             CREATE TABLE IF NOT EXISTS borrow_requests (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 item_id INT NOT NULL,
@@ -115,7 +115,7 @@ try {
 
     // 4. Create reviews table
     try {
-        $pdo->exec("
+        $conn->exec("
             CREATE TABLE IF NOT EXISTS reviews (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 reviewer_id INT NOT NULL,
@@ -147,7 +147,7 @@ try {
 
     // 5. Create notifications table
     try {
-        $pdo->exec("
+        $conn->exec("
             CREATE TABLE IF NOT EXISTS notifications (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 user_id INT NOT NULL,
@@ -174,7 +174,7 @@ try {
     }
 
     // Get list of all tables
-    $stmt = $pdo->query("SHOW TABLES");
+    $stmt = $conn->query("SHOW TABLES");
     $all_tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
     
     $results['success'] = true;
