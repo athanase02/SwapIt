@@ -65,7 +65,7 @@
     <script>
         async function autoLogin() {
             try {
-                const response = await fetch('quick-login.php', {
+                const response = await fetch('/SwapIt/public/quick-login.php', {
                     credentials: 'include'
                 });
                 const data = await response.json();
