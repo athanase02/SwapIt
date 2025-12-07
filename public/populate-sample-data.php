@@ -239,9 +239,10 @@ try {
         $stmt = $conn->prepare("
             INSERT INTO meeting_schedules (
                 borrow_request_id, scheduled_by, meeting_type,
-                meeting_date, meeting_time, location, notes, status
+                meeting_date, meeting_location, notes, meeting_status
             )
-            VALUES (?, ?, 'pickup', DATE_SUB(CURDATE(), INTERVAL ? DAY), '14:00:00', 
+            VALUES (?, ?, 'offline', 
+                    DATE_SUB(NOW(), INTERVAL ? DAY) + INTERVAL 14 HOUR, 
                     'Student Center Main Entrance', 'Pickup confirmed', 'completed')
         ");
         $stmt->execute([$requestId, $lender_id, (2 + $i)]);
