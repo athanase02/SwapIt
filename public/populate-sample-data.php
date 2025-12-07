@@ -164,14 +164,17 @@ try {
                 borrower_message, status, created_at
             )
             VALUES (?, ?, ?, DATE_ADD(CURDATE(), INTERVAL ? DAY), DATE_ADD(CURDATE(), INTERVAL ? DAY), 
-                    ?, 20.00, 'Ashesi University Campus', ?, 'pending', DATE_SUB(NOW(), INTERVAL ? DAY))
+                    ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY))
         ");
         $stmt->execute([
             $item_id, $borrower_id, $lender_id,
             (7 + $i), // Start in 7-11 days
             (12 + $i), // End in 12-16 days
             $item_price * 0.2, // 20% of item price
+            20.00,
+            'Ashesi University Campus',
             "Hi! I'd like to borrow this for a few days. Available?",
+            'pending',
             $i // Created 0-4 days ago
         ]);
         $requestsCreated++;
@@ -193,14 +196,17 @@ try {
                 borrower_message, status, created_at
             )
             VALUES (?, ?, ?, DATE_ADD(CURDATE(), INTERVAL ? DAY), DATE_ADD(CURDATE(), INTERVAL ? DAY), 
-                    ?, 15.00, 'Campus Library', ?, 'pending', DATE_SUB(NOW(), INTERVAL ? HOUR))
+                    ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? HOUR))
         ");
         $stmt->execute([
             $item_id, $borrower_id, $lender_id,
             (3 + $i), // Start in 3-7 days
             (8 + $i), // End in 8-12 days
             $item_price * 0.15,
+            15.00,
+            'Campus Library',
             "Hello! Interested in borrowing this. Is it available?",
+            'pending',
             ($i * 6) // Created 0-24 hours ago
         ]);
         $requestsCreated++;
@@ -222,14 +228,17 @@ try {
                 borrower_message, status, created_at, updated_at
             )
             VALUES (?, ?, ?, DATE_SUB(CURDATE(), INTERVAL ? DAY), DATE_ADD(CURDATE(), INTERVAL ? DAY), 
-                    ?, 25.00, 'Student Center', ?, 'active', DATE_SUB(NOW(), INTERVAL ? DAY), NOW())
+                    ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY), NOW())
         ");
         $stmt->execute([
             $item_id, $borrower_id, $lender_id,
             (2 + $i), // Started 2-6 days ago
             (3 + $i), // Ends in 3-7 days
             $item_price * 0.25,
+            25.00,
+            'Student Center',
             "Need this for a project. Thanks!",
+            'active',
             (7 + $i) // Created 7-11 days ago
         ]);
         $requestId = $conn->lastInsertId();
@@ -264,14 +273,17 @@ try {
                 borrower_message, status, created_at, updated_at
             )
             VALUES (?, ?, ?, DATE_SUB(CURDATE(), INTERVAL ? DAY), DATE_SUB(CURDATE(), INTERVAL ? DAY), 
-                    ?, 30.00, 'Library', ?, 'completed', DATE_SUB(NOW(), INTERVAL ? DAY), DATE_SUB(NOW(), INTERVAL ? DAY))
+                    ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY), DATE_SUB(NOW(), INTERVAL ? DAY))
         ");
         $stmt->execute([
             $item_id, $borrower_id, $lender_id,
             (20 + $i * 2), // Started 20-28 days ago
             (15 + $i * 2), // Ended 15-23 days ago
             $item_price * 0.3,
+            30.00,
+            'Library',
             "Great item! Would love to borrow it.",
+            'completed',
             (25 + $i * 2) // Created 25-33 days ago
         ]);
         $requestId = $conn->lastInsertId();
