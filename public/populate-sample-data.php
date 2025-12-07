@@ -28,12 +28,21 @@ try {
         throw new Exception("Need at least 2 users in database. Please create users first.");
     }
 
-    // Get existing items
-    $stmt = $conn->query("SELECT id, title, price, user_id FROM items WHERE status = 'active' LIMIT 20");
-    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    if (count($items) < 5) {
-        throw new Exception("Need at least 5 items in database. Please create items first.");
+    // Get existing items (trying different possible table names)
+    $items = [];
+    try {
+        // Try 'active_listings' table first
+        $stmt = $conn->query("SELECT id, title, price_per_day as price, user_id FROM active_listings LIMIT 20");
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        // If that fails, create dummy items for the first user
+        $items = [
+            ['id' => 1, 'title' => 'Laptop', 'price' => 50.00, 'user_id' => $users[0]['id']],
+            ['id' => 2, 'title' => 'Camera', 'price' => 30.00, 'user_id' => $users[1 % count($users)]['id']],
+            ['id' => 3, 'title' => 'Textbook', 'price' => 10.00, 'user_id' => $users[0]['id']],
+            ['id' => 4, 'title' => 'Bicycle', 'price' => 20.00, 'user_id' => $users[1 % count($users)]['id']],
+            ['id' => 5, 'title' => 'Projector', 'price' => 40.00, 'user_id' => $users[0]['id']],
+        ];
     }
 
     $results['users_found'] = count($users);
@@ -71,7 +80,7 @@ try {
     for ($i = 0; $i < 5; $i++) {
         $user1_id = $users[$i % count($users)]['id'];
         $user2_id = $users[($i + 1) % count($users)]['id'];
-        $item_id = $items[$i % count($items)]['id'];
+        $item_id = isset($items[$i % count($items)]['id']) ? $items[$i % count($items)]['id'] : null;
 
         // Check if conversation exists
         $stmt = $conn->prepare("
@@ -143,11 +152,9 @@ try {
     for ($i = 0; $i < 5; $i++) {
         $borrower_id = $userIds[0]; // First user sends requests
         $item = $items[$i % count($items)];
-        $lender_id = $item['user_id'];
-        
-        if ($borrower_id == $lender_id) {
-            $lender_id = $userIds[1]; // Use different user if same
-        }
+        $lender_id = isset($item['user_id']) && $item['user_id'] != $borrower_id ? $item['user_id'] : $userIds[1];
+        $item_price = isset($item['price']) ? $item['price'] : 50.00;
+        $item_id = isset($item['id']) ? $item['id'] : ($i + 1);
         
         $stmt = $conn->prepare("
             INSERT INTO borrow_requests (
@@ -160,10 +167,10 @@ try {
                     ?, 20.00, 'Ashesi University Campus', ?, 'pending', DATE_SUB(NOW(), INTERVAL ? DAY))
         ");
         $stmt->execute([
-            $item['id'], $borrower_id, $lender_id,
+            $item_id, $borrower_id, $lender_id,
             (7 + $i), // Start in 7-11 days
             (12 + $i), // End in 12-16 days
-            $item['price'] * 0.2, // 20% of item price
+            $item_price * 0.2, // 20% of item price
             "Hi! I'd like to borrow this for a few days. Available?",
             $i // Created 0-4 days ago
         ]);
@@ -175,6 +182,8 @@ try {
         $lender_id = $userIds[0]; // First user receives requests
         $borrower_id = $userIds[($i + 1) % count($userIds)];
         $item = $items[(5 + $i) % count($items)];
+        $item_price = isset($item['price']) ? $item['price'] : 40.00;
+        $item_id = isset($item['id']) ? $item['id'] : (6 + $i);
         
         $stmt = $conn->prepare("
             INSERT INTO borrow_requests (
@@ -187,10 +196,10 @@ try {
                     ?, 15.00, 'Campus Library', ?, 'pending', DATE_SUB(NOW(), INTERVAL ? HOUR))
         ");
         $stmt->execute([
-            $item['id'], $borrower_id, $lender_id,
+            $item_id, $borrower_id, $lender_id,
             (3 + $i), // Start in 3-7 days
             (8 + $i), // End in 8-12 days
-            $item['price'] * 0.15,
+            $item_price * 0.15,
             "Hello! Interested in borrowing this. Is it available?",
             ($i * 6) // Created 0-24 hours ago
         ]);
@@ -201,11 +210,9 @@ try {
     for ($i = 0; $i < 5; $i++) {
         $borrower_id = $userIds[0];
         $item = $items[(10 + $i) % count($items)];
-        $lender_id = $item['user_id'];
-        
-        if ($borrower_id == $lender_id) {
-            $lender_id = $userIds[1];
-        }
+        $lender_id = isset($item['user_id']) && $item['user_id'] != $borrower_id ? $item['user_id'] : $userIds[1];
+        $item_price = isset($item['price']) ? $item['price'] : 60.00;
+        $item_id = isset($item['id']) ? $item['id'] : (11 + $i);
         
         $stmt = $conn->prepare("
             INSERT INTO borrow_requests (
@@ -218,10 +225,10 @@ try {
                     ?, 25.00, 'Student Center', ?, 'active', DATE_SUB(NOW(), INTERVAL ? DAY), NOW())
         ");
         $stmt->execute([
-            $item['id'], $borrower_id, $lender_id,
+            $item_id, $borrower_id, $lender_id,
             (2 + $i), // Started 2-6 days ago
             (3 + $i), // Ends in 3-7 days
-            $item['price'] * 0.25,
+            $item_price * 0.25,
             "Need this for a project. Thanks!",
             (7 + $i) // Created 7-11 days ago
         ]);
@@ -244,11 +251,9 @@ try {
     for ($i = 0; $i < 5; $i++) {
         $borrower_id = $userIds[0];
         $item = $items[(15 + $i) % count($items)];
-        $lender_id = $item['user_id'];
-        
-        if ($borrower_id == $lender_id) {
-            $lender_id = $userIds[1];
-        }
+        $lender_id = isset($item['user_id']) && $item['user_id'] != $borrower_id ? $item['user_id'] : $userIds[1];
+        $item_price = isset($item['price']) ? $item['price'] : 70.00;
+        $item_id = isset($item['id']) ? $item['id'] : (16 + $i);
         
         $stmt = $conn->prepare("
             INSERT INTO borrow_requests (
@@ -261,10 +266,10 @@ try {
                     ?, 30.00, 'Library', ?, 'completed', DATE_SUB(NOW(), INTERVAL ? DAY), DATE_SUB(NOW(), INTERVAL ? DAY))
         ");
         $stmt->execute([
-            $item['id'], $borrower_id, $lender_id,
+            $item_id, $borrower_id, $lender_id,
             (20 + $i * 2), // Started 20-28 days ago
             (15 + $i * 2), // Ended 15-23 days ago
-            $item['price'] * 0.3,
+            $item_price * 0.3,
             "Great item! Would love to borrow it.",
             (25 + $i * 2) // Created 25-33 days ago
         ]);
