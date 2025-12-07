@@ -48,33 +48,56 @@ class MessagingSystem {
     }
 
     async loadConversations() {
+        const container = document.getElementById('conversationsList');
+        if (!container) return;
+
         try {
-            const response = await fetch('/api/messages.php?action=get_conversations', {
+            // Show loading state
+            container.innerHTML = '<div class="loading">Loading conversations...</div>';
+
+            const response = await fetch('../api/messages.php?action=getConversations', {
                 credentials: 'include'
             });
 
             const data = await response.json();
 
             if (data.success) {
-                this.renderConversations(data.conversations);
+                this.renderConversations(data.conversations || []);
             } else {
-                console.error('Failed to load conversations:', data.error);
+                // Show error or empty state
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-comments" style="font-size: 48px; color: #6b7280; margin-bottom: 16px;"></i>
+                        <p style="color: #6b7280; margin: 0;">No conversations yet</p>
+                        <small style="color: #9ca3af;">Start browsing items to connect with other users</small>
+                    </div>
+                `;
             }
         } catch (error) {
             console.error('Error loading conversations:', error);
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #ef4444; margin-bottom: 16px;"></i>
+                    <p style="color: #ef4444; margin: 0;">Error loading conversations</p>
+                    <small style="color: #9ca3af;">Please try refreshing the page</small>
+                </div>
+            `;
         }
     }
 
     renderConversations(conversations) {
-        const container = document.getElementById('conversations-list');
+        const container = document.getElementById('conversationsList');
         if (!container) return;
 
-        if (conversations.length === 0) {
+        if (!conversations || conversations.length === 0) {
             container.innerHTML = `
-                <div class="no-conversations">
-                    <i class="fas fa-comments"></i>
-                    <p>No conversations yet</p>
-                    <small>Start browsing items to connect with other users</small>
+                <div class="empty-state" style="padding: 40px 20px; text-align: center;">
+                    <i class="fas fa-comments" style="font-size: 48px; color: #6b7280; margin-bottom: 16px;"></i>
+                    <h3 style="color: #374151; margin: 0 0 8px;">No conversations yet</h3>
+                    <p style="color: #6b7280; margin: 0; font-size: 14px;">Start browsing items to connect with other users</p>
+                    <a href="browse.html" class="btn btn-primary" style="margin-top: 20px; display: inline-block; padding: 10px 20px; background: #3b82f6; color: white; text-decoration: none; border-radius: 6px;">
+                        <i class="fas fa-search"></i> Browse Items
+                    </a>
                 </div>
             `;
             return;

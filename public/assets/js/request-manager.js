@@ -79,129 +79,230 @@ class RequestManager {
     }
 
     async loadRequests(role = 'all', status = 'all') {
+        const sentList = document.getElementById('sentRequestsList');
+        const receivedList = document.getElementById('receivedRequestsList');
+        const activeList = document.getElementById('activeRequestsList');
+        const completedList = document.getElementById('completedRequestsList');
+
+        // Show loading in all tabs
+        [sentList, receivedList, activeList, completedList].forEach(list => {
+            if (list) list.innerHTML = '<div class="loading">Loading requests...</div>';
+        });
+
         try {
             const response = await fetch(
-                `/api/requests.php?action=get_my_requests&role=${role}&status=${status}`,
+                `../api/requests.php?action=getUserRequests`,
                 { credentials: 'include' }
             );
 
             const data = await response.json();
 
             if (data.success) {
-                this.renderRequests(data.requests);
+                const requests = data.requests || [];
+                this.renderRequestsByTab(requests);
+                this.updateTabCounts(requests);
             } else {
-                console.error('Failed to load requests:', data.error);
+                // Show empty state
+                this.renderEmptyState();
             }
         } catch (error) {
             console.error('Error loading requests:', error);
+            this.renderErrorState();
         }
     }
 
-    renderRequests(requests) {
-        const container = document.getElementById('requests-container');
+    renderRequestsByTab(requests) {
+        const sent = requests.filter(r => r.request_type === 'sent');
+        const received = requests.filter(r => r.request_type === 'received');
+        const active = requests.filter(r => r.status === 'active');
+        const completed = requests.filter(r => r.status === 'completed');
+
+        this.renderRequestList('sentRequestsList', sent, 'sent');
+        this.renderRequestList('receivedRequestsList', received, 'received');
+        this.renderRequestList('activeRequestsList', active, 'active');
+        this.renderRequestList('completedRequestsList', completed, 'completed');
+    }
+
+    updateTabCounts(requests) {
+        const counts = {
+            sent: requests.filter(r => r.request_type === 'sent').length,
+            received: requests.filter(r => r.request_type === 'received').length,
+            active: requests.filter(r => r.status === 'active').length,
+            completed: requests.filter(r => r.status === 'completed').length
+        };
+
+        document.getElementById('sentCount').textContent = counts.sent;
+        document.getElementById('receivedCount').textContent = counts.received;
+        document.getElementById('activeCount').textContent = counts.active;
+        document.getElementById('completedCount').textContent = counts.completed;
+    }
+
+    renderRequestList(containerId, requests, type) {
+        const container = document.getElementById(containerId);
         if (!container) return;
 
         if (requests.length === 0) {
+            const messages = {
+                sent: 'You haven\'t sent any requests yet',
+                received: 'No one has requested to borrow from you yet',
+                active: 'No active borrows at the moment',
+                completed: 'No completed transactions yet'
+            };
+
             container.innerHTML = `
-                <div class="no-requests">
-                    <i class="fas fa-clipboard-list"></i>
-                    <p>No requests found</p>
-                    <small>Your borrow requests will appear here</small>
+                <div class="empty-state" style="padding: 60px 20px; text-align: center;">
+                    <i class="fas fa-inbox" style="font-size: 48px; color: #6b7280; margin-bottom: 16px;"></i>
+                    <h3 style="color: #374151; margin: 0 0 8px;">${messages[type]}</h3>
+                    <p style="color: #6b7280; margin: 0; font-size: 14px;">Start browsing items to make requests</p>
+                    <a href="browse.html" class="btn btn-primary" style="margin-top: 20px; display: inline-block; padding: 10px 20px; background: #3b82f6; color: white; text-decoration: none; border-radius: 6px;">
+                        <i class="fas fa-search"></i> Browse Items
+                    </a>
                 </div>
             `;
             return;
         }
 
-        const currentUserId = document.body.dataset.userId || window.currentUserId;
-
-        container.innerHTML = requests.map(req => {
-            const isLender = req.lender_id == currentUserId;
-            const statusClass = this.getStatusClass(req.status);
-            const statusText = this.getStatusText(req.status);
-
-            return `
-                <div class="request-card ${statusClass}">
-                    <div class="request-header">
-                        <div class="item-info">
-                            <img src="${req.item_image || '/public/assets/images/placeholder.jpg'}" 
-                                 alt="${req.item_title}" class="item-thumbnail">
-                            <div>
-                                <h3>${req.item_title}</h3>
-                                <p class="request-role">${isLender ? 'Lend Request' : 'Borrow Request'}</p>
-                            </div>
-                        </div>
-                        <span class="request-status status-${req.status}">${statusText}</span>
-                    </div>
-
-                    <div class="request-details">
-                        <div class="detail-row">
-                            <i class="fas fa-user"></i>
-                            <span>${isLender ? req.borrower_name : req.lender_name}</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="fas fa-calendar"></i>
-                            <span>${this.formatDate(req.borrow_start_date)} - ${this.formatDate(req.borrow_end_date)}</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="fas fa-dollar-sign"></i>
-                            <span>$${parseFloat(req.total_price).toFixed(2)}</span>
-                        </div>
-                    </div>
-
-                    ${req.borrower_message ? `
-                        <div class="request-message">
-                            <strong>Message:</strong> ${this.escapeHtml(req.borrower_message)}
-                        </div>
-                    ` : ''}
-
-                    <div class="request-actions">
-                        ${this.getActionButtons(req, isLender)}
-                    </div>
-                </div>
-            `;
-        }).join('');
+        container.innerHTML = requests.map(req => this.renderRequestCard(req)).join('');
     }
 
-    getActionButtons(request, isLender) {
+    renderEmptyState() {
+        [document.getElementById('sentRequestsList'), 
+         document.getElementById('receivedRequestsList'),
+         document.getElementById('activeRequestsList'),
+         document.getElementById('completedRequestsList')].forEach(list => {
+            if (list) {
+                list.innerHTML = `
+                    <div class="empty-state" style="padding: 60px 20px; text-align: center;">
+                        <i class="fas fa-inbox" style="font-size: 48px; color: #6b7280; margin-bottom: 16px;"></i>
+                        <h3 style="color: #374151; margin: 0 0 8px;">No requests yet</h3>
+                        <p style="color: #6b7280; margin: 0; font-size: 14px;">Your requests will appear here</p>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    renderErrorState() {
+        [document.getElementById('sentRequestsList'), 
+         document.getElementById('receivedRequestsList'),
+         document.getElementById('activeRequestsList'),
+         document.getElementById('completedRequestsList')].forEach(list => {
+            if (list) {
+                list.innerHTML = `
+                    <div class="empty-state" style="padding: 60px 20px; text-align: center;">
+                        <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #ef4444; margin-bottom: 16px;"></i>
+                        <h3 style="color: #ef4444; margin: 0 0 8px;">Error loading requests</h3>
+                        <p style="color: #6b7280; margin: 0; font-size: 14px;">Please try refreshing the page</p>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    renderRequestCard(req) {
+        const statusBadgeClass = {
+            'pending': 'status-badge pending',
+            'accepted': 'status-badge accepted',
+            'rejected': 'status-badge rejected',
+            'active': 'status-badge active',
+            'completed': 'status-badge completed',
+            'cancelled': 'status-badge cancelled'
+        };
+
+        return `
+            <div class="request-card">
+                <div class="request-header">
+                    <div class="request-item-info">
+                        <img src="${req.item_image || '../assets/images/placeholder.jpg'}" 
+                             alt="${req.item_title}" class="item-image">
+                        <div class="item-details">
+                            <h3>${req.item_title}</h3>
+                            <p><i class="fas fa-user"></i> ${req.other_user_name}</p>
+                            <p><i class="fas fa-map-marker-alt"></i> ${req.pickup_location || 'Location not specified'}</p>
+                        </div>
+                    </div>
+                    <span class="${statusBadgeClass[req.status]}">${this.getStatusText(req.status)}</span>
+                </div>
+
+                <div class="request-body">
+                    <div class="request-dates">
+                        <div class="date-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>${this.formatDate(req.borrow_start_date)} - ${this.formatDate(req.borrow_end_date)}</span>
+                        </div>
+                    </div>
+                    <div class="request-price">$${parseFloat(req.total_price).toFixed(2)}</div>
+                    ${req.borrower_message ? `
+                        <div class="request-message">
+                            <strong>Message:</strong>
+                            ${req.borrower_message}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="request-footer">
+                    <div class="user-info">
+                        <div class="user-avatar">${req.other_user_name.charAt(0).toUpperCase()}</div>
+                        <span class="user-name">${req.other_user_name}</span>
+                    </div>
+                    <div class="request-actions">
+                        ${this.renderRequestActions(req)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    renderRequestActions(req) {
         const buttons = [];
 
-        // View details button (always available)
+        // View details button
         buttons.push(`
-            <button class="btn btn-secondary view-request-btn" data-request-id="${request.id}">
-                <i class="fas fa-eye"></i> View Details
+            <button class="btn btn-outline" onclick="requestManager.viewRequest(${req.id})">
+                <i class="fas fa-eye"></i> View
             </button>
         `);
 
-        // Lender actions for pending requests
-        if (isLender && request.status === 'pending') {
+        // Actions based on request type and status
+        if (req.request_type === 'received' && req.status === 'pending') {
             buttons.push(`
-                <button class="btn btn-success accept-request-btn" data-request-id="${request.id}">
+                <button class="btn btn-success" onclick="requestManager.acceptRequest(${req.id})">
                     <i class="fas fa-check"></i> Accept
                 </button>
-                <button class="btn btn-danger reject-request-btn" data-request-id="${request.id}">
-                    <i class="fas fa-times"></i> Decline
+                <button class="btn btn-danger" onclick="requestManager.rejectRequest(${req.id})">
+                    <i class="fas fa-times"></i> Reject
                 </button>
             `);
         }
 
-        // Schedule meeting button for accepted requests
-        if (request.status === 'accepted') {
+        // Schedule meeting for accepted requests
+        if (req.status === 'accepted' || req.status === 'active') {
             buttons.push(`
-                <button class="btn btn-primary schedule-meeting-btn" data-request-id="${request.id}">
-                    <i class="fas fa-calendar-plus"></i> Schedule Meeting
+                <button class="btn btn-primary" onclick="requestManager.scheduleMeeting(${req.id})">
+                    <i class="fas fa-calendar-plus"></i> Meeting
                 </button>
             `);
         }
-
-        // Message button
-        const otherUserId = isLender ? request.borrower_id : request.lender_id;
-        buttons.push(`
-            <button class="btn btn-info start-conversation-btn" data-user-id="${otherUserId}">
-                <i class="fas fa-comment"></i> Message
-            </button>
-        `);
 
         return buttons.join('');
+    }
+
+    getStatusText(status) {
+        const texts = {
+            'pending': 'Pending',
+            'accepted': 'Accepted',
+            'rejected': 'Rejected',
+            'active': 'Active',
+            'completed': 'Completed',
+            'cancelled': 'Cancelled'
+        };
+        return texts[status] || status;
+    }
+
+    formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
     async submitRequest() {
