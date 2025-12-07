@@ -94,7 +94,7 @@ try {
         if ($existingConv) {
             $conversation_id = $existingConv['id'];
         } else {
-            $stmt = $conn->prepare("INSERT INTO conversations (user1_id, user2_id, item_id, created_at, updated_at, last_message_at) VALUES (?, ?, ?, NOW(), NOW(), NOW())");
+            $stmt = $conn->prepare("INSERT INTO conversations (user1_id, user2_id, item_id, created_at, last_message_at) VALUES (?, ?, ?, NOW(), NOW())");
             $stmt->execute([$user1_id, $user2_id, $item_id]);
             $conversation_id = $conn->lastInsertId();
             $conversationsCreated++;
