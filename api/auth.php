@@ -51,7 +51,7 @@ require_once dirname(__DIR__) . '/config/db.php';
 /**
  * Security Event Logger
  * OWASP #9: Security Logging and Monitoring Failures - Prevention
- * Logs all security-relevant events for audit and monitoring
+ * Logs all security relevant events for audit and monitoring
  * 
  * @author Olivier Kwizera - Logging implementation
  * @author Athanase Abayo - Event tracking
