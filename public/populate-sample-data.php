@@ -28,14 +28,12 @@ try {
         throw new Exception("Need at least 2 users in database. Please create users first.");
     }
 
-    // Get existing items (trying different possible table names)
+    // Get existing items
     $items = [];
     try {
-        // Try 'active_listings' table first
         $stmt = $conn->query("SELECT id, title, price_per_day as price, user_id FROM active_listings LIMIT 20");
         $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
-        // If that fails, create dummy items for the first user
         $items = [
             ['id' => 1, 'title' => 'Laptop', 'price' => 50.00, 'user_id' => $users[0]['id']],
             ['id' => 2, 'title' => 'Camera', 'price' => 30.00, 'user_id' => $users[1 % count($users)]['id']],
@@ -48,8 +46,7 @@ try {
     $results['users_found'] = count($users);
     $results['items_found'] = count($items);
 
-    // ==================== CREATE CONVERSATIONS & MESSAGES ====================
-    
+    // Sample messages
     $sampleMessages = [
         "Hi! I'm interested in borrowing this item.",
         "Sure! When would you need it?",
@@ -83,136 +80,80 @@ try {
         $item_id = isset($items[$i % count($items)]['id']) ? $items[$i % count($items)]['id'] : null;
 
         // Check if conversation exists
-        $stmt = $conn->prepare("
-            SELECT id FROM conversations 
-            WHERE (user1_id = ? AND user2_id = ?) 
-               OR (user1_id = ? AND user2_id = ?)
-        ");
+        $stmt = $conn->prepare("SELECT id FROM conversations WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)");
         $stmt->execute([$user1_id, $user2_id, $user2_id, $user1_id]);
         $existingConv = $stmt->fetch();
 
         if ($existingConv) {
             $conversation_id = $existingConv['id'];
         } else {
-            // Create conversation
-            $stmt = $conn->prepare("
-                INSERT INTO conversations (user1_id, user2_id, item_id, created_at, updated_at)
-                VALUES (?, ?, ?, NOW(), NOW())
-            ");
+            $stmt = $conn->prepare("INSERT INTO conversations (user1_id, user2_id, item_id, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())");
             $stmt->execute([$user1_id, $user2_id, $item_id]);
             $conversation_id = $conn->lastInsertId();
             $conversationsCreated++;
         }
 
-        // Create 5 messages for this conversation
+        // Create 5 messages
         for ($m = 0; $m < 5; $m++) {
             $sender_id = ($m % 2 === 0) ? $user1_id : $user2_id;
             $receiver_id = ($m % 2 === 0) ? $user2_id : $user1_id;
             $message_text = $sampleMessages[($i * 5 + $m) % count($sampleMessages)];
+            $is_read = ($m < 3 ? 1 : 0);
+            $hours_ago = (5 - $m);
             
-            $stmt = $conn->prepare("
-                INSERT INTO messages (
-                    conversation_id, sender_id, receiver_id, message_text, 
-                    item_id, is_read, created_at
-                )
-                VALUES (?, ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? HOUR))
-            ");
-            $stmt->execute([
-                $conversation_id, 
-                $sender_id, 
-                $receiver_id, 
-                $message_text,
-                $item_id,
-                ($m < 3 ? 1 : 0), // First 3 messages are read
-                (5 - $m) // Spread messages over last 5 hours
-            ]);
+            $stmt = $conn->prepare("INSERT INTO messages (conversation_id, sender_id, receiver_id, message_text, item_id, is_read, created_at) VALUES (?, ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? HOUR))");
+            $stmt->execute([$conversation_id, $sender_id, $receiver_id, $message_text, $item_id, $is_read, $hours_ago]);
             $messagesCreated++;
         }
 
-        // Update conversation last_message_at
-        $stmt = $conn->prepare("
-            UPDATE conversations 
-            SET last_message_at = NOW() 
-            WHERE id = ?
-        ");
+        $stmt = $conn->prepare("UPDATE conversations SET last_message_at = NOW() WHERE id = ?");
         $stmt->execute([$conversation_id]);
     }
 
     $results['conversations_created'] = $conversationsCreated;
     $results['messages_created'] = $messagesCreated;
 
-    // ==================== CREATE BORROW REQUESTS ====================
-    
+    // Create borrow requests
     $requestsCreated = 0;
-    
-    // Get user IDs for creating requests
     $userIds = array_column($users, 'id');
     
-    // Create 5 SENT requests (pending status)
+    // 5 SENT requests
     for ($i = 0; $i < 5; $i++) {
-        $borrower_id = $userIds[0]; // First user sends requests
+        $borrower_id = $userIds[0];
         $item = $items[$i % count($items)];
         $lender_id = isset($item['user_id']) && $item['user_id'] != $borrower_id ? $item['user_id'] : $userIds[1];
         $item_price = isset($item['price']) ? $item['price'] : 50.00;
         $item_id = isset($item['id']) ? $item['id'] : ($i + 1);
         
-        $stmt = $conn->prepare("
-            INSERT INTO borrow_requests (
-                item_id, borrower_id, lender_id, 
-                borrow_start_date, borrow_end_date, 
-                total_price, security_deposit, pickup_location,
-                borrower_message, status, created_at
-            )
-            VALUES (?, ?, ?, DATE_ADD(CURDATE(), INTERVAL ? DAY), DATE_ADD(CURDATE(), INTERVAL ? DAY), 
-                    ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY))
-        ");
-        $stmt->execute([
-            $item_id, $borrower_id, $lender_id,
-            (7 + $i), // Start in 7-11 days
-            (12 + $i), // End in 12-16 days
-            $item_price * 0.2, // 20% of item price
-            20.00,
-            'Ashesi University Campus',
-            "Hi! I'd like to borrow this for a few days. Available?",
-            'pending',
-            $i // Created 0-4 days ago
-        ]);
+        $start_days = (7 + $i);
+        $end_days = (12 + $i);
+        $total_price = $item_price * 0.2;
+        $created_days = $i;
+        
+        $stmt = $conn->prepare("INSERT INTO borrow_requests (item_id, borrower_id, lender_id, borrow_start_date, borrow_end_date, total_price, security_deposit, pickup_location, borrower_message, status, created_at) VALUES (?, ?, ?, DATE_ADD(CURDATE(), INTERVAL ? DAY), DATE_ADD(CURDATE(), INTERVAL ? DAY), ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY))");
+        $stmt->execute([$item_id, $borrower_id, $lender_id, $start_days, $end_days, $total_price, 20.00, 'Ashesi University Campus', "Hi! I'd like to borrow this for a few days. Available?", 'pending', $created_days]);
         $requestsCreated++;
     }
 
-    // Create 5 RECEIVED requests (pending status, to first user)
+    // 5 RECEIVED requests
     for ($i = 0; $i < 5; $i++) {
-        $lender_id = $userIds[0]; // First user receives requests
+        $lender_id = $userIds[0];
         $borrower_id = $userIds[($i + 1) % count($userIds)];
         $item = $items[(5 + $i) % count($items)];
         $item_price = isset($item['price']) ? $item['price'] : 40.00;
         $item_id = isset($item['id']) ? $item['id'] : (6 + $i);
         
-        $stmt = $conn->prepare("
-            INSERT INTO borrow_requests (
-                item_id, borrower_id, lender_id, 
-                borrow_start_date, borrow_end_date, 
-                total_price, security_deposit, pickup_location,
-                borrower_message, status, created_at
-            )
-            VALUES (?, ?, ?, DATE_ADD(CURDATE(), INTERVAL ? DAY), DATE_ADD(CURDATE(), INTERVAL ? DAY), 
-                    ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? HOUR))
-        ");
-        $stmt->execute([
-            $item_id, $borrower_id, $lender_id,
-            (3 + $i), // Start in 3-7 days
-            (8 + $i), // End in 8-12 days
-            $item_price * 0.15,
-            15.00,
-            'Campus Library',
-            "Hello! Interested in borrowing this. Is it available?",
-            'pending',
-            ($i * 6) // Created 0-24 hours ago
-        ]);
+        $start_days = (3 + $i);
+        $end_days = (8 + $i);
+        $total_price = $item_price * 0.15;
+        $created_hours = ($i * 6);
+        
+        $stmt = $conn->prepare("INSERT INTO borrow_requests (item_id, borrower_id, lender_id, borrow_start_date, borrow_end_date, total_price, security_deposit, pickup_location, borrower_message, status, created_at) VALUES (?, ?, ?, DATE_ADD(CURDATE(), INTERVAL ? DAY), DATE_ADD(CURDATE(), INTERVAL ? DAY), ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? HOUR))");
+        $stmt->execute([$item_id, $borrower_id, $lender_id, $start_days, $end_days, $total_price, 15.00, 'Campus Library', "Hello! Interested in borrowing this. Is it available?", 'pending', $created_hours]);
         $requestsCreated++;
     }
 
-    // Create 5 ACTIVE requests (accepted and ongoing)
+    // 5 ACTIVE requests with meetings
     for ($i = 0; $i < 5; $i++) {
         $borrower_id = $userIds[0];
         $item = $items[(10 + $i) % count($items)];
@@ -220,44 +161,22 @@ try {
         $item_price = isset($item['price']) ? $item['price'] : 60.00;
         $item_id = isset($item['id']) ? $item['id'] : (11 + $i);
         
-        $stmt = $conn->prepare("
-            INSERT INTO borrow_requests (
-                item_id, borrower_id, lender_id, 
-                borrow_start_date, borrow_end_date, 
-                total_price, security_deposit, pickup_location,
-                borrower_message, status, created_at, updated_at
-            )
-            VALUES (?, ?, ?, DATE_SUB(CURDATE(), INTERVAL ? DAY), DATE_ADD(CURDATE(), INTERVAL ? DAY), 
-                    ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY), NOW())
-        ");
-        $stmt->execute([
-            $item_id, $borrower_id, $lender_id,
-            (2 + $i), // Started 2-6 days ago
-            (3 + $i), // Ends in 3-7 days
-            $item_price * 0.25,
-            25.00,
-            'Student Center',
-            "Need this for a project. Thanks!",
-            'active',
-            (7 + $i) // Created 7-11 days ago
-        ]);
+        $start_days_ago = (2 + $i);
+        $end_days_future = (3 + $i);
+        $total_price = $item_price * 0.25;
+        $created_days = (7 + $i);
+        
+        $stmt = $conn->prepare("INSERT INTO borrow_requests (item_id, borrower_id, lender_id, borrow_start_date, borrow_end_date, total_price, security_deposit, pickup_location, borrower_message, status, created_at, updated_at) VALUES (?, ?, ?, DATE_SUB(CURDATE(), INTERVAL ? DAY), DATE_ADD(CURDATE(), INTERVAL ? DAY), ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY), NOW())");
+        $stmt->execute([$item_id, $borrower_id, $lender_id, $start_days_ago, $end_days_future, $total_price, 25.00, 'Student Center', "Need this for a project. Thanks!", 'active', $created_days]);
         $requestId = $conn->lastInsertId();
         $requestsCreated++;
 
-        // Create meeting schedule for active requests
-        $stmt = $conn->prepare("
-            INSERT INTO meeting_schedules (
-                borrow_request_id, scheduled_by, meeting_type,
-                meeting_date, meeting_location, notes, meeting_status
-            )
-            VALUES (?, ?, 'offline', 
-                    DATE_SUB(NOW(), INTERVAL ? DAY) + INTERVAL 14 HOUR, 
-                    'Student Center Main Entrance', 'Pickup confirmed', 'completed')
-        ");
-        $stmt->execute([$requestId, $lender_id, (2 + $i)]);
+        $meeting_days_ago = (2 + $i);
+        $stmt = $conn->prepare("INSERT INTO meeting_schedules (borrow_request_id, scheduled_by, meeting_type, meeting_date, meeting_location, notes, meeting_status) VALUES (?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY) + INTERVAL 14 HOUR, ?, ?, ?)");
+        $stmt->execute([$requestId, $lender_id, 'offline', $meeting_days_ago, 'Student Center Main Entrance', 'Pickup confirmed', 'completed']);
     }
 
-    // Create 5 COMPLETED requests
+    // 5 COMPLETED requests with reviews
     for ($i = 0; $i < 5; $i++) {
         $borrower_id = $userIds[0];
         $item = $items[(15 + $i) % count($items)];
@@ -265,57 +184,31 @@ try {
         $item_price = isset($item['price']) ? $item['price'] : 70.00;
         $item_id = isset($item['id']) ? $item['id'] : (16 + $i);
         
-        $stmt = $conn->prepare("
-            INSERT INTO borrow_requests (
-                item_id, borrower_id, lender_id, 
-                borrow_start_date, borrow_end_date, 
-                total_price, security_deposit, pickup_location,
-                borrower_message, status, created_at, updated_at
-            )
-            VALUES (?, ?, ?, DATE_SUB(CURDATE(), INTERVAL ? DAY), DATE_SUB(CURDATE(), INTERVAL ? DAY), 
-                    ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY), DATE_SUB(NOW(), INTERVAL ? DAY))
-        ");
-        $stmt->execute([
-            $item_id, $borrower_id, $lender_id,
-            (20 + $i * 2), // Started 20-28 days ago
-            (15 + $i * 2), // Ended 15-23 days ago
-            $item_price * 0.3,
-            30.00,
-            'Library',
-            "Great item! Would love to borrow it.",
-            'completed',
-            (25 + $i * 2) // Created 25-33 days ago
-        ]);
+        $start_days_ago = (20 + $i * 2);
+        $end_days_ago = (15 + $i * 2);
+        $total_price = $item_price * 0.3;
+        $created_days = (25 + $i * 2);
+        
+        $stmt = $conn->prepare("INSERT INTO borrow_requests (item_id, borrower_id, lender_id, borrow_start_date, borrow_end_date, total_price, security_deposit, pickup_location, borrower_message, status, created_at, updated_at) VALUES (?, ?, ?, DATE_SUB(CURDATE(), INTERVAL ? DAY), DATE_SUB(CURDATE(), INTERVAL ? DAY), ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY), DATE_SUB(NOW(), INTERVAL ? DAY))");
+        $stmt->execute([$item_id, $borrower_id, $lender_id, $start_days_ago, $end_days_ago, $total_price, 30.00, 'Library', "Great item! Would love to borrow it.", 'completed', $created_days]);
         $requestId = $conn->lastInsertId();
         $requestsCreated++;
 
-        // Add review for completed requests
-        $stmt = $conn->prepare("
-            INSERT INTO reviews (
-                reviewer_id, reviewed_user_id, borrow_request_id,
-                rating, review_type, title, comment, created_at
-            )
-            VALUES (?, ?, ?, ?, 'borrower_to_lender', ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY))
-        ");
-        $stmt->execute([
-            $borrower_id,
-            $lender_id,
-            $requestId,
-            (4 + ($i % 2)), // Rating 4 or 5
-            'Great Experience!',
-            'Item was in excellent condition. Lender was very responsive and professional.',
-            (14 + $i * 2) // Review created after return
-        ]);
+        $rating = (4 + ($i % 2));
+        $review_days = (14 + $i * 2);
+        $stmt = $conn->prepare("INSERT INTO reviews (reviewer_id, reviewed_user_id, borrow_request_id, rating, review_type, title, comment, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY))");
+        $stmt->execute([$borrower_id, $lender_id, $requestId, $rating, 'borrower_to_lender', 'Great Experience!', 'Item was in excellent condition. Lender was very responsive and professional.', $review_days]);
     }
 
     $results['requests_created'] = $requestsCreated;
 
-    // Update user activity
-    $stmt = $conn->prepare("
-        INSERT INTO user_activities (user_id, activity_type, description, created_at)
-        VALUES (?, 'sample_data', 'Sample data populated for testing', NOW())
-    ");
-    $stmt->execute([$userIds[0]]);
+    // Log activity
+    try {
+        $stmt = $conn->prepare("INSERT INTO user_activities (user_id, activity_type, description, created_at) VALUES (?, ?, ?, NOW())");
+        $stmt->execute([$userIds[0], 'sample_data', 'Sample data populated for testing']);
+    } catch (Exception $e) {
+        // Ignore if user_activities fails
+    }
 
     $results['success'] = true;
     $results['message'] = 'Sample data created successfully!';
