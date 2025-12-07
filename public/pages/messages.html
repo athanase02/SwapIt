@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - SwapIt</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/messaging.css">
+</head>
+<body>
+    <div class="container">
+        <div class="messaging-container">
+            <!-- Conversations Sidebar -->
+            <div class="conversations-sidebar">
+                <div class="sidebar-header">
+                    <h2>Messages</h2>
+                    <button id="newConversationBtn" class="btn-icon" title="New Message">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 5v10m-5-5h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="conversationSearch" placeholder="Search conversations...">
+                </div>
+
+                <div id="conversationsList" class="conversations-list">
+                    <!-- Conversations will be loaded here -->
+                    <div class="loading">Loading conversations...</div>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="chat-area">
+                <div id="noConversationSelected" class="no-conversation">
+                    <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                        <path d="M40 10C23.4315 10 10 23.4315 10 40C10 56.5685 23.4315 70 40 70C56.5685 70 70 56.5685 70 40C70 23.4315 56.5685 10 40 10Z" stroke="#ccc" stroke-width="3"/>
+                        <path d="M30 35C30 32.7909 31.7909 31 34 31C36.2091 31 38 32.7909 38 35C38 37.2091 36.2091 39 34 39C31.7909 39 30 37.2091 30 35Z" fill="#ccc"/>
+                        <path d="M42 35C42 32.7909 43.7909 31 46 31C48.2091 31 50 32.7909 50 35C50 37.2091 48.2091 39 46 39C43.7909 39 42 37.2091 42 35Z" fill="#ccc"/>
+                        <path d="M28 50C28 45 32 42 40 42C48 42 52 45 52 50" stroke="#ccc" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                    <h3>Select a conversation</h3>
+                    <p>Choose a conversation from the list or start a new one</p>
+                </div>
+
+                <div id="chatContainer" class="chat-container" style="display: none;">
+                    <div class="chat-header">
+                        <div class="chat-user-info">
+                            <div class="user-avatar" id="chatAvatar">
+                                <span id="chatAvatarInitial">U</span>
+                            </div>
+                            <div class="user-details">
+                                <h3 id="chatUsername">Username</h3>
+                                <span id="chatUserStatus" class="user-status">Active</span>
+                            </div>
+                        </div>
+                        <div class="chat-actions">
+                            <button class="btn-icon" id="chatInfoBtn" title="Conversation Info">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+                                    <path d="M10 10v4m0-8v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="messagesContainer" class="messages-container">
+                        <!-- Messages will be loaded here -->
+                    </div>
+
+                    <div class="message-input-container">
+                        <form id="messageForm" class="message-form">
+                            <textarea 
+                                id="messageInput" 
+                                placeholder="Type your message..." 
+                                rows="1"
+                                required
+                            ></textarea>
+                            <button type="submit" class="btn-send" id="sendBtn">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Conversation Modal -->
+    <div id="newConversationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>New Message</h3>
+                <button class="modal-close" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="recipientSearch">To:</label>
+                    <input type="text" id="recipientSearch" placeholder="Search users...">
+                    <div id="userSearchResults" class="search-results"></div>
+                </div>
+                <div class="form-group">
+                    <label for="firstMessage">Message:</label>
+                    <textarea id="firstMessage" rows="4" placeholder="Type your message..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelNewConversation">Cancel</button>
+                <button class="btn btn-primary" id="startConversationBtn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/messaging.js"></script>
+    <script>
+        // Initialize messaging system when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const messagingSystem = new MessagingSystem();
+            messagingSystem.init();
+        });
+    </script>
+</body>
+</html>

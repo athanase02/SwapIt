@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Requests - SwapIt</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/requests.css">
+</head>
+<body>
+    <div class="container">
+        <div class="requests-page">
+            <div class="page-header">
+                <h1>My Borrow Requests</h1>
+                <p>Manage your borrowing requests and approvals</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="sent">
+                    Sent Requests
+                    <span class="tab-badge" id="sentCount">0</span>
+                </button>
+                <button class="tab-btn" data-tab="received">
+                    Received Requests
+                    <span class="tab-badge" id="receivedCount">0</span>
+                </button>
+                <button class="tab-btn" data-tab="active">
+                    Active Borrows
+                    <span class="tab-badge" id="activeCount">0</span>
+                </button>
+                <button class="tab-btn" data-tab="completed">
+                    Completed
+                    <span class="tab-badge" id="completedCount">0</span>
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Sent Requests Tab -->
+                <div id="sentTab" class="tab-pane active">
+                    <div class="requests-filter">
+                        <select id="sentStatusFilter">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="accepted">Accepted</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div id="sentRequestsList" class="requests-list">
+                        <div class="loading">Loading requests...</div>
+                    </div>
+                </div>
+
+                <!-- Received Requests Tab -->
+                <div id="receivedTab" class="tab-pane">
+                    <div class="requests-filter">
+                        <select id="receivedStatusFilter">
+                            <option value="pending">Pending</option>
+                            <option value="all">All Status</option>
+                            <option value="accepted">Accepted</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div id="receivedRequestsList" class="requests-list">
+                        <div class="loading">Loading requests...</div>
+                    </div>
+                </div>
+
+                <!-- Active Borrows Tab -->
+                <div id="activeTab" class="tab-pane">
+                    <div id="activeRequestsList" class="requests-list">
+                        <div class="loading">Loading active borrows...</div>
+                    </div>
+                </div>
+
+                <!-- Completed Tab -->
+                <div id="completedTab" class="tab-pane">
+                    <div id="completedRequestsList" class="requests-list">
+                        <div class="loading">Loading completed borrows...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Detail Modal -->
+    <div id="requestDetailModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>Request Details</h3>
+                <button class="modal-close" id="closeDetailModal">&times;</button>
+            </div>
+            <div class="modal-body" id="requestDetailContent">
+                <!-- Request details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Meeting Modal -->
+    <div id="scheduleMeetingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Schedule Meeting</h3>
+                <button class="modal-close" id="closeMeetingModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleMeetingForm">
+                    <input type="hidden" id="meetingRequestId">
+                    
+                    <div class="form-group">
+                        <label for="meetingType">Meeting Type *</label>
+                        <select id="meetingType" required>
+                            <option value="">Select type...</option>
+                            <option value="pickup">Pickup</option>
+                            <option value="return">Return</option>
+                            <option value="discussion">Discussion</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="meetingDate">Date *</label>
+                        <input type="date" id="meetingDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="meetingTime">Time *</label>
+                        <input type="time" id="meetingTime" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="meetingLocation">Location *</label>
+                        <input type="text" id="meetingLocation" placeholder="Enter meeting location" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="meetingNotes">Additional Notes</label>
+                        <textarea id="meetingNotes" rows="3" placeholder="Any additional information..."></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancelMeeting">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Schedule Meeting</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Request Modal -->
+    <div id="rejectRequestModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Reject Request</h3>
+                <button class="modal-close" id="closeRejectModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="rejectRequestForm">
+                    <input type="hidden" id="rejectRequestId">
+                    
+                    <div class="form-group">
+                        <label for="rejectionReason">Reason for rejection *</label>
+                        <textarea id="rejectionReason" rows="4" placeholder="Please provide a reason..." required></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancelReject">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Reject Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/request-manager.js"></script>
+    <script>
+        // Initialize request manager when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const requestManager = new RequestManager();
+            requestManager.init();
+        });
+    </script>
+</body>
+</html>
