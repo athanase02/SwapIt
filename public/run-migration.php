@@ -25,7 +25,7 @@ $result = [
 ];
 
 try {
-    // 1. Create meeting_schedules table
+    // 1. Create meeting_schedules table (without foreign keys first)
     try {
         $sql = "CREATE TABLE IF NOT EXISTS meeting_schedules (
             id INT PRIMARY KEY AUTO_INCREMENT,
@@ -39,8 +39,6 @@ try {
             notes TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (borrow_request_id) REFERENCES borrow_requests(id) ON DELETE CASCADE,
-            FOREIGN KEY (scheduled_by) REFERENCES users(id) ON DELETE CASCADE,
             INDEX idx_request (borrow_request_id),
             INDEX idx_date (meeting_date),
             INDEX idx_status (meeting_status)
@@ -49,12 +47,13 @@ try {
         $result['tables_created'][] = 'meeting_schedules';
     } catch (PDOException $e) {
         if (strpos($e->getMessage(), 'already exists') === false) {
-            throw $e;
+            $result['errors'][] = 'meeting_schedules: ' . $e->getMessage();
+        } else {
+            $result['tables_created'][] = 'meeting_schedules (already exists)';
         }
-        $result['tables_created'][] = 'meeting_schedules (already exists)';
     }
 
-    // 2. Create user_activities table
+    // 2. Create user_activities table (without foreign keys)
     try {
         $sql = "CREATE TABLE IF NOT EXISTS user_activities (
             id INT PRIMARY KEY AUTO_INCREMENT,
@@ -65,7 +64,6 @@ try {
             related_id INT,
             description TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
             INDEX idx_user (user_id),
             INDEX idx_created (created_at),
             INDEX idx_type (activity_type)
@@ -74,9 +72,10 @@ try {
         $result['tables_created'][] = 'user_activities';
     } catch (PDOException $e) {
         if (strpos($e->getMessage(), 'already exists') === false) {
-            throw $e;
+            $result['errors'][] = 'user_activities: ' . $e->getMessage();
+        } else {
+            $result['tables_created'][] = 'user_activities (already exists)';
         }
-        $result['tables_created'][] = 'user_activities (already exists)';
     }
 
     // 3. Add columns to profiles table
