@@ -91,7 +91,7 @@ class RequestManager {
 
         try {
             const response = await fetch(
-                `../api/requests.php?action=getUserRequests`,
+                `../api/requests.php?action=get_my_requests`,
                 { credentials: 'include' }
             );
 
@@ -315,7 +315,7 @@ class RequestManager {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
         try {
-            const response = await fetch('/api/requests.php', {
+            const response = await fetch('../api/requests.php', {
                 method: 'POST',
                 credentials: 'include',
                 body: formData
@@ -350,7 +350,7 @@ class RequestManager {
         if (notes) formData.append('notes', notes);
 
         try {
-            const response = await fetch('/api/requests.php', {
+            const response = await fetch('../api/requests.php', {
                 method: 'POST',
                 credentials: 'include',
                 body: formData
@@ -380,7 +380,7 @@ class RequestManager {
         if (reason) formData.append('reason', reason);
 
         try {
-            const response = await fetch('/api/requests.php', {
+            const response = await fetch('../api/requests.php', {
                 method: 'POST',
                 credentials: 'include',
                 body: formData
@@ -410,7 +410,7 @@ class RequestManager {
         submitBtn.disabled = true;
 
         try {
-            const response = await fetch('/api/requests.php', {
+            const response = await fetch('../api/requests.php', {
                 method: 'POST',
                 credentials: 'include',
                 body: formData
@@ -437,7 +437,7 @@ class RequestManager {
     async viewRequestDetails(requestId) {
         try {
             const response = await fetch(
-                `/api/requests.php?action=get_request_details&request_id=${requestId}`,
+                `../api/requests.php?action=get_request_details&request_id=${requestId}`,
                 { credentials: 'include' }
             );
 

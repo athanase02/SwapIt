@@ -20,14 +20,26 @@ class MessagingSystem {
     }
 
     setupEventListeners() {
+        // Message form submission
+        const messageForm = document.getElementById('messageForm');
+        if (messageForm) {
+            messageForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.sendMessage();
+            });
+        }
+
         // Send message button
-        const sendBtn = document.getElementById('send-message-btn');
+        const sendBtn = document.getElementById('sendBtn');
         if (sendBtn) {
-            sendBtn.addEventListener('click', () => this.sendMessage());
+            sendBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.sendMessage();
+            });
         }
 
         // Message input - send on Enter
-        const messageInput = document.getElementById('message-input');
+        const messageInput = document.getElementById('messageInput');
         if (messageInput) {
             messageInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -55,7 +67,7 @@ class MessagingSystem {
             // Show loading state
             container.innerHTML = '<div class="loading">Loading conversations...</div>';
 
-            const response = await fetch('../api/messages.php?action=getConversations', {
+            const response = await fetch('../api/messages.php?action=get_conversations', {
                 credentials: 'include'
             });
 
@@ -149,7 +161,7 @@ class MessagingSystem {
 
         try {
             const response = await fetch(
-                `/api/messages.php?action=get_messages&conversation_id=${this.currentConversationId}`,
+                `../api/messages.php?action=get_messages&conversation_id=${this.currentConversationId}`,
                 { credentials: 'include' }
             );
 
@@ -203,7 +215,7 @@ class MessagingSystem {
     }
 
     async sendMessage() {
-        const input = document.getElementById('message-input');
+        const input = document.getElementById('messageInput');
         if (!input) return;
 
         const messageText = input.value.trim();
@@ -283,7 +295,7 @@ class MessagingSystem {
 
     async getUnreadCount() {
         try {
-            const response = await fetch('/api/messages.php?action=get_unread_count', {
+            const response = await fetch('../api/messages.php?action=get_unread_count', {
                 credentials: 'include'
             });
 

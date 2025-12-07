@@ -355,14 +355,26 @@ class RequestService {
         $sql = "SELECT br.*, 
                        i.title as item_title, i.image_url as item_image, i.price_per_day,
                        borrower.full_name as borrower_name, borrower.avatar_url as borrower_avatar,
-                       lender.full_name as lender_name, lender.avatar_url as lender_avatar
+                       lender.full_name as lender_name, lender.avatar_url as lender_avatar,
+                       CASE 
+                           WHEN br.borrower_id = ? THEN 'sent'
+                           WHEN br.lender_id = ? THEN 'received'
+                       END as request_type,
+                       CASE 
+                           WHEN br.borrower_id = ? THEN lender.full_name
+                           ELSE borrower.full_name
+                       END as other_user_name,
+                       CASE 
+                           WHEN br.borrower_id = ? THEN lender.avatar_url
+                           ELSE borrower.avatar_url
+                       END as other_user_avatar
                 FROM borrow_requests br
                 JOIN items i ON br.item_id = i.id
                 JOIN users borrower ON br.borrower_id = borrower.id
                 JOIN users lender ON br.lender_id = lender.id
                 WHERE 1=1";
         
-        $params = [];
+        $params = [$userId, $userId, $userId, $userId];
         
         if ($role === 'borrower') {
             $sql .= " AND br.borrower_id = ?";
