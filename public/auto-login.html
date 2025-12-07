@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auto Login for Testing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f1117;
+            color: #e4e4e7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: #1a1d27;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        h1 { color: #3b82f6; margin-bottom: 20px; }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #4b5563;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover { background: #2563eb; }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Quick Login for Testing</h1>
+        <div id="status">
+            <div class="spinner"></div>
+            <p>Logging you in...</p>
+        </div>
+        <div id="actions" style="display: none; margin-top: 20px;">
+            <button onclick="window.location.href='pages/messages.html'">📨 View Messages</button>
+            <button onclick="window.location.href='pages/requests.html'">🔄 View Requests</button>
+            <button onclick="window.location.href='pages/dashboard.html'">📊 Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        async function autoLogin() {
+            try {
+                const response = await fetch('quick-login.php', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                const statusDiv = document.getElementById('status');
+                const actionsDiv = document.getElementById('actions');
+                
+                if (data.success) {
+                    statusDiv.innerHTML = `
+                        <div style="font-size: 48px; margin-bottom: 10px;">✅</div>
+                        <p class="success">Logged in as: <strong>${data.user.full_name}</strong></p>
+                        <p style="color: #9ca3af; font-size: 14px;">${data.user.email}</p>
+                    `;
+                    actionsDiv.style.display = 'block';
+                    
+                    // Auto-redirect after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'pages/messages.html';
+                    }, 2000);
+                } else {
+                    statusDiv.innerHTML = `
+                        <div style="font-size: 48px; margin-bottom: 10px;">❌</div>
+                        <p class="error">Login failed: ${data.error}</p>
+                        <p style="color: #9ca3af; font-size: 14px;">Make sure you have users in your database</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('status').innerHTML = `
+                    <div style="font-size: 48px; margin-bottom: 10px;">❌</div>
+                    <p class="error">Error: ${error.message}</p>
+                `;
+            }
+        }
+        
+        // Auto-login on page load
+        autoLogin();
+    </script>
+</body>
+</html>
