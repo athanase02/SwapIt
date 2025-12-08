@@ -10,6 +10,10 @@ class MessagingSystem {
         this.currentReceiverId = null;
         this.pollingInterval = null;
         this.unreadCount = 0;
+        this.typingTimeout = null;
+        this.isTyping = false;
+        this.otherUserTyping = false;
+        this.onlineUsers = new Set();
         this.init();
     }
 
@@ -17,6 +21,10 @@ class MessagingSystem {
         this.setupEventListeners();
         this.loadConversations();
         this.startUnreadCountPolling();
+        this.loadOnlineUsers();
+        
+        // Poll online users every 30 seconds
+        setInterval(() => this.loadOnlineUsers(), 30000);
     }
 
     setupEventListeners() {
@@ -45,7 +53,14 @@ class MessagingSystem {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     this.sendMessage();
+                } else {
+                    this.handleTyping();
                 }
+            });
+            
+            // Detect typing
+            messageInput.addEventListener('input', () => {
+                this.handleTyping();
             });
         }
 
@@ -357,9 +372,104 @@ class MessagingSystem {
         return div.innerHTML;
     }
 
+    // Typing indicator methods
+    handleTyping() {
+        if (!this.isTyping) {
+            this.isTyping = true;
+            this.sendTypingStatus(true);
+        }
+
+        clearTimeout(this.typingTimeout);
+        this.typingTimeout = setTimeout(() => {
+            this.isTyping = false;
+            this.sendTypingStatus(false);
+        }, 1000);
+    }
+
+    async sendTypingStatus(isTyping) {
+        if (!this.currentConversationId) return;
+
+        try {
+            const formData = new FormData();
+            formData.append('action', 'typing_status');
+            formData.append('conversation_id', this.currentConversationId);
+            formData.append('is_typing', isTyping ? '1' : '0');
+
+            await fetch('../api/messages.php', {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            });
+        } catch (error) {
+            console.error('Error sending typing status:', error);
+        }
+    }
+
+    showTypingIndicator() {
+        const messagesContainer = document.getElementById('messagesContainer');
+        if (!messagesContainer) return;
+
+        const existingIndicator = document.querySelector('.typing-indicator-wrapper');
+        if (existingIndicator) return;
+
+        const typingHtml = `
+            <div class="message received typing-indicator-wrapper">
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        `;
+        messagesContainer.insertAdjacentHTML('beforeend', typingHtml);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    hideTypingIndicator() {
+        const indicator = document.querySelector('.typing-indicator-wrapper');
+        if (indicator) {
+            indicator.remove();
+        }
+    }
+
+    // Online status methods
+    async loadOnlineUsers() {
+        try {
+            const response = await fetch('../api/notifications.php?action=get_online_users', {
+                credentials: 'include'
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                this.onlineUsers = new Set(data.online_users.map(u => u.user_id));
+                this.updateOnlineStatusIndicators();
+            }
+        } catch (error) {
+            console.error('Error loading online users:', error);
+        }
+    }
+
+    updateOnlineStatusIndicators() {
+        document.querySelectorAll('[data-user-id]').forEach(elem => {
+            const userId = parseInt(elem.dataset.userId);
+            const statusIndicator = elem.querySelector('.online-status');
+            
+            if (statusIndicator) {
+                if (this.onlineUsers.has(userId)) {
+                    statusIndicator.className = 'online-status online';
+                } else {
+                    statusIndicator.className = 'online-status offline';
+                }
+            }
+        });
+    }
+
     destroy() {
         if (this.pollingInterval) {
             clearInterval(this.pollingInterval);
+        }
+        if (this.typingTimeout) {
+            clearTimeout(this.typingTimeout);
         }
     }
 }
