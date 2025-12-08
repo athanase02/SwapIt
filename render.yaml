@@ -1,9 +1,11 @@
 services:
   - type: web
     name: swapit
-    env: docker
+    runtime: php
     plan: free
-    healthCheckPath: /health.php
+    buildCommand: chmod +x render-build.sh && ./render-build.sh
+    startCommand: chmod +x render-start.sh && ./render-start.sh
+    healthCheckPath: /
     envVars:
       - key: DB_HOST
         sync: false
@@ -14,6 +16,16 @@ services:
       - key: DB_USER
         sync: false
       - key: DB_PASSWORD
+        sync: false
+      - key: RAILWAY_DB_HOST
+        sync: false
+      - key: RAILWAY_DB_PORT
+        sync: false
+      - key: RAILWAY_DB_NAME
+        sync: false
+      - key: RAILWAY_DB_USER
+        sync: false
+      - key: RAILWAY_DB_PASSWORD
         sync: false
       - key: GOOGLE_CLIENT_ID
         sync: false
