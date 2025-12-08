@@ -8,20 +8,28 @@
 
 try {
     // Check if running with Railway MySQL (priority - most specific)
-    if (getenv('RAILWAY_DB_HOST')) {
+    if (getenv('MYSQLHOST') || getenv('RAILWAY_DB_HOST')) {
         // Railway MySQL connection
-        $host = getenv('RAILWAY_DB_HOST');
-        $port = getenv('RAILWAY_DB_PORT') ?: '3306';
-        $database = getenv('RAILWAY_DB_NAME');
-        $username = getenv('RAILWAY_DB_USER');
-        $password = getenv('RAILWAY_DB_PASSWORD');
+        $host = getenv('MYSQLHOST') ?: getenv('RAILWAY_DB_HOST');
+        $port = getenv('MYSQLPORT') ?: getenv('RAILWAY_DB_PORT') ?: '3306';
+        $database = getenv('MYSQLDATABASE') ?: getenv('RAILWAY_DB_NAME') ?: 'railway';
+        $username = getenv('MYSQLUSER') ?: getenv('RAILWAY_DB_USER') ?: 'root';
+        $password = getenv('MYSQLPASSWORD') ?: getenv('RAILWAY_DB_PASSWORD');
+        
+        // Use public URL host for external connections
+        if (getenv('MYSQL_PUBLIC_URL')) {
+            $publicUrl = parse_url(getenv('MYSQL_PUBLIC_URL'));
+            $host = $publicUrl['host'];
+            $port = $publicUrl['port'] ?? '3306';
+        }
         
         $dsn = "mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4";
         
         $conn = new PDO($dsn, $username, $password, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false
+            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_TIMEOUT => 10
         ]);
         
         error_log("SwapIt: Connected to Railway MySQL ($host:$port/$database)");
