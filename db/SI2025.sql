@@ -118,6 +118,7 @@ CREATE TABLE items (
     description TEXT,
     category_id INT NOT NULL,
     condition_status ENUM('New', 'Like New', 'Good', 'Fair', 'Poor') NOT NULL,
+    condition_description TEXT COMMENT 'Detailed condition notes from owner',
     price DECIMAL(10,2) NOT NULL COMMENT 'Borrowing price per day/week',
     rental_period ENUM('hourly', 'daily', 'weekly', 'monthly') DEFAULT 'daily',
     location VARCHAR(255) NOT NULL,
@@ -159,7 +160,74 @@ CREATE TABLE item_images (
 );
 
 -- ============================================================
--- SECTION 3: TRANSACTION TABLES
+-- SECTION 3: REAL-TIME SYSTEM TABLES
+-- ============================================================
+
+-- User online status tracking for real-time presence
+CREATE TABLE user_online_status (
+    user_id INT PRIMARY KEY,
+    last_activity_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    is_online BOOLEAN AS (TIMESTAMPDIFF(SECOND, last_activity_at, NOW()) < 60) STORED,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_last_activity (last_activity_at),
+    INDEX idx_online_status (is_online)
+);
+
+-- Meeting schedules for pickup and return coordination
+CREATE TABLE meeting_schedules (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    borrow_request_id INT NOT NULL,
+    meeting_type ENUM('pickup', 'return') NOT NULL,
+    meeting_date DATETIME NOT NULL,
+    location VARCHAR(255),
+    meeting_link TEXT COMMENT 'Virtual meeting link if applicable',
+    notes TEXT,
+    status ENUM('scheduled', 'confirmed', 'completed', 'cancelled') DEFAULT 'scheduled',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_borrow_request (borrow_request_id),
+    INDEX idx_meeting_date (meeting_date),
+    INDEX idx_status (status)
+);
+
+-- Ratings for transactions (separate from reviews for simpler rating)
+CREATE TABLE ratings (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    transaction_id INT NOT NULL,
+    from_user_id INT NOT NULL,
+    to_user_id INT NOT NULL,
+    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    review_text TEXT,
+    rating_type ENUM('borrower_to_lender', 'lender_to_borrower') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (from_user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (to_user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_rating (transaction_id, from_user_id, rating_type),
+    INDEX idx_to_user (to_user_id),
+    INDEX idx_rating (rating)
+);
+
+-- User activity logs for tracking actions
+CREATE TABLE user_activities (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    activity_type ENUM('login', 'logout', 'item_viewed', 'item_created', 'item_updated', 
+                      'request_sent', 'request_accepted', 'request_rejected', 'message_sent',
+                      'profile_updated', 'review_posted') NOT NULL,
+    description TEXT,
+    entity_type VARCHAR(50) COMMENT 'Type of related entity (item, request, message, etc.)',
+    entity_id INT COMMENT 'ID of related entity',
+    metadata JSON COMMENT 'Additional activity data',
+    ip_address VARCHAR(45),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_activity (user_id, created_at DESC),
+    INDEX idx_activity_type (activity_type),
+    INDEX idx_entity (entity_type, entity_id)
+);
+
+-- ============================================================
+-- SECTION 4: TRANSACTION TABLES
 -- ============================================================
 
 -- Borrow/swap requests (formerly swap_requests)
