@@ -25,15 +25,21 @@ async function updateTopnavAuthState() {
 
     if (user) {
       // User is LOGGED IN - show authenticated menu
-      mainNavMenu.innerHTML = `
-        <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
-        <li><a href="browse.html"><i class="fas fa-search"></i> <span data-i18n="nav.browse">Browse Items</span></a></li>
-        <li><a href="add-listing.html"><i class="fas fa-plus-circle"></i> <span data-i18n="nav.addListing">Add Listing</span></a></li>
-        <li><a href="wishlist.html"><i class="fas fa-heart"></i> <span data-i18n="nav.wishlist">Wishlist</span></a></li>
-        <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> <span data-i18n="nav.cart">Cart</span></a></li>
-      `;
-      // Apply translations to the newly inserted navigation
-      window.swapitTranslation?.applyTranslations();
+      // Check if menu already has items to avoid overwriting badges
+      const hasMenuItems = mainNavMenu.querySelectorAll('li').length > 0;
+      
+      if (!hasMenuItems) {
+        mainNavMenu.innerHTML = `
+          <li><a href="browse.html"><i class="fas fa-search"></i> <span data-i18n="nav.browse">Browse</span></a></li>
+          <li><a href="messages.html"><i class="fas fa-comments"></i> <span data-i18n="nav.messages">Messages</span> <span class="messages-badge">0</span></a></li>
+          <li><a href="requests.html"><i class="fas fa-exchange-alt"></i> <span data-i18n="nav.requests">Requests</span> <span class="requests-badge">0</span></a></li>
+          <li><a href="add-listing.html"><i class="fas fa-plus-circle"></i> <span data-i18n="nav.addListing">Add Listing</span></a></li>
+          <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> <span data-i18n="nav.cart">Cart</span></a></li>
+          <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
+        `;
+        // Apply translations to the newly inserted navigation
+        window.swapitTranslation?.applyTranslations();
+      }
     } else {
       // User is LOGGED OUT - redirect to home page
       // These pages are for authenticated users only

@@ -389,8 +389,16 @@
     font-weight: bold;
     min-width: 18px;
     text-align: center;
-    display: none;
+    display: inline-block;
     margin-left: 5px;
+    vertical-align: middle;
+}
+
+/* Hide badge when count is 0 */
+.messages-badge:empty,
+.requests-badge:empty,
+.notification-count:empty {
+    display: none;
 }
 
 /* Responsive Design */

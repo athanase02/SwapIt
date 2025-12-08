@@ -269,9 +269,11 @@ class RealTimeNotifications {
     updateMessageBadge(count) {
         const badges = document.querySelectorAll('.messages-badge');
         badges.forEach(badge => {
+            badge.textContent = count > 99 ? '99+' : count;
             if (count > 0) {
-                badge.textContent = count > 99 ? '99+' : count;
                 badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
             }
         });
     }
@@ -279,9 +281,11 @@ class RealTimeNotifications {
     updateRequestBadge(count) {
         const badges = document.querySelectorAll('.requests-badge');
         badges.forEach(badge => {
+            badge.textContent = count > 99 ? '99+' : count;
             if (count > 0) {
-                badge.textContent = count > 99 ? '99+' : count;
                 badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
             }
         });
     }
