@@ -109,13 +109,16 @@ class BrowseFilter {
                         <img class="card__thumb" src="${imageUrl}" alt="${this.escapeHtml(item.title || 'Item')}" onerror="this.src='https://placehold.co/400x300?text=Item'">
                         <h3>${this.escapeHtml(item.title || 'Item')}</h3>
                         <p>${this.escapeHtml((item.description || '').substring(0, 100))}${item.description && item.description.length > 100 ? '...' : ''}</p>
-                        <div class="card__meta">GHS ${item.price || 0} — ${this.escapeHtml(item.location || 'Location not specified')}</div>
+                        <div class="card__meta">GHS ${item.price || 0}/day — ${this.escapeHtml(item.location || 'Location not specified')}</div>
+                        <div class="card__owner" style="margin-top: 8px; color: #666; font-size: 0.9rem;">
+                            <i class="fas fa-user"></i> ${this.escapeHtml(item.owner_name || 'Owner')}
+                        </div>
                         <div class="card__actions" style="margin-top: 12px; display: flex; gap: 8px;">
-                            <button class="btn btn--primary btn--small" onclick="window.location.href='../pages/cart.html'">
-                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            <button class="btn btn--primary btn--small" onclick="showItemDetails(${item.id})">
+                                <i class="fas fa-eye"></i> View Details
                             </button>
-                            <button class="btn btn--secondary btn--small" onclick="alert('Wishlist feature coming soon!')">
-                                <i class="fas fa-heart"></i>
+                            <button class="btn btn--secondary btn--small" onclick="quickRequest(${item.id}, '${this.escapeHtml(item.title)}')">
+                                <i class="fas fa-paper-plane"></i> Request
                             </button>
                         </div>
                     `;
@@ -392,5 +395,286 @@ class BrowseFilter {
  */
 document.addEventListener('DOMContentLoaded', () => {
     // Page is loaded, start the filtering system
+    new BrowseFilter();
+});
+
+// Global functions for item interactions
+
+/**
+ * Show item details in a modal
+ * @param {number} itemId - ID of the item to display
+ */
+async function showItemDetails(itemId) {
+    try {
+        const response = await fetch(`/api/listings.php?action=get_all_items`, {
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        if (!data.success) throw new Error('Failed to load item');
+        
+        const item = data.items.find(i => i.id === itemId);
+        if (!item) throw new Error('Item not found');
+        
+        // Create modal
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;';
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        
+        const imageUrl = item.image_url || 'https://placehold.co/600x400?text=' + encodeURIComponent(item.title);
+        
+        modal.innerHTML = `
+            <div style="background:white;border-radius:20px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;position:relative;">
+                <button onclick="this.closest('div').parentElement.remove()" style="position:absolute;top:15px;right:15px;background:#ff4757;color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.5rem;z-index:1;box-shadow:0 4px 12px rgba(0,0,0,0.3);">×</button>
+                
+                <img src="${imageUrl}" style="width:100%;height:400px;object-fit:cover;border-radius:20px 20px 0 0;" onerror="this.src='https://placehold.co/600x400?text=Item'">
+                
+                <div style="padding:30px;">
+                    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:20px;">
+                        <div>
+                            <h2 style="margin:0;font-size:2rem;color:#333;">${escapeHtml(item.title)}</h2>
+                            <p style="color:#666;margin:8px 0;"><i class="fas fa-tag"></i> ${escapeHtml(item.category_name || 'Uncategorized')}</p>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:2rem;font-weight:bold;color:#667eea;">GHS ${item.price}</div>
+                            <div style="color:#666;font-size:0.9rem;">per day</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background:#f8f9fa;padding:15px;border-radius:12px;margin-bottom:20px;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                            <div><i class="fas fa-user" style="color:#667eea;margin-right:8px;"></i><strong>Owner:</strong> ${escapeHtml(item.owner_name || 'Unknown')}</div>
+                            <div><i class="fas fa-map-marker-alt" style="color:#667eea;margin-right:8px;"></i><strong>Location:</strong> ${escapeHtml(item.location || 'Not specified')}</div>
+                            <div><i class="fas fa-check-circle" style="color:#28a745;margin-right:8px;"></i><strong>Status:</strong> ${item.status === 'available' ? '<span style="color:#28a745">Available</span>' : '<span style="color:#dc3545">Unavailable</span>'}</div>
+                            <div><i class="fas fa-calendar" style="color:#667eea;margin-right:8px;"></i><strong>Listed:</strong> ${new Date(item.created_at).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom:25px;">
+                        <h3 style="color:#333;margin-bottom:10px;">Description</h3>
+                        <p style="color:#666;line-height:1.6;">${escapeHtml(item.description || 'No description provided.')}</p>
+                    </div>
+                    
+                    <div style="display:flex;gap:12px;margin-top:25px;">
+                        <button onclick="requestItem(${item.id}, '${escapeHtml(item.title)}', ${item.price}, '${escapeHtml(item.owner_name)}')" style="flex:1;padding:15px;background:#667eea;color:white;border:none;border-radius:12px;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all 0.3s;">
+                            <i class="fas fa-paper-plane"></i> Send Borrow Request
+                        </button>
+                        <button onclick="addToWishlist(${item.id})" style="padding:15px 25px;background:white;color:#667eea;border:2px solid #667eea;border-radius:12px;font-size:1.1rem;cursor:pointer;transition:all 0.3s;">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+    } catch (error) {
+        console.error('Error showing item details:', error);
+        alert('Failed to load item details. Please try again.');
+    }
+}
+
+/**
+ * Quick request function
+ * @param {number} itemId - ID of the item
+ * @param {string} itemTitle - Title of the item
+ */
+function quickRequest(itemId, itemTitle) {
+    requestItem(itemId, itemTitle, 0, 'Owner');
+}
+
+/**
+ * Request an item with date selection
+ * @param {number} itemId - ID of the item
+ * @param {string} itemTitle - Title of the item
+ * @param {number} price - Daily price
+ * @param {string} ownerName - Owner's name
+ */
+function requestItem(itemId, itemTitle, price, ownerName) {
+    // Create request modal
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px;';
+    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+    
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dayAfter = new Date();
+    dayAfter.setDate(dayAfter.getDate() + 2);
+    
+    modal.innerHTML = `
+        <div style="background:white;border-radius:20px;max-width:600px;width:100%;padding:30px;position:relative;">
+            <button onclick="this.closest('div').parentElement.remove()" style="position:absolute;top:15px;right:15px;background:#ff4757;color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.5rem;">×</button>
+            
+            <h2 style="margin:0 0 10px 0;color:#333;"><i class="fas fa-paper-plane" style="color:#667eea;"></i> Borrow Request</h2>
+            <p style="color:#666;margin-bottom:25px;">Request to borrow: <strong>${escapeHtml(itemTitle)}</strong> from ${escapeHtml(ownerName)}</p>
+            
+            <form id="requestForm" onsubmit="submitRequest(event, ${itemId}, ${price})">
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;font-weight:600;margin-bottom:8px;color:#333;">Start Date</label>
+                    <input type="date" id="start_date" required style="width:100%;padding:12px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;" min="${tomorrow.toISOString().split('T')[0]}">
+                </div>
+                
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;font-weight:600;margin-bottom:8px;color:#333;">End Date</label>
+                    <input type="date" id="end_date" required style="width:100%;padding:12px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;" min="${dayAfter.toISOString().split('T')[0]}">
+                </div>
+                
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;font-weight:600;margin-bottom:8px;color:#333;">Message to Owner</label>
+                    <textarea id="request_message" rows="4" required style="width:100%;padding:12px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;resize:vertical;" placeholder="Hi! I would like to borrow this item. I'll take good care of it!"></textarea>
+                </div>
+                
+                <div id="priceEstimate" style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:20px;display:none;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="color:#666;">Estimated Total:</span>
+                        <span style="font-size:1.5rem;font-weight:bold;color:#667eea;">GHS <span id="totalPrice">0</span></span>
+                    </div>
+                    <small style="color:#999;"><span id="dayCount">0</span> days × GHS ${price}/day</small>
+                </div>
+                
+                <button type="submit" style="width:100%;padding:15px;background:#667eea;color:white;border:none;border-radius:12px;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all 0.3s;">
+                    <i class="fas fa-check"></i> Send Request
+                </button>
+            </form>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Calculate price estimate when dates change
+    if (price > 0) {
+        const startInput = modal.querySelector('#start_date');
+        const endInput = modal.querySelector('#end_date');
+        const priceEstimate = modal.querySelector('#priceEstimate');
+        const totalPriceSpan = modal.querySelector('#totalPrice');
+        const dayCountSpan = modal.querySelector('#dayCount');
+        
+        function updateEstimate() {
+            const start = new Date(startInput.value);
+            const end = new Date(endInput.value);
+            if (start && end && end > start) {
+                const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                const total = days * price;
+                dayCountSpan.textContent = days;
+                totalPriceSpan.textContent = total.toFixed(2);
+                priceEstimate.style.display = 'block';
+            } else {
+                priceEstimate.style.display = 'none';
+            }
+        }
+        
+        startInput.addEventListener('change', updateEstimate);
+        endInput.addEventListener('change', updateEstimate);
+    }
+}
+
+/**
+ * Submit borrow request
+ * @param {Event} event - Form submit event
+ * @param {number} itemId - ID of the item
+ * @param {number} price - Daily price
+ */
+async function submitRequest(event, itemId, price) {
+    event.preventDefault();
+    
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+    const message = document.getElementById('request_message').value;
+    
+    const formData = new FormData();
+    formData.append('action', 'create_borrow_request');
+    formData.append('item_id', itemId);
+    formData.append('start_date', startDate);
+    formData.append('end_date', endDate);
+    formData.append('message', message);
+    
+    try {
+        const response = await fetch('/api/listings.php', {
+            method: 'POST',
+            credentials: 'include',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Close modal
+            event.target.closest('div').parentElement.remove();
+            
+            // Show success notification
+            showSuccessNotification('Request sent successfully! The owner will be notified.');
+            
+            // Optionally redirect to requests page
+            setTimeout(() => {
+                window.location.href = 'requests.html';
+            }, 2000);
+        } else {
+            alert('Error: ' + (data.error || 'Failed to send request'));
+        }
+    } catch (error) {
+        console.error('Error submitting request:', error);
+        alert('Failed to send request. Please try again.');
+    }
+}
+
+/**
+ * Add item to wishlist
+ * @param {number} itemId - ID of the item
+ */
+async function addToWishlist(itemId) {
+    const formData = new FormData();
+    formData.append('action', 'add_to_wishlist');
+    formData.append('item_id', itemId);
+    
+    try {
+        const response = await fetch('/api/listings.php', {
+            method: 'POST',
+            credentials: 'include',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccessNotification('Added to wishlist!');
+        } else {
+            alert('Error: ' + (data.error || 'Failed to add to wishlist'));
+        }
+    } catch (error) {
+        console.error('Error adding to wishlist:', error);
+        alert('Failed to add to wishlist. Please try again.');
+    }
+}
+
+/**
+ * Show success notification
+ * @param {string} message - Message to display
+ */
+function showSuccessNotification(message) {
+    const notif = document.createElement('div');
+    notif.style.cssText = 'position:fixed;top:20px;right:20px;background:#28a745;color:white;padding:20px 30px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.3);z-index:10001;animation:slideIn 0.3s;';
+    notif.innerHTML = `<i class="fas fa-check-circle"></i> ${escapeHtml(message)}`;
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+        notif.style.animation = 'slideOut 0.3s';
+        setTimeout(() => notif.remove(), 300);
+    }, 3000);
+}
+
+/**
+ * HTML escape helper
+ * @param {string} str - String to escape
+ * @returns {string} Escaped string
+ */
+function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, s => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[s]);
+}
     new BrowseFilter();
 });
