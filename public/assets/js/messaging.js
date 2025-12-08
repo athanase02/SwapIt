@@ -198,8 +198,8 @@ class MessagingSystem {
 
         if (messages.length === 0) {
             container.innerHTML = `
-                <div class="no-messages">
-                    <p>No messages yet. Start the conversation!</p>
+                <div class="no-messages" style="text-align: center; padding: 40px; color: #6b7280;">
+                    <p style="font-size: 16px;">No messages yet. Start the conversation!</p>
                 </div>
             `;
             return;
@@ -210,17 +210,9 @@ class MessagingSystem {
 
         container.innerHTML = messages.map(msg => `
             <div class="message ${msg.sender_id == currentUserId ? 'sent' : 'received'}">
-                <div class="message-avatar">
-                    <img src="${msg.sender_avatar || '/public/assets/images/default-avatar.png'}" 
-                         alt="${msg.sender_name}">
-                </div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-sender">${msg.sender_name}</span>
-                        <span class="message-time">${this.formatTime(msg.created_at)}</span>
-                    </div>
+                <div class="message-bubble">
                     <div class="message-text">${this.escapeHtml(msg.message_text)}</div>
-                    ${msg.is_read ? '<span class="read-indicator"><i class="fas fa-check-double"></i></span>' : ''}
+                    <div class="message-time">${this.formatTime(msg.created_at)}</div>
                 </div>
             </div>
         `).join('');
