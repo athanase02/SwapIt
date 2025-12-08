@@ -57,10 +57,10 @@ try {
     else {
         // Local development connecting to Railway MySQL (hardcoded)
         $host = 'shinkansen.proxy.rlwy.net';
-        $port = '56904';
+        $port = '32604';
         $database = 'railway';
         $username = 'root';
-        $password = 'JJJKhMufpprtiSlcREMoPfpjHwivYjnd';
+        $password = 'psMDOMvbOfBoWmHXkhNkhbRLpnPjpcVV';
         
         $dsn = "mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4";
         
