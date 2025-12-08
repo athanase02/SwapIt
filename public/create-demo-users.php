@@ -114,18 +114,16 @@ try {
         $category = $stmt->fetch();
         $categoryId = $category ? $category['id'] : 1;
         
-        $stmt = $conn->prepare("INSERT INTO items (title, description, category_id, condition_status, price_per_day, rental_period, location, user_id, status, image_urls) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO items (user_id, title, description, category_id, image_url, condition_status, availability_status, location) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
+            $johnId,
             'Epson EX3280 Projector',
             'High-quality projector perfect for presentations and events. 3LCD technology, 3300 lumens brightness, WXGA resolution (1280x800). Includes HDMI cable, remote control, and carrying case. Great condition, well-maintained.',
             $categoryId,
-            'Excellent',
-            25.00,
-            'daily',
-            'Ashesi University - Main Library, 2nd Floor',
-            $johnId,
+            'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=400&fit=crop',
+            'like_new',
             'available',
-            json_encode(['https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=400&fit=crop'])
+            'Ashesi University - Main Library, 2nd Floor'
         ]);
         $projectorId = $conn->lastInsertId();
         echo "<div class='success'>✅ Created Epson EX3280 Projector listing (ID: $projectorId) for John</div>";
@@ -155,18 +153,16 @@ try {
         $stmt = $conn->prepare("SELECT id FROM items WHERE user_id = ? AND title = ?");
         $stmt->execute([$johnId, $item['title']]);
         if (!$stmt->fetch()) {
-            $stmt = $conn->prepare("INSERT INTO items (title, description, category_id, condition_status, price_per_day, rental_period, location, user_id, status, image_urls) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO items (user_id, title, description, category_id, image_url, condition_status, availability_status, location) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
+                $johnId,
                 $item['title'],
                 $item['description'],
                 $categoryId,
-                $item['condition'],
-                $item['price'],
-                'daily',
-                'Ashesi University Campus',
-                $johnId,
+                $item['image'],
+                $item['condition'] === 'Excellent' ? 'like_new' : 'good',
                 'available',
-                json_encode([$item['image']])
+                'Ashesi University Campus'
             ]);
             echo "<div class='success'>✅ Created " . $item['title'] . " for John</div>";
         }
