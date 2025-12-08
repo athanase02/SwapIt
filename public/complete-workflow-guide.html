@@ -237,6 +237,17 @@
         <!-- Introduction -->
         <div class="workflow-section">
             <h2><span class="icon">ℹ️</span> What You'll Test</h2>
+            <div class="alert" style="background:#fff3cd;border-left-color:#ffc107;">
+                <h4>⚠️ IMPORTANT: Setup Required First!</h4>
+                <p style="margin-top:10px;">
+                    <strong>Before testing, you MUST create the demo users and items:</strong><br>
+                    <button onclick="window.location.href='/create-demo-users.php'" style="padding:12px 24px;background:#667eea;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;margin:10px 0;font-size:1.1rem;">
+                        🚀 Click Here to Create Demo Users & Items
+                    </button>
+                    <br>
+                    This will create Sarah (student) and John (professor) accounts with a projector listing.
+                </p>
+            </div>
             <div class="alert info">
                 <h4>Scenario: Sarah needs to borrow a projector from John</h4>
                 <p>You'll experience the complete workflow from searching for an item to completing a transaction with ratings. This demonstrates how two SwapIt users interact throughout the entire borrowing process.</p>
@@ -418,6 +429,10 @@
         <div class="workflow-section">
             <h2><span class="icon">🚀</span> Quick Access Links</h2>
             <div class="quick-links">
+                <a href="/create-demo-users.php" class="quick-link" style="background:#28a745;color:white;border-color:#28a745;">
+                    <i class="fas fa-user-plus"></i>
+                    Create Demo Users
+                </a>
                 <a href="/pages/login.html" class="quick-link">
                     <i class="fas fa-sign-in-alt"></i>
                     Login Page
