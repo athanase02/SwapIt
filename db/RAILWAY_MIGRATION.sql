@@ -161,6 +161,26 @@ LEFT JOIN (
 WHERE br.status IN ('scheduled', 'active');
 
 -- =====================================================
+-- TABLE 7: login_attempts (Security & Rate Limiting)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS login_attempts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    identifier_hash VARCHAR(64) NOT NULL COMMENT 'SHA-256 hash of email + IP',
+    email VARCHAR(255) NOT NULL,
+    ip_address VARCHAR(45) NOT NULL COMMENT 'Supports IPv4 and IPv6',
+    attempt_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    locked_until TIMESTAMP NULL DEFAULT NULL,
+    success BOOLEAN DEFAULT FALSE,
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_identifier_hash (identifier_hash),
+    INDEX idx_email (email),
+    INDEX idx_ip_address (ip_address),
+    INDEX idx_attempt_time (attempt_time),
+    INDEX idx_locked_until (locked_until)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================
 -- VERIFICATION QUERIES
 -- =====================================================
 SELECT 'Migration Complete!' as Status;
@@ -180,6 +200,8 @@ SELECT 'user_activities', COUNT(*) FROM user_activities
 UNION ALL
 SELECT 'meeting_schedules', COUNT(*) FROM meeting_schedules
 UNION ALL
-SELECT 'message_attachments', COUNT(*) FROM message_attachments;
+SELECT 'message_attachments', COUNT(*) FROM message_attachments
+UNION ALL
+SELECT 'login_attempts', COUNT(*) FROM login_attempts;
 
 SELECT '✅ All tables created successfully!' as FinalStatus;
