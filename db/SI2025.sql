@@ -160,7 +160,40 @@ CREATE TABLE item_images (
 );
 
 -- ============================================================
--- SECTION 3: REAL-TIME SYSTEM TABLES
+-- SECTION 3: TRANSACTION TABLES (MOVED UP - needed for foreign keys)
+-- ============================================================
+
+-- Borrow/swap requests (formerly swap_requests)
+CREATE TABLE borrow_requests (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    item_id INT NOT NULL,
+    borrower_id INT NOT NULL,
+    lender_id INT NOT NULL,
+    status ENUM('pending', 'accepted', 'rejected', 'active', 'completed', 'cancelled', 'disputed') DEFAULT 'pending',
+    borrow_start_date DATETIME NOT NULL,
+    borrow_end_date DATETIME NOT NULL,
+    actual_return_date DATETIME NULL,
+    total_price DECIMAL(10,2) NOT NULL,
+    security_deposit DECIMAL(10,2) DEFAULT 0.00,
+    pickup_location VARCHAR(255),
+    return_location VARCHAR(255),
+    borrower_message TEXT,
+    lender_notes TEXT,
+    cancellation_reason TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
+    FOREIGN KEY (borrower_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (lender_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_status (status),
+    INDEX idx_borrower (borrower_id),
+    INDEX idx_lender (lender_id),
+    INDEX idx_item (item_id),
+    INDEX idx_dates (borrow_start_date, borrow_end_date)
+);
+
+-- ============================================================
+-- SECTION 4: REAL-TIME SYSTEM TABLES
 -- ============================================================
 
 -- User online status tracking for real-time presence
@@ -195,6 +228,7 @@ CREATE TABLE meeting_schedules (
     status ENUM('scheduled', 'confirmed', 'completed', 'cancelled') DEFAULT 'scheduled',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (borrow_request_id) REFERENCES borrow_requests(id) ON DELETE CASCADE,
     INDEX idx_borrow_request (borrow_request_id),
     INDEX idx_meeting_date (meeting_date),
     INDEX idx_status (status)
@@ -292,37 +326,8 @@ CREATE TABLE user_activities (
 );
 
 -- ============================================================
--- SECTION 4: TRANSACTION TABLES
+-- SECTION 5: ADDITIONAL TRANSACTION TABLES
 -- ============================================================
-
--- Borrow/swap requests (formerly swap_requests)
-CREATE TABLE borrow_requests (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    item_id INT NOT NULL,
-    borrower_id INT NOT NULL,
-    lender_id INT NOT NULL,
-    status ENUM('pending', 'accepted', 'rejected', 'active', 'completed', 'cancelled', 'disputed') DEFAULT 'pending',
-    borrow_start_date DATETIME NOT NULL,
-    borrow_end_date DATETIME NOT NULL,
-    actual_return_date DATETIME NULL,
-    total_price DECIMAL(10,2) NOT NULL,
-    security_deposit DECIMAL(10,2) DEFAULT 0.00,
-    pickup_location VARCHAR(255),
-    return_location VARCHAR(255),
-    borrower_message TEXT,
-    lender_notes TEXT,
-    cancellation_reason TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
-    FOREIGN KEY (borrower_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (lender_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_status (status),
-    INDEX idx_borrower (borrower_id),
-    INDEX idx_lender (lender_id),
-    INDEX idx_item (item_id),
-    INDEX idx_dates (borrow_start_date, borrow_end_date)
-);
 
 -- Transaction history for financial tracking
 CREATE TABLE transactions (
@@ -363,7 +368,7 @@ CREATE TABLE cart_items (
 );
 
 -- ============================================================
--- SECTION 4: SOCIAL FEATURES TABLES
+-- SECTION 6: SOCIAL FEATURES TABLES
 -- ============================================================
 
 -- Wishlist/Saved items
@@ -468,8 +473,48 @@ CREATE TABLE user_follows (
 );
 
 -- ============================================================
--- SECTION 5: NOTIFICATION TABLES
+-- SECTION 7: NOTIFICATION TABLES
 -- ============================================================
+
+-- Conversations - Group messages between two users (MOVED UP - needed for foreign keys)
+CREATE TABLE conversations (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user1_id INT NOT NULL,
+    user2_id INT NOT NULL,
+    item_id INT,
+    last_message_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user1_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE SET NULL,
+    UNIQUE KEY unique_conversation (user1_id, user2_id),
+    INDEX idx_users (user1_id, user2_id),
+    INDEX idx_last_message (last_message_at)
+);
+
+-- Messages between users
+CREATE TABLE messages (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    conversation_id INT NOT NULL,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    item_id INT,
+    message_text TEXT NOT NULL,
+    attachment_url TEXT,
+    is_read BOOLEAN DEFAULT FALSE,
+    read_at TIMESTAMP NULL,
+    is_deleted_by_sender BOOLEAN DEFAULT FALSE,
+    is_deleted_by_receiver BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE SET NULL,
+    INDEX idx_conversation (conversation_id),
+    INDEX idx_sender (sender_id),
+    INDEX idx_receiver (receiver_id),
+    INDEX idx_read (is_read)
+);
 
 -- User notifications
 CREATE TABLE notifications (
@@ -493,7 +538,7 @@ CREATE TABLE notifications (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- SECTION 6: ADMINISTRATIVE TABLES
+-- SECTION 8: ADMINISTRATIVE TABLES
 -- ============================================================
 
 -- Reported content for moderation
