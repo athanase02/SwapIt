@@ -9,6 +9,14 @@ $request_method = $_SERVER['REQUEST_METHOD'];
 $uri_parts = parse_url($request_uri);
 $path = rtrim($uri_parts['path'], '/');
 
+// Handle health check first (for Render.com)
+if ($path === '/health.php' || $path === '/health') {
+    if (file_exists(__DIR__ . '/health.php')) {
+        include __DIR__ . '/health.php';
+        exit;
+    }
+}
+
 // Handle root URL - serve home.html
 if (empty($path) || $path === '/') {
     if (file_exists(__DIR__ . '/home.html')) {
