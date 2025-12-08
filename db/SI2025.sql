@@ -8,10 +8,10 @@
 --           transaction history, and administrative features
 -- ============================================================
 
--- Drop database if exists and create new one
-DROP DATABASE IF EXISTS SI2025;
-CREATE DATABASE SI2025;
-USE SI2025;
+-- Use existing database (for Railway/managed hosting)
+-- DROP DATABASE IF EXISTS SI2025;
+-- CREATE DATABASE SI2025;
+-- USE SI2025;
 
 -- ============================================================
 -- SECTION 1: USER MANAGEMENT TABLES
@@ -167,10 +167,8 @@ CREATE TABLE item_images (
 CREATE TABLE user_online_status (
     user_id INT PRIMARY KEY,
     last_activity_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_online BOOLEAN AS (TIMESTAMPDIFF(SECOND, last_activity_at, NOW()) < 60) STORED,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_last_activity (last_activity_at),
-    INDEX idx_online_status (is_online)
+    INDEX idx_last_activity (last_activity_at)
 );
 
 -- Meeting schedules for pickup and return coordination
@@ -713,10 +711,10 @@ SELECT 'SwapIt Database (SI2025) created successfully!' as status,
 -- Add Google OAuth support to users table
 -- This migration adds the google_id column to store Google account IDs
 
-ALTER TABLE users ADD COLUMN IF NOT EXISTS google_id VARCHAR(255) NULL UNIQUE AFTER email;
+ALTER TABLE users ADD COLUMN google_id VARCHAR(255) NULL UNIQUE AFTER email;
 
 -- Add index for faster Google ID lookups
-CREATE INDEX IF NOT EXISTS idx_google_id ON users(google_id);
+CREATE INDEX idx_google_id ON users(google_id);
 
 -- Update existing users without google_id (optional)
 -- This is safe to run multiple times
