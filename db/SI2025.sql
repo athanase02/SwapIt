@@ -171,6 +171,18 @@ CREATE TABLE user_online_status (
     INDEX idx_last_activity (last_activity_at)
 );
 
+-- Online users tracking with status
+CREATE TABLE online_users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL UNIQUE,
+    status ENUM('online', 'away', 'offline') DEFAULT 'online',
+    last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_status (status),
+    INDEX idx_last_seen (last_seen)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Meeting schedules for pickup and return coordination
 CREATE TABLE meeting_schedules (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -186,7 +198,62 @@ CREATE TABLE meeting_schedules (
     INDEX idx_borrow_request (borrow_request_id),
     INDEX idx_meeting_date (meeting_date),
     INDEX idx_status (status)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Login attempts tracking for security and rate limiting
+CREATE TABLE login_attempts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    identifier_hash VARCHAR(64) NOT NULL COMMENT 'SHA-256 hash of email + IP',
+    email VARCHAR(255) NOT NULL,
+    ip_address VARCHAR(45) NOT NULL COMMENT 'Supports IPv4 and IPv6',
+    attempt_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    locked_until TIMESTAMP NULL DEFAULT NULL,
+    success BOOLEAN DEFAULT FALSE,
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_identifier_hash (identifier_hash),
+    INDEX idx_email (email),
+    INDEX idx_ip_address (ip_address),
+    INDEX idx_attempt_time (attempt_time),
+    INDEX idx_locked_until (locked_until)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Transaction history for tracking request status changes
+CREATE TABLE transaction_history (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    request_id INT NOT NULL,
+    borrower_id INT NOT NULL,
+    lender_id INT NOT NULL,
+    item_id INT NOT NULL,
+    action_type VARCHAR(50) NOT NULL,
+    performed_by INT NOT NULL,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (request_id) REFERENCES borrow_requests(id) ON DELETE CASCADE,
+    FOREIGN KEY (borrower_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (lender_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
+    FOREIGN KEY (performed_by) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_request_id (request_id),
+    INDEX idx_borrower_id (borrower_id),
+    INDEX idx_lender_id (lender_id),
+    INDEX idx_item_id (item_id),
+    INDEX idx_action_type (action_type),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Message attachments for file sharing
+CREATE TABLE message_attachments (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    message_id INT NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_url TEXT NOT NULL,
+    file_type VARCHAR(100),
+    file_size INT COMMENT 'File size in bytes',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE,
+    INDEX idx_message_id (message_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Ratings for transactions (separate from reviews for simpler rating)
 CREATE TABLE ratings (
@@ -408,20 +475,22 @@ CREATE TABLE user_follows (
 CREATE TABLE notifications (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
-    type ENUM('borrow_request', 'request_accepted', 'request_rejected', 'item_borrowed', 
-              'return_reminder', 'return_confirmed', 'new_review', 'new_message', 
-              'item_saved', 'price_drop', 'new_follower', 'system_announcement') NOT NULL,
+    type VARCHAR(50) NOT NULL,
     title VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
     related_id INT COMMENT 'ID of related entity (item, request, user, etc.)',
+    related_type VARCHAR(50) COMMENT 'Type of related entity',
     action_url VARCHAR(500),
-    is_read BOOLEAN DEFAULT FALSE,
+    is_read TINYINT(1) DEFAULT 0,
     read_at TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_user_read (user_id, is_read),
-    INDEX idx_created (created_at)
-);
+    INDEX idx_user_id (user_id),
+    INDEX idx_type (type),
+    INDEX idx_is_read (is_read),
+    INDEX idx_created_at (created_at),
+    INDEX idx_user_read (user_id, is_read)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
 -- SECTION 6: ADMINISTRATIVE TABLES
