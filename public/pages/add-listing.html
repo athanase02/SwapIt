@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="../assets/css/styles.css" />
   <link rel="stylesheet" href="../assets/css/language-switcher.css">
   <link rel="stylesheet" href="../assets/css/mobile-responsive.css">
+  <link rel="stylesheet" href="../assets/css/real-time-notifications.css">
   <script src="../assets/js/auth-client.js"></script>
   <style>
     body {
@@ -431,6 +432,25 @@
         <span>SwapIt</span>
       </a>
       <div id="languageSwitcher" style="margin-left: auto; margin-right: 2rem;"></div>
+      
+      <!-- Notification Bell -->
+      <div style="position: relative; display: inline-block; margin-right: 1rem;">
+        <div class="notification-bell-container" id="notificationBell">
+          <i class="fas fa-bell notification-bell"></i>
+          <span class="notification-badge">0</span>
+        </div>
+        
+        <div class="notification-panel" id="notificationPanel">
+          <div class="notification-panel-header">
+            <span class="notification-panel-title">Notifications</span>
+            <button class="mark-all-read-btn" id="markAllReadBtn">Mark all as read</button>
+          </div>
+          <div class="notifications-list" id="notificationsList">
+            <div class="loading">Loading...</div>
+          </div>
+        </div>
+      </div>
+      
       <ul class="nav-links" id="mainNavMenu">
         <!-- Dynamic menu items will be inserted here based on auth state -->
         <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
@@ -733,5 +753,6 @@
   <script src="../assets/js/language-switcher.js"></script>
   <script src="../assets/js/add-listing.js"></script>
   <script src="../assets/js/nav-auth-topnav.js"></script>
+  <script src="../assets/js/real-time-notifications.js"></script>
 </body>
 </html>

@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="../assets/css/language-switcher.css">
     <link rel="stylesheet" href="../assets/css/messaging.css">
+    <link rel="stylesheet" href="../assets/css/real-time-notifications.css">
     <style>
         body {
             background: var(--bg);
@@ -98,10 +99,29 @@
                 <span>SwapIt</span>
             </a>
             <div id="languageSwitcher" style="margin-left: auto; margin-right: 2rem;"></div>
+            
+            <!-- Notification Bell -->
+            <div style="position: relative; display: inline-block; margin-right: 1rem;">
+                <div class="notification-bell-container" id="notificationBell">
+                    <i class="fas fa-bell notification-bell"></i>
+                    <span class="notification-badge">0</span>
+                </div>
+                
+                <div class="notification-panel" id="notificationPanel">
+                    <div class="notification-panel-header">
+                        <span class="notification-panel-title">Notifications</span>
+                        <button class="mark-all-read-btn" id="markAllReadBtn">Mark all as read</button>
+                    </div>
+                    <div class="notifications-list" id="notificationsList">
+                        <div class="loading">Loading...</div>
+                    </div>
+                </div>
+            </div>
+            
             <ul class="nav-links" id="mainNavMenu">
                 <li><a href="browse.html"><i class="fas fa-search"></i> <span data-i18n="nav.browse">Browse</span></a></li>
-                <li><a href="messages.html" class="active"><i class="fas fa-comments"></i> <span data-i18n="nav.messages">Messages</span></a></li>
-                <li><a href="requests.html"><i class="fas fa-exchange-alt"></i> <span data-i18n="nav.requests">Requests</span></a></li>
+                <li><a href="messages.html" class="active"><i class="fas fa-comments"></i> <span data-i18n="nav.messages">Messages</span> <span class="messages-badge">0</span></a></li>
+                <li><a href="requests.html"><i class="fas fa-exchange-alt"></i> <span data-i18n="nav.requests">Requests</span> <span class="requests-badge">0</span></a></li>
                 <li><a href="add-listing.html"><i class="fas fa-plus-circle"></i> <span data-i18n="nav.addListing">Add Listing</span></a></li>
                 <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> <span data-i18n="nav.cart">Cart</span></a></li>
                 <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
@@ -240,6 +260,7 @@
     <script src="../assets/js/translation.js"></script>
     <script src="../assets/js/language-switcher.js"></script>
     <script src="../assets/js/nav-auth-topnav.js"></script>
+    <script src="../assets/js/real-time-notifications.js"></script>
     <script src="../assets/js/messaging.js"></script>
     <script>
         // Initialize messaging system when page loads
