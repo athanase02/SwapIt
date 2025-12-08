@@ -28,12 +28,21 @@ if (strpos($path, '/api/') === 0) {
         'auth.php' => $base_dir . '/api/auth.php',
         'profile.php' => $base_dir . '/api/profile.php',
         'listings.php' => $base_dir . '/api/listings.php',
+        'items.php' => $base_dir . '/api/items.php',
+        'messages.php' => $base_dir . '/api/messages.php',
+        'notifications.php' => $base_dir . '/api/notifications.php',
+        'requests.php' => $base_dir . '/api/requests.php',
+        'online-status.php' => $base_dir . '/api/online-status.php',
+        'transactions.php' => $base_dir . '/api/transactions.php',
+        'ratings.php' => $base_dir . '/api/ratings.php',
+        'admin-users.php' => $base_dir . '/api/admin-users.php',
         'google-callback.php' => $base_dir . '/api/google-callback.php',
         'google-oauth.php' => $base_dir . '/api/google-oauth.php',
         'test-db.php' => $base_dir . '/api/test-db.php',
         'test-update.php' => $base_dir . '/api/test-update.php',
         'test-google-oauth.php' => $base_dir . '/api/test-google-oauth.php',
         'test-ssl.php' => $base_dir . '/api/test-ssl.php',
+        'test-connection.php' => $base_dir . '/api/test-connection.php',
         'php-info.php' => $base_dir . '/api/php-info.php'
     ];
     
