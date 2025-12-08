@@ -7,21 +7,16 @@
  */
 
 try {
-    // Check if running with Railway MySQL (priority - most specific)
-    if (getenv('MYSQLHOST') || getenv('RAILWAY_DB_HOST')) {
-        // Railway MySQL connection
-        $host = getenv('MYSQLHOST') ?: getenv('RAILWAY_DB_HOST');
-        $port = getenv('MYSQLPORT') ?: getenv('RAILWAY_DB_PORT') ?: '3306';
-        $database = getenv('MYSQLDATABASE') ?: getenv('RAILWAY_DB_NAME') ?: 'si2025';
-        $username = getenv('MYSQLUSER') ?: getenv('RAILWAY_DB_USER') ?: 'root';
-        $password = getenv('MYSQLPASSWORD') ?: getenv('RAILWAY_DB_PASSWORD');
-        
-        // Use public URL host for external connections
-        if (getenv('MYSQL_PUBLIC_URL')) {
-            $publicUrl = parse_url(getenv('MYSQL_PUBLIC_URL'));
-            $host = $publicUrl['host'];
-            $port = $publicUrl['port'] ?? '3306';
-        }
+    // Check if running on Render with Railway MySQL (via DB_* environment variables)
+    // This is the primary check for Render deployment
+    if (getenv('DB_HOST')) {
+        // Render deployment connecting to Railway MySQL
+        // Use RAILWAY_DB_* variables if available, otherwise fall back to DB_* variables
+        $host = getenv('RAILWAY_DB_HOST') ?: getenv('DB_HOST');
+        $port = getenv('RAILWAY_DB_PORT') ?: getenv('DB_PORT') ?: '3306';
+        $database = getenv('RAILWAY_DB_NAME') ?: getenv('DB_NAME') ?: 'railway';
+        $username = getenv('RAILWAY_DB_USER') ?: getenv('DB_USER') ?: 'root';
+        $password = getenv('RAILWAY_DB_PASSWORD') ?: getenv('DB_PASSWORD');
         
         $dsn = "mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4";
         
@@ -29,110 +24,65 @@ try {
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => false,
-            PDO::ATTR_TIMEOUT => 10
+            PDO::ATTR_TIMEOUT => 15,
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+            PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
         ]);
         
-        error_log("SwapIt: Connected to Railway MySQL ($host:$port/$database)");
+        error_log("SwapIt: Connected to Railway MySQL from Render ($host:$port/$database)");
     }
-    // Check if running on Render with MySQL (via environment variables)
-    elseif (getenv('DB_HOST')) {
-        // Render MySQL connection
-        $host = getenv('DB_HOST');
-        $port = getenv('DB_PORT') ?: '3306';
-        $database = getenv('DB_NAME');
-        $username = getenv('DB_USER');
-        $password = getenv('DB_PASSWORD');
+    // Check if running with Railway environment variables (production on Railway)
+    elseif (getenv('MYSQLHOST') || getenv('RAILWAY_DB_HOST')) {
+        // Railway MySQL connection via environment variables
+        $host = getenv('MYSQLHOST') ?: getenv('RAILWAY_DB_HOST');
+        $port = getenv('MYSQLPORT') ?: getenv('RAILWAY_DB_PORT') ?: '3306';
+        $database = getenv('MYSQLDATABASE') ?: getenv('RAILWAY_DB_NAME') ?: 'railway';
+        $username = getenv('MYSQLUSER') ?: getenv('RAILWAY_DB_USER') ?: 'root';
+        $password = getenv('MYSQLPASSWORD') ?: getenv('RAILWAY_DB_PASSWORD');
         
         $dsn = "mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4";
         
-        $conn = new PDO($dsn, $username, $password);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $conn = new PDO($dsn, $username, $password, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_TIMEOUT => 10,
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+            PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
+        ]);
         
-        error_log("SwapIt: Connected to MySQL on Render ($host:$port/$database)");
+        error_log("SwapIt: Connected to Railway MySQL (Railway production) ($host:$port/$database)");
+    }
+    // Local development connecting to Railway MySQL
+    else {
+        // Local development connecting to Railway MySQL (hardcoded)
+        $host = 'shinkansen.proxy.rlwy.net';
+        $port = '56904';
+        $database = 'railway';
+        $username = 'root';
+        $password = 'JJJKhMufpprtiSlcREMoPfpjHwivYjnd';
         
-        // Create tables for MySQL
-        $conn->exec("CREATE TABLE IF NOT EXISTS users (
-            id INT PRIMARY KEY AUTO_INCREMENT,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            password_hash VARCHAR(255) NOT NULL,
-            full_name VARCHAR(255) NOT NULL,
-            avatar_url TEXT,
-            phone VARCHAR(20),
-            google_id VARCHAR(255),
-            is_verified BOOLEAN DEFAULT FALSE,
-            is_active BOOLEAN DEFAULT TRUE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        $dsn = "mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4";
         
-        $conn->exec("CREATE TABLE IF NOT EXISTS profiles (
-            id INT PRIMARY KEY AUTO_INCREMENT,
-            user_id INT NOT NULL UNIQUE,
-            full_name VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL,
-            phone VARCHAR(20),
-            bio TEXT,
-            avatar_url TEXT,
-            location VARCHAR(255),
-            rating_average DECIMAL(3,2) DEFAULT 5.00,
-            total_reviews INT DEFAULT 0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        $conn = new PDO($dsn, $username, $password, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_TIMEOUT => 10,
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+            PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
+        ]);
         
-        error_log("SwapIt: Render MySQL tables initialized");
-        
-    } else {
-        // Local MySQL using PDO
-        $host = "localhost";
-        $username = "root"; 
-        $password = ""; 
-        $database = "SI2025";
-        
-        $conn = new PDO("mysql:host=$host", $username, $password);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        
-        // Create database if doesn't exist
-        $conn->exec("CREATE DATABASE IF NOT EXISTS $database");
-        $conn->exec("USE $database");
-        
-        error_log("SwapIt: Connected to local MySQL database");
-        
-        // Create tables for MySQL
-        $conn->exec("CREATE TABLE IF NOT EXISTS users (
-            id INT PRIMARY KEY AUTO_INCREMENT,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            password_hash VARCHAR(255) NOT NULL,
-            full_name VARCHAR(255) NOT NULL,
-            avatar_url TEXT,
-            phone VARCHAR(20),
-            google_id VARCHAR(255),
-            is_verified BOOLEAN DEFAULT FALSE,
-            is_active BOOLEAN DEFAULT TRUE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-        
-        $conn->exec("CREATE TABLE IF NOT EXISTS profiles (
-            id INT PRIMARY KEY AUTO_INCREMENT,
-            user_id INT NOT NULL UNIQUE,
-            full_name VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL,
-            phone VARCHAR(20),
-            bio TEXT,
-            avatar_url TEXT,
-            location VARCHAR(255),
-            rating_average DECIMAL(3,2) DEFAULT 5.00,
-            total_reviews INT DEFAULT 0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-        
-        error_log("SwapIt: Local MySQL tables initialized");
+        error_log("SwapIt: Connected to Railway MySQL (local dev) ($host:$port/$database)");
+    }
+    
+    // Verify connection and log table count
+    try {
+        $stmt = $conn->query("SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = '$database'");
+        $result = $stmt->fetch();
+        error_log("SwapIt: Database has {$result['count']} tables");
+    } catch (Exception $e) {
+        error_log("SwapIt: Could not verify tables: " . $e->getMessage());
     }
     
 } catch (PDOException $e) {
