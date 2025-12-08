@@ -7,8 +7,27 @@
  */
 
 try {
+    // Check if running with Railway MySQL (priority - most specific)
+    if (getenv('RAILWAY_DB_HOST')) {
+        // Railway MySQL connection
+        $host = getenv('RAILWAY_DB_HOST');
+        $port = getenv('RAILWAY_DB_PORT') ?: '3306';
+        $database = getenv('RAILWAY_DB_NAME');
+        $username = getenv('RAILWAY_DB_USER');
+        $password = getenv('RAILWAY_DB_PASSWORD');
+        
+        $dsn = "mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4";
+        
+        $conn = new PDO($dsn, $username, $password, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false
+        ]);
+        
+        error_log("SwapIt: Connected to Railway MySQL ($host:$port/$database)");
+    }
     // Check if running on Render with MySQL (via environment variables)
-    if (getenv('DB_HOST')) {
+    elseif (getenv('DB_HOST')) {
         // Render MySQL connection
         $host = getenv('DB_HOST');
         $port = getenv('DB_PORT') ?: '3306';

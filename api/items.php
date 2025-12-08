@@ -36,25 +36,21 @@ class ItemsService {
                 WHERE 1=1";
         
         $params = [];
-        $types = '';
         
         // Apply filters
         if (!empty($filters['category'])) {
             $sql .= " AND c.slug = ?";
             $params[] = $filters['category'];
-            $types .= 's';
         }
         
         if (!empty($filters['location'])) {
             $sql .= " AND i.location LIKE ?";
             $params[] = '%' . $filters['location'] . '%';
-            $types .= 's';
         }
         
         if (!empty($filters['status'])) {
             $sql .= " AND i.status = ?";
             $params[] = $filters['status'];
-            $types .= 's';
         } else {
             $sql .= " AND i.status = 'available'";
         }
@@ -64,19 +60,16 @@ class ItemsService {
             $searchTerm = '%' . $filters['search'] . '%';
             $params[] = $searchTerm;
             $params[] = $searchTerm;
-            $types .= 'ss';
         }
         
         if (!empty($filters['min_price'])) {
             $sql .= " AND i.price >= ?";
             $params[] = floatval($filters['min_price']);
-            $types .= 'd';
         }
         
         if (!empty($filters['max_price'])) {
             $sql .= " AND i.price <= ?";
             $params[] = floatval($filters['max_price']);
-            $types .= 'd';
         }
         
         // Sorting
@@ -93,19 +86,12 @@ class ItemsService {
         }
         
         $stmt = $this->conn->prepare($sql);
+        $stmt->execute($params);
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        if (!empty($params)) {
-            $stmt->bind_param($types, ...$params);
-        }
-        
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $items = [];
-        
-        while ($row = $result->fetch_assoc()) {
-            // Add image_url for compatibility
-            $row['image_url'] = $row['primary_image'] ?? 'https://placehold.co/400x300?text=' . urlencode($row['title']);
-            $items[] = $row;
+        // Add image_url for compatibility
+        foreach ($items as &$item) {
+            $item['image_url'] = $item['primary_image'] ?? 'https://placehold.co/400x300?text=' . urlencode($item['title']);
         }
         
         return [
@@ -132,10 +118,8 @@ class ItemsService {
              LEFT JOIN categories c ON i.category_id = c.id
              WHERE i.id = ?"
         );
-        $stmt->bind_param('i', $itemId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $item = $result->fetch_assoc();
+        $stmt->execute([$itemId]);
+        $item = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if (!$item) {
             return ['success' => false, 'error' => 'Item not found'];
@@ -148,12 +132,10 @@ class ItemsService {
              WHERE item_id = ? 
              ORDER BY is_primary DESC, display_order ASC"
         );
-        $imageStmt->bind_param('i', $itemId);
-        $imageStmt->execute();
-        $imageResult = $imageStmt->get_result();
+        $imageStmt->execute([$itemId]);
         $images = [];
         
-        while ($img = $imageResult->fetch_assoc()) {
+        while ($img = $imageStmt->fetch(PDO::FETCH_ASSOC)) {
             $images[] = $img['image_url'];
         }
         

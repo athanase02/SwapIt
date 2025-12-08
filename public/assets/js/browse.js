@@ -29,6 +29,9 @@ class BrowseFilter {
             await window.swapitTranslation.init();
         }
         
+        // Clear loading message
+        this.grid.innerHTML = '';
+        
         // Load items from database
         await this.loadItemsFromDatabase();
         
@@ -39,17 +42,25 @@ class BrowseFilter {
             }
         });
         
-        // Load items from database
-        await this.loadItemsFromDatabase();
-        
         // Load any items user created while offline (stored in browser)
         this.loadPendingListings();
         
         // Attach listeners to filter dropdowns (category, location, price, etc.)
         this.setupFilterControls();
         
-        // Display all items on initial load (no filtering yet)
-        this.render();
+        // If no items loaded, show message
+        if (this.cards.length === 0) {
+            this.grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #9aa5c3;">
+                    <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                    <h3 style="margin-bottom: 8px;">No items available</h3>
+                    <p>Check back later or try adjusting your filters.</p>
+                </div>
+            `;
+        } else {
+            // Display all items on initial load (no filtering yet)
+            this.render();
+        }
     }
 
     /**
@@ -62,17 +73,24 @@ class BrowseFilter {
      */
     async loadItemsFromDatabase() {
         try {
+            console.log('Fetching items from database...');
             const response = await fetch('/api/items.php?action=get_all', {
                 credentials: 'include'
             });
             
+            console.log('Response status:', response.status);
+            
             if (!response.ok) {
-                throw new Error('Failed to fetch items');
+                const errorText = await response.text();
+                console.error('Failed to fetch items:', response.status, errorText);
+                throw new Error('Failed to fetch items: ' + response.status);
             }
             
             const data = await response.json();
+            console.log('Items data received:', data);
             
             if (data.success && data.items && data.items.length > 0) {
+                console.log('Processing', data.items.length, 'items');
                 data.items.forEach(item => {
                     // Create a new article element for this item
                     const art = document.createElement('article');
@@ -111,10 +129,21 @@ class BrowseFilter {
                     this.grid.appendChild(art);
                     this.cards.push(art);
                 });
+                console.log('Successfully added', this.cards.length, 'items to grid');
+            } else {
+                console.warn('No items returned or API returned error:', data);
             }
         } catch (error) {
-            console.warn('Could not load items from database:', error);
-            // Continue with existing items - don't break the page
+            console.error('Error loading items from database:', error);
+            // Show error message in grid
+            this.grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #ff7df2;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 16px;"></i>
+                    <h3 style="margin-bottom: 8px;">Could not load items</h3>
+                    <p style="color: #9aa5c3;">Error: ${error.message}</p>
+                    <p style="color: #9aa5c3; margin-top: 16px;">Please check your database connection and try refreshing the page.</p>
+                </div>
+            `;
         }
     }
 
