@@ -329,8 +329,9 @@ $apis = [
 echo "<table><tr><th>API</th><th>Endpoint</th><th>Status</th></tr>";
 
 foreach ($apis as $name => $endpoint) {
-    $fullUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . '/' . $endpoint;
-    $accessible = file_exists(__DIR__ . '/' . $endpoint);
+    $scheme = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http');
+    $fullUrl = $scheme . '://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . '/' . $endpoint;
+    $accessible = file_exists(__DIR__ . '/' . str_replace('../', '', $endpoint));
     
     if ($accessible) {
         echo "<tr><td>{$name}</td><td>{$endpoint}</td><td><span class='badge badge-success'>✅ ACCESSIBLE</span></td></tr>";
