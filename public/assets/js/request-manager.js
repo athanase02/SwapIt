@@ -7,12 +7,64 @@
 class RequestManager {
     constructor() {
         this.currentRequestId = null;
+        this.autoRefreshInterval = null;
         this.init();
     }
 
     init() {
         this.setupEventListeners();
         this.loadRequests();
+        this.startRealTimeUpdates();
+    }
+    
+    /**
+     * Start real-time updates for requests
+     */
+    startRealTimeUpdates() {
+        // Register callback with real-time manager
+        if (window.realTimeManager) {
+            window.realTimeManager.onRequestUpdate((requests) => {
+                // Refresh the display when requests are updated
+                this.refreshRequestsDisplay(requests);
+            });
+        }
+        
+        // Also refresh every 10 seconds
+        this.autoRefreshInterval = setInterval(() => {
+            this.loadRequests();
+        }, 10000);
+    }
+    
+    /**
+     * Stop real-time updates (when leaving page)
+     */
+    stopRealTimeUpdates() {
+        if (this.autoRefreshInterval) {
+            clearInterval(this.autoRefreshInterval);
+        }
+    }
+    
+    /**
+     * Refresh requests display without full reload
+     */
+    refreshRequestsDisplay(requests) {
+        if (!requests || requests.length === 0) return;
+        
+        // Update badges for pending counts
+        const pendingReceived = requests.filter(r => 
+            r.request_type === 'received' && r.status === 'pending'
+        ).length;
+        
+        const pendingSent = requests.filter(r => 
+            r.request_type === 'sent' && r.status === 'pending'
+        ).length;
+        
+        // Update badges if they exist
+        const receivedBadge = document.querySelector('[data-tab="received"] .badge');
+        if (receivedBadge) receivedBadge.textContent = pendingReceived;
+        
+        const sentBadge = document.querySelector('[data-tab="sent"] .badge');
+        if (sentBadge) sentBadge.textContent = pendingSent;
     }
 
     setupEventListeners() {

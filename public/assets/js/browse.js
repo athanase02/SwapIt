@@ -1,43 +1,27 @@
 /**
- * Browse Page Filter and Search System
- * Client-side filtering by category, location, price, and search query
+ * Browse Page - Dynamic Item Loading with Real-Time Features
  * 
  * @class BrowseFilter
  * @author Athanase Abayo - Core filtering architecture and search logic
  * @author Mabinty Mambu - Category and location filtering
  * @author Olivier Kwizera - Price range filtering and sorting
- * @version 2.0
+ * @version 3.0 - Real-time database integration
  */
 class BrowseFilter {
     /**
      * Initialize the browse filter
-     * Sets up the main grid container where items will be displayed
-     * If the grid doesn't exist on the page, stop here (nothing to filter)
-     * Otherwise, create an empty array to hold all item cards and start initialization
-     * 
-     * @constructor
-     * @author Athanase Abayo
      */
     constructor() {
-        // Find the container where all items are displayed
         this.grid = document.getElementById('itemsGrid');
-        if (!this.grid) return; // Exit early if grid doesn't exist
+        if (!this.grid) return;
         
-        // Array to store all item cards for filtering
         this.cards = [];
+        this.items = []; // Store item data
         this.init();
     }
 
     /**
-     * Initialize filter system and load items
-     * This runs once when the page loads
-     * Step 1: Grab all existing item cards from the page
-     * Step 2: Load any items saved offline (pending listings)
-     * Step 3: Wire up the filter dropdowns and search box
-     * Step 4: Show all items on screen (no filters applied yet)
-     * 
-     * @author Athanase Abayo - Core initialization
-     * @author Mabinty Mambu - Event handlers
+     * Initialize filter system and load items from database
      */
     async init() {
         // Initialize translation system first
@@ -45,8 +29,8 @@ class BrowseFilter {
             await window.swapitTranslation.init();
         }
         
-        // Collect all existing item cards already on the page
-        this.cards = Array.from(this.grid.querySelectorAll('.card'));
+        // Load items from database
+        await this.loadItemsFromDatabase();
         
         // Add unique IDs to cards if they don't have them
         this.cards.forEach((card, index) => {
@@ -676,5 +660,43 @@ function escapeHtml(str) {
         "'": '&#39;'
     })[s]);
 }
+
+// Initialize browse filter when page loads
+if (document.getElementById('itemsGrid')) {
     new BrowseFilter();
-});
+}
+
+/**
+ * Show item details in modal
+ * @param {number} itemId - ID of item to show
+ */
+window.showItemDetails = function(itemId) {
+    if (window.itemDetailsManager) {
+        window.itemDetailsManager.showItem(itemId);
+    } else {
+        console.error('Item details manager not loaded');
+        alert('Item details unavailable. Please refresh the page.');
+    }
+};
+
+/**
+ * Quick request function - opens modal at request form
+ * @param {number} itemId - ID of item
+ * @param {string} itemTitle - Title of item
+ */
+window.quickRequest = function(itemId, itemTitle) {
+    if (window.itemDetailsManager) {
+        window.itemDetailsManager.showItem(itemId);
+        // Scroll to form after modal opens
+        setTimeout(() => {
+            const form = document.getElementById('borrowRequestForm');
+            if (form) {
+                form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 300);
+    } else {
+        console.error('Item details manager not loaded');
+        alert('Request feature unavailable. Please refresh the page.');
+    }
+};
+
