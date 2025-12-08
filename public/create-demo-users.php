@@ -114,7 +114,7 @@ try {
         $category = $stmt->fetch();
         $categoryId = $category ? $category['id'] : 1;
         
-        $stmt = $conn->prepare("INSERT INTO items (title, description, category_id, condition_status, price, rental_period, location, user_id, status, image_urls) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO items (title, description, category_id, condition_status, price_per_day, rental_period, location, user_id, status, image_urls) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             'Epson EX3280 Projector',
             'High-quality projector perfect for presentations and events. 3LCD technology, 3300 lumens brightness, WXGA resolution (1280x800). Includes HDMI cable, remote control, and carrying case. Great condition, well-maintained.',
@@ -155,7 +155,7 @@ try {
         $stmt = $conn->prepare("SELECT id FROM items WHERE user_id = ? AND title = ?");
         $stmt->execute([$johnId, $item['title']]);
         if (!$stmt->fetch()) {
-            $stmt = $conn->prepare("INSERT INTO items (title, description, category_id, condition_status, price, rental_period, location, user_id, status, image_urls) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO items (title, description, category_id, condition_status, price_per_day, rental_period, location, user_id, status, image_urls) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $item['title'],
                 $item['description'],
