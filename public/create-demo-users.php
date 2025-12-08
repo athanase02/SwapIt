@@ -46,21 +46,22 @@ try {
     // Create Sarah if not exists
     if (!in_array('sarah.student@ashesi.edu.gh', $existingEmails)) {
         $password = password_hash('Demo123!', PASSWORD_BCRYPT);
-        $stmt = $conn->prepare("INSERT INTO users (email, password_hash, full_name, phone, user_type, is_verified, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+        $stmt = $conn->prepare("INSERT INTO users (email, password_hash, full_name, phone, is_verified) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([
             'sarah.student@ashesi.edu.gh',
             $password,
             'Sarah Student',
             '+233501234567',
-            'student',
             1
         ]);
         $sarahId = $conn->lastInsertId();
         
         // Create profile for Sarah
-        $stmt = $conn->prepare("INSERT INTO profiles (user_id, bio, avatar_url, location, created_at) VALUES (?, ?, ?, ?, NOW())");
+        $stmt = $conn->prepare("INSERT INTO profiles (user_id, full_name, email, bio, avatar_url, location) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $sarahId,
+            'Sarah Student',
+            'sarah.student@ashesi.edu.gh',
             'Computer Science student at Ashesi University. Looking for items to borrow for projects and events.',
             'https://ui-avatars.com/api/?name=Sarah+Student&background=667eea&color=fff&size=200',
             'Ashesi University Campus'
@@ -75,21 +76,22 @@ try {
     // Create John if not exists
     if (!in_array('john.prof@ashesi.edu.gh', $existingEmails)) {
         $password = password_hash('Demo123!', PASSWORD_BCRYPT);
-        $stmt = $conn->prepare("INSERT INTO users (email, password_hash, full_name, phone, user_type, is_verified, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+        $stmt = $conn->prepare("INSERT INTO users (email, password_hash, full_name, phone, is_verified) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([
             'john.prof@ashesi.edu.gh',
             $password,
             'John Professor',
             '+233507654321',
-            'faculty',
             1
         ]);
         $johnId = $conn->lastInsertId();
         
         // Create profile for John
-        $stmt = $conn->prepare("INSERT INTO profiles (user_id, bio, avatar_url, location, created_at) VALUES (?, ?, ?, ?, NOW())");
+        $stmt = $conn->prepare("INSERT INTO profiles (user_id, full_name, email, bio, avatar_url, location) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $johnId,
+            'John Professor',
+            'john.prof@ashesi.edu.gh',
             'Professor at Ashesi University. Happy to lend equipment to students for academic projects.',
             'https://ui-avatars.com/api/?name=John+Professor&background=764ba2&color=fff&size=200',
             'Ashesi University Campus'
@@ -112,7 +114,7 @@ try {
         $category = $stmt->fetch();
         $categoryId = $category ? $category['id'] : 1;
         
-        $stmt = $conn->prepare("INSERT INTO items (title, description, category_id, condition_status, price, rental_period, location, owner_id, status, image_urls, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+        $stmt = $conn->prepare("INSERT INTO items (title, description, category_id, condition_status, price, rental_period, location, owner_id, status, image_urls) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             'Epson EX3280 Projector',
             'High-quality projector perfect for presentations and events. 3LCD technology, 3300 lumens brightness, WXGA resolution (1280x800). Includes HDMI cable, remote control, and carrying case. Great condition, well-maintained.',
@@ -153,7 +155,7 @@ try {
         $stmt = $conn->prepare("SELECT id FROM items WHERE owner_id = ? AND title = ?");
         $stmt->execute([$johnId, $item['title']]);
         if (!$stmt->fetch()) {
-            $stmt = $conn->prepare("INSERT INTO items (title, description, category_id, condition_status, price, rental_period, location, owner_id, status, image_urls, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+            $stmt = $conn->prepare("INSERT INTO items (title, description, category_id, condition_status, price, rental_period, location, owner_id, status, image_urls) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $item['title'],
                 $item['description'],
