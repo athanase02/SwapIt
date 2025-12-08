@@ -12,6 +12,17 @@ require_once dirname(__DIR__) . '/config/db.php';
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
+// If no action provided, return helpful error
+if (empty($action)) {
+    echo json_encode([
+        'success' => false,
+        'error' => 'No action specified',
+        'usage' => 'Add ?action=get_all to the URL',
+        'available_actions' => ['get_all', 'get_item', 'create', 'update', 'delete']
+    ]);
+    exit;
+}
+
 class ItemsService {
     private $conn;
     
@@ -267,6 +278,9 @@ $itemsService = new ItemsService($conn);
 
 // Handle requests
 try {
+    // Log the incoming request for debugging
+    error_log("Items API called with action: " . ($action ?: 'NONE'));
+    
     switch ($action) {
         case 'get_all':
             $filters = [
@@ -368,7 +382,12 @@ try {
             break;
             
         default:
-            echo json_encode(['success' => false, 'error' => 'Invalid action']);
+            error_log("Items API: Unknown action '$action' requested");
+            echo json_encode([
+                'success' => false, 
+                'error' => 'Invalid action: ' . ($action ?: 'none provided'),
+                'available_actions' => ['get_all', 'get_item', 'create', 'update', 'delete']
+            ]);
             break;
     }
 } catch (Exception $e) {
