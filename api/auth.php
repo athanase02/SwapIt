@@ -108,132 +108,191 @@ class SecurityLogger {
  * @author Athanase Abayo - Session integration
  */
 class RateLimiter {
-    private static $storageFile = __DIR__ . '/../logs/rate_limit.json';
+    private static $conn = null;
     
     /**
-     * Check if request is within rate limit
-     * @param string $identifier - Usually IP address or email
-     * @param int $maxAttempts - Maximum attempts allowed
-     * @param int $timeWindow - Time window in seconds
-     * @return array - ['allowed' => bool, 'remaining' => int, 'reset_time' => int]
-     * @author Olivier Kwizera
+     * Get database connection (PDO)
      */
-    public static function check($identifier, $maxAttempts = 5, $timeWindow = 900) {
-        // Ensure storage directory exists
-        $storageDir = dirname(self::$storageFile);
-        if (!is_dir($storageDir)) {
-            @mkdir($storageDir, 0755, true);
+    private static function getConnection() {
+        if (self::$conn === null) {
+            require_once __DIR__ . '/../config/db.php';
+            global $conn;
+            self::$conn = $conn;
         }
-        
-        // Load existing rate limit data
-        $data = [];
-        if (file_exists(self::$storageFile)) {
-            $content = @file_get_contents(self::$storageFile);
-            $data = json_decode($content, true) ?: [];
-        }
-        
-        $now = time();
-        $key = hash('sha256', $identifier); // Hash identifier for privacy
-        
-        // Clean old entries
-        if (isset($data[$key])) {
-            $data[$key]['attempts'] = array_filter($data[$key]['attempts'], function($timestamp) use ($now, $timeWindow) {
-                return ($now - $timestamp) < $timeWindow;
-            });
-        } else {
-            $data[$key] = ['attempts' => [], 'locked_until' => 0];
-        }
-        
-        // Check if account is locked
-        if ($data[$key]['locked_until'] > $now) {
-            $remaining = $data[$key]['locked_until'] - $now;
-            SecurityLogger::log('rate_limit_exceeded', "Rate limit exceeded for: $identifier", ['remaining_seconds' => $remaining]);
-            return [
-                'allowed' => false,
-                'remaining' => 0,
-                'reset_time' => $data[$key]['locked_until'],
-                'locked' => true,
-                'message' => "Too many attempts. Account locked for " . ceil($remaining / 60) . " minutes."
-            ];
-        }
-        
-        // Check current attempts
-        $attemptCount = count($data[$key]['attempts']);
-        
-        if ($attemptCount >= $maxAttempts) {
-            // Lock account for 15 minutes
-            $data[$key]['locked_until'] = $now + 900;
-            self::save($data);
-            SecurityLogger::log('account_locked', "Account temporarily locked: $identifier", ['attempts' => $attemptCount]);
-            return [
-                'allowed' => false,
-                'remaining' => 0,
-                'reset_time' => $data[$key]['locked_until'],
-                'locked' => true,
-                'message' => 'Too many attempts. Account locked for 15 minutes.'
-            ];
-        }
-        
-        return [
-            'allowed' => true,
-            'remaining' => $maxAttempts - $attemptCount,
-            'reset_time' => $now + $timeWindow,
-            'locked' => false
-        ];
+        return self::$conn;
     }
     
     /**
-     * Record a failed attempt
-     * @param string $identifier - Usually IP address or email
-     * @author Olivier Kwizera
+     * Parse identifier to extract email and IP
+     * @param string $identifier - Format: "email:IP" or just "email"
+     * @return array - ['email' => string, 'ip' => string]
      */
-    public static function recordAttempt($identifier) {
-        $storageDir = dirname(self::$storageFile);
-        if (!is_dir($storageDir)) {
-            @mkdir($storageDir, 0755, true);
+    private static function parseIdentifier($identifier) {
+        $parts = explode(':', $identifier, 2);
+        if (count($parts) === 2) {
+            return ['email' => $parts[0], 'ip' => $parts[1]];
         }
-        
-        $data = [];
-        if (file_exists(self::$storageFile)) {
-            $content = @file_get_contents(self::$storageFile);
-            $data = json_decode($content, true) ?: [];
+        // Fallback: try to parse as email + IP concatenated
+        $atPos = strpos($identifier, '@');
+        if ($atPos !== false) {
+            $email = substr($identifier, 0, strpos($identifier, '.', $atPos) + 4);
+            $ip = substr($identifier, strlen($email));
+            return ['email' => $email, 'ip' => $ip ?: 'unknown'];
         }
-        
-        $key = hash('sha256', $identifier);
-        if (!isset($data[$key])) {
-            $data[$key] = ['attempts' => [], 'locked_until' => 0];
+        return ['email' => $identifier, 'ip' => 'unknown'];
+    }
+    
+    /**
+     * Check if request is within rate limit
+     * @param string $identifier - Usually email + IP address
+     * @param int $maxAttempts - Maximum attempts allowed
+     * @param int $timeWindow - Time window in seconds
+     * @return array - ['allowed' => bool, 'remaining' => int, 'reset_time' => int]
+     * @author Olivier Kwizera - Updated to use database storage
+     */
+    public static function check($identifier, $maxAttempts = 5, $timeWindow = 900) {
+        try {
+            $conn = self::getConnection();
+            $now = time();
+            $key = hash('sha256', $identifier); // Hash identifier for privacy
+            $parsed = self::parseIdentifier($identifier);
+            
+            // Check if account is currently locked
+            $stmt = $conn->prepare("
+                SELECT locked_until 
+                FROM login_attempts 
+                WHERE identifier_hash = ? 
+                AND locked_until IS NOT NULL 
+                AND locked_until > NOW()
+                ORDER BY locked_until DESC 
+                LIMIT 1
+            ");
+            $stmt->execute([$key]);
+            $row = $stmt->fetch();
+            
+            if ($row) {
+                $lockedUntil = strtotime($row['locked_until']);
+                $remaining = $lockedUntil - $now;
+                SecurityLogger::log('rate_limit_exceeded', "Rate limit exceeded for: $identifier", ['remaining_seconds' => $remaining]);
+                return [
+                    'allowed' => false,
+                    'remaining' => 0,
+                    'reset_time' => $lockedUntil,
+                    'locked' => true,
+                    'message' => "Too many attempts. Account locked for " . ceil($remaining / 60) . " minutes."
+                ];
+            }
+            
+            // Clean up old attempts (outside time window)
+            $windowStart = date('Y-m-d H:i:s', $now - $timeWindow);
+            $stmt = $conn->prepare("DELETE FROM login_attempts WHERE identifier_hash = ? AND attempt_time < ?");
+            $stmt->execute([$key, $windowStart]);
+            
+            // Count recent failed attempts within time window
+            $stmt = $conn->prepare("
+                SELECT COUNT(*) as attempt_count 
+                FROM login_attempts 
+                WHERE identifier_hash = ? 
+                AND attempt_time >= ? 
+                AND success = FALSE
+            ");
+            $stmt->execute([$key, $windowStart]);
+            $row = $stmt->fetch();
+            $attemptCount = (int)$row['attempt_count'];
+            
+            if ($attemptCount >= $maxAttempts) {
+                // Lock account for 15 minutes
+                $lockedUntil = date('Y-m-d H:i:s', $now + 900);
+                $stmt = $conn->prepare("
+                    UPDATE login_attempts 
+                    SET locked_until = ? 
+                    WHERE identifier_hash = ?
+                ");
+                $stmt->execute([$lockedUntil, $key]);
+                
+                SecurityLogger::log('account_locked', "Account temporarily locked: $identifier", ['attempts' => $attemptCount]);
+                return [
+                    'allowed' => false,
+                    'remaining' => 0,
+                    'reset_time' => $now + 900,
+                    'locked' => true,
+                    'message' => 'Too many attempts. Account locked for 15 minutes.'
+                ];
+            }
+            
+            return [
+                'allowed' => true,
+                'remaining' => $maxAttempts - $attemptCount,
+                'reset_time' => $now + $timeWindow,
+                'locked' => false
+            ];
+            
+        } catch (Exception $e) {
+            error_log("RateLimiter check error: " . $e->getMessage());
+            // On error, allow the request (fail open for availability)
+            return ['allowed' => true, 'remaining' => 5, 'reset_time' => time() + 900, 'locked' => false];
         }
-        
-        $data[$key]['attempts'][] = time();
-        self::save($data);
+    }
+    
+    /**
+     * Record a failed login attempt
+     * @param string $identifier - Usually email + IP address
+     * @param string $userAgent - Optional user agent string
+     * @author Olivier Kwizera - Updated to use database storage
+     */
+    public static function recordAttempt($identifier, $userAgent = null) {
+        try {
+            $conn = self::getConnection();
+            $key = hash('sha256', $identifier);
+            $parsed = self::parseIdentifier($identifier);
+            
+            if ($userAgent === null && isset($_SERVER['HTTP_USER_AGENT'])) {
+                $userAgent = $_SERVER['HTTP_USER_AGENT'];
+            }
+            
+            $stmt = $conn->prepare("
+                INSERT INTO login_attempts 
+                (identifier_hash, email, ip_address, success, user_agent) 
+                VALUES (?, ?, ?, FALSE, ?)
+            ");
+            $stmt->execute([$key, $parsed['email'], $parsed['ip'], $userAgent]);
+            
+        } catch (Exception $e) {
+            error_log("RateLimiter recordAttempt error: " . $e->getMessage());
+        }
     }
     
     /**
      * Reset attempts for an identifier (on successful login)
-     * @param string $identifier - Usually IP address or email
-     * @author Olivier Kwizera
+     * @param string $identifier - Usually email + IP address
+     * @author Olivier Kwizera - Updated to use database storage
      */
     public static function reset($identifier) {
-        if (!file_exists(self::$storageFile)) {
-            return;
+        try {
+            $conn = self::getConnection();
+            $key = hash('sha256', $identifier);
+            $parsed = self::parseIdentifier($identifier);
+            
+            // Record successful login
+            $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+            $stmt = $conn->prepare("
+                INSERT INTO login_attempts 
+                (identifier_hash, email, ip_address, success, user_agent) 
+                VALUES (?, ?, ?, TRUE, ?)
+            ");
+            $stmt->execute([$key, $parsed['email'], $parsed['ip'], $userAgent]);
+            
+            // Clear locked_until status for this identifier
+            $stmt = $conn->prepare("
+                UPDATE login_attempts 
+                SET locked_until = NULL 
+                WHERE identifier_hash = ?
+            ");
+            $stmt->execute([$key]);
+            
+        } catch (Exception $e) {
+            error_log("RateLimiter reset error: " . $e->getMessage());
         }
-        
-        $data = json_decode(@file_get_contents(self::$storageFile), true) ?: [];
-        $key = hash('sha256', $identifier);
-        
-        if (isset($data[$key])) {
-            $data[$key] = ['attempts' => [], 'locked_until' => 0];
-            self::save($data);
-        }
-    }
-    
-    /**
-     * Save rate limit data to file
-     * @param array $data - Rate limit data
-     * @author Olivier Kwizera
-     */
-    private static function save($data) {
-        @file_put_contents(self::$storageFile, json_encode($data), LOCK_EX);
     }
 }
 
