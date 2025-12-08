@@ -3,6 +3,7 @@ services:
     name: swapit
     env: docker
     plan: free
+    healthCheckPath: /health.php
     envVars:
       - key: DB_HOST
         sync: false
