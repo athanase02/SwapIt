@@ -420,45 +420,6 @@ CREATE TABLE review_votes (
     UNIQUE KEY unique_vote (review_id, user_id)
 );
 
--- Messages between users
-CREATE TABLE messages (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    conversation_id INT NOT NULL,
-    sender_id INT NOT NULL,
-    receiver_id INT NOT NULL,
-    item_id INT,
-    message_text TEXT NOT NULL,
-    attachment_url TEXT,
-    is_read BOOLEAN DEFAULT FALSE,
-    read_at TIMESTAMP NULL,
-    is_deleted_by_sender BOOLEAN DEFAULT FALSE,
-    is_deleted_by_receiver BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE SET NULL,
-    INDEX idx_conversation (conversation_id),
-    INDEX idx_sender (sender_id),
-    INDEX idx_receiver (receiver_id),
-    INDEX idx_read (is_read)
-);
-
--- Conversations - Group messages between two users
-CREATE TABLE conversations (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user1_id INT NOT NULL,
-    user2_id INT NOT NULL,
-    item_id INT,
-    last_message_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user1_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE SET NULL,
-    UNIQUE KEY unique_conversation (user1_id, user2_id),
-    INDEX idx_users (user1_id, user2_id),
-    INDEX idx_last_message (last_message_at)
-);
-
 -- User follows/connections
 CREATE TABLE user_follows (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -473,10 +434,10 @@ CREATE TABLE user_follows (
 );
 
 -- ============================================================
--- SECTION 7: NOTIFICATION TABLES
+-- SECTION 7: MESSAGING & NOTIFICATION TABLES
 -- ============================================================
 
--- Conversations - Group messages between two users (MOVED UP - needed for foreign keys)
+-- Conversations - Group messages between two users
 CREATE TABLE conversations (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user1_id INT NOT NULL,
