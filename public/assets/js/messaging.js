@@ -241,26 +241,35 @@ class MessagingSystem {
             formData.append('action', 'send_message');
             formData.append('receiver_id', this.currentReceiverId);
             formData.append('message', messageText);
+            if (this.currentConversationId) {
+                formData.append('conversation_id', this.currentConversationId);
+            }
 
-            const response = await fetch('/api/messages.php', {
+            const response = await fetch('../api/messages.php', {
                 method: 'POST',
                 credentials: 'include',
                 body: formData
             });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
             const data = await response.json();
 
             if (data.success) {
                 input.value = '';
                 this.currentConversationId = data.conversation_id;
+                // Immediately add the message to UI for instant feedback
                 await this.loadMessages();
                 await this.loadConversations(); // Refresh conversation list
             } else {
-                alert('Failed to send message: ' + data.error);
+                console.error('Send message failed:', data.error);
+                alert('Failed to send message: ' + (data.error || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error sending message:', error);
-            alert('Failed to send message. Please try again.');
+            alert('Failed to send message: ' + error.message);
         }
     }
 
@@ -271,11 +280,15 @@ class MessagingSystem {
             formData.append('user_id', userId);
             if (itemId) formData.append('item_id', itemId);
 
-            const response = await fetch('/api/messages.php', {
+            const response = await fetch('../api/messages.php', {
                 method: 'POST',
                 credentials: 'include',
                 body: formData
             });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
             const data = await response.json();
 
@@ -284,13 +297,15 @@ class MessagingSystem {
                 if (window.location.pathname.includes('messages')) {
                     await this.openConversation(data.conversation_id, userId);
                 } else {
-                    window.location.href = `/public/pages/messages.html?conversation=${data.conversation_id}`;
+                    window.location.href = `pages/messages.html?conversation=${data.conversation_id}`;
                 }
             } else {
-                alert('Failed to start conversation: ' + data.error);
+                console.error('Start conversation failed:', data.error);
+                alert('Failed to start conversation: ' + (data.error || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error starting conversation:', error);
+            alert('Failed to start conversation: ' + error.message);
         }
     }
 
