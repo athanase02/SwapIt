@@ -12,7 +12,7 @@ try {
         // Railway MySQL connection
         $host = getenv('MYSQLHOST') ?: getenv('RAILWAY_DB_HOST');
         $port = getenv('MYSQLPORT') ?: getenv('RAILWAY_DB_PORT') ?: '3306';
-        $database = getenv('MYSQLDATABASE') ?: getenv('RAILWAY_DB_NAME') ?: 'railway';
+        $database = getenv('MYSQLDATABASE') ?: getenv('RAILWAY_DB_NAME') ?: 'si2025';
         $username = getenv('MYSQLUSER') ?: getenv('RAILWAY_DB_USER') ?: 'root';
         $password = getenv('MYSQLPASSWORD') ?: getenv('RAILWAY_DB_PASSWORD');
         
