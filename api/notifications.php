@@ -245,6 +245,7 @@ try {
             break;
             
         case 'mark_all_read':
+        case 'mark_all_as_read':
             $result = $notificationService->markAllAsRead($userId);
             echo json_encode($result);
             break;
@@ -268,13 +269,23 @@ try {
             break;
             
         default:
+            error_log("Invalid notification action: $action");
             echo json_encode(['success' => false, 'error' => 'Invalid action']);
             break;
     }
-} catch (Exception $e) {
+} catch (PDOException $e) {
+    error_log("Notification database error: " . $e->getMessage());
     echo json_encode([
         'success' => false,
-        'error' => 'An error occurred: ' . $e->getMessage()
+        'error' => 'Database error occurred. Please try again.',
+        'debug' => isset($_GET['debug']) ? $e->getMessage() : null
+    ]);
+} catch (Exception $e) {
+    error_log("Notification error: " . $e->getMessage());
+    echo json_encode([
+        'success' => false,
+        'error' => 'An error occurred. Please try again.',
+        'debug' => isset($_GET['debug']) ? $e->getMessage() : null
     ]);
 }
 ?>

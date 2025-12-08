@@ -275,6 +275,7 @@ try {
             $itemId = $_POST['item_id'] ?? null;
             
             if (empty($receiverId) || empty($messageText)) {
+                MessageLogger::log('send_message_error', 'Missing fields', ['receiver_id' => $receiverId, 'has_message' => !empty($messageText)]);
                 echo json_encode(['success' => false, 'error' => 'Missing required fields']);
                 exit;
             }
@@ -285,6 +286,7 @@ try {
             }
             
             $result = $messagingService->sendMessage($userId, $receiverId, $messageText, $itemId);
+            MessageLogger::log('send_message_success', 'Message sent', $result);
             echo json_encode($result);
             break;
             
@@ -294,16 +296,19 @@ try {
             $offset = $_GET['offset'] ?? 0;
             
             if (empty($conversationId)) {
+                MessageLogger::log('get_messages_error', 'Missing conversation_id', []);
                 echo json_encode(['success' => false, 'error' => 'Conversation ID required']);
                 exit;
             }
             
             $result = $messagingService->getMessages($conversationId, $userId, $limit, $offset);
+            MessageLogger::log('get_messages', 'Messages retrieved', ['conversation_id' => $conversationId, 'count' => count($result['messages'] ?? [])]);
             echo json_encode($result);
             break;
             
         case 'get_conversations':
             $result = $messagingService->getUserConversations($userId);
+            MessageLogger::log('get_conversations', 'Conversations retrieved', ['count' => count($result['conversations'] ?? [])]);
             echo json_encode($result);
             break;
             
@@ -338,14 +343,23 @@ try {
             break;
             
         default:
+            MessageLogger::log('invalid_action', 'Invalid action requested', ['action' => $action]);
             echo json_encode(['success' => false, 'error' => 'Invalid action']);
             break;
     }
-} catch (Exception $e) {
-    MessageLogger::log('error', 'Exception occurred: ' . $e->getMessage());
+} catch (PDOException $e) {
+    MessageLogger::log('database_error', 'Database error: ' . $e->getMessage(), ['code' => $e->getCode()]);
     echo json_encode([
         'success' => false,
-        'error' => 'An error occurred. Please try again.'
+        'error' => 'Database error occurred. Please try again.',
+        'debug' => isset($_GET['debug']) ? $e->getMessage() : null
+    ]);
+} catch (Exception $e) {
+    MessageLogger::log('error', 'Exception occurred: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+    echo json_encode([
+        'success' => false,
+        'error' => 'An error occurred. Please try again.',
+        'debug' => isset($_GET['debug']) ? $e->getMessage() : null
     ]);
 }
 ?>
