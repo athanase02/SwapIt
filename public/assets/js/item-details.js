@@ -235,7 +235,9 @@ class ItemDetailsManager {
             return;
         }
         
-        const cost = days * parseFloat(this.currentItem.price_per_day);
+        // Use 'price' field from database (not price_per_day)
+        const pricePerDay = parseFloat(this.currentItem.price || this.currentItem.price_per_day || 0);
+        const cost = days * pricePerDay;
         document.getElementById('costAmount').textContent = cost.toFixed(2);
         document.getElementById('estimatedCost').style.display = 'block';
     }
@@ -274,6 +276,7 @@ class ItemDetailsManager {
             const formData = new FormData();
             formData.append('action', 'create_request');
             formData.append('item_id', this.currentItem.id);
+            formData.append('owner_id', this.currentItem.owner_id); // Fixed: use owner_id from API
             formData.append('start_date', startDate);
             formData.append('end_date', endDate);
             formData.append('message', message);
@@ -318,7 +321,7 @@ class ItemDetailsManager {
         try {
             const formData = new FormData();
             formData.append('action', 'start_conversation');
-            formData.append('user_id', this.currentItem.user_id);
+            formData.append('user_id', this.currentItem.owner_id); // Fixed: use owner_id from API
             formData.append('item_id', this.currentItem.id);
             
             const response = await fetch('/api/messages.php', {

@@ -83,7 +83,7 @@ class RequestService {
         $stmt = $this->conn->prepare(
             "SELECT i.*, u.id as lender_id, u.full_name as lender_name 
              FROM items i 
-             JOIN users u ON i.user_id = u.id 
+             JOIN users u ON i.owner_id = u.id 
              WHERE i.id = ? AND i.status = 'available'"
         );
         $stmt->execute([$data['item_id']]);
@@ -98,11 +98,12 @@ class RequestService {
             return ['success' => false, 'error' => 'Cannot borrow your own item'];
         }
         
-        // Calculate total price
+        // Calculate total price - use 'price' field (not price_per_day)
         $startDate = new DateTime($data['borrow_start_date']);
         $endDate = new DateTime($data['borrow_end_date']);
         $days = $startDate->diff($endDate)->days + 1;
-        $totalPrice = $item['price_per_day'] * $days;
+        $pricePerDay = $item['price'] ?? 0; // Database uses 'price' field
+        $totalPrice = $pricePerDay * $days;
         
         // Create request
         $stmt = $this->conn->prepare(
@@ -160,7 +161,7 @@ class RequestService {
     public function acceptRequest($requestId, $lenderId, $notes = null) {
         // Verify lender owns this request
         $stmt = $this->conn->prepare(
-            "SELECT br.*, i.title as item_title, i.user_id as item_owner,
+            "SELECT br.*, i.title as item_title, i.owner_id as item_owner,
                     b.full_name as borrower_name
              FROM borrow_requests br
              JOIN items i ON br.item_id = i.id
