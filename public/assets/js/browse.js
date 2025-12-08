@@ -62,7 +62,7 @@ class BrowseFilter {
      */
     async loadItemsFromDatabase() {
         try {
-            const response = await fetch('/api/listings.php?action=get_all_items', {
+            const response = await fetch('/api/items.php?action=get_all', {
                 credentials: 'include'
             });
             

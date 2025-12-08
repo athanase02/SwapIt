@@ -24,29 +24,37 @@ class ItemsService {
      */
     public function getAllItems($filters = []) {
         $sql = "SELECT i.*, 
+                       c.name as category_name,
+                       c.slug as category_slug,
                        u.full_name as owner_name, 
                        u.avatar_url as owner_avatar,
-                       u.id as user_id
+                       u.id as owner_id,
+                       (SELECT image_url FROM item_images WHERE item_id = i.id AND is_primary = 1 LIMIT 1) as primary_image
                 FROM items i
-                JOIN users u ON i.user_id = u.id
+                JOIN users u ON i.owner_id = u.id
+                LEFT JOIN categories c ON i.category_id = c.id
                 WHERE 1=1";
         
         $params = [];
+        $types = '';
         
         // Apply filters
         if (!empty($filters['category'])) {
-            $sql .= " AND i.category = ?";
+            $sql .= " AND c.slug = ?";
             $params[] = $filters['category'];
+            $types .= 's';
         }
         
         if (!empty($filters['location'])) {
             $sql .= " AND i.location LIKE ?";
             $params[] = '%' . $filters['location'] . '%';
+            $types .= 's';
         }
         
         if (!empty($filters['status'])) {
             $sql .= " AND i.status = ?";
             $params[] = $filters['status'];
+            $types .= 's';
         } else {
             $sql .= " AND i.status = 'available'";
         }
@@ -56,34 +64,49 @@ class ItemsService {
             $searchTerm = '%' . $filters['search'] . '%';
             $params[] = $searchTerm;
             $params[] = $searchTerm;
+            $types .= 'ss';
         }
         
         if (!empty($filters['min_price'])) {
-            $sql .= " AND i.price_per_day >= ?";
-            $params[] = $filters['min_price'];
+            $sql .= " AND i.price >= ?";
+            $params[] = floatval($filters['min_price']);
+            $types .= 'd';
         }
         
         if (!empty($filters['max_price'])) {
-            $sql .= " AND i.price_per_day <= ?";
-            $params[] = $filters['max_price'];
+            $sql .= " AND i.price <= ?";
+            $params[] = floatval($filters['max_price']);
+            $types .= 'd';
         }
         
         // Sorting
         $sortBy = $filters['sort'] ?? 'recent';
         switch ($sortBy) {
             case 'price-low':
-                $sql .= " ORDER BY i.price_per_day ASC";
+                $sql .= " ORDER BY i.price ASC";
                 break;
             case 'price-high':
-                $sql .= " ORDER BY i.price_per_day DESC";
+                $sql .= " ORDER BY i.price DESC";
                 break;
             default:
                 $sql .= " ORDER BY i.created_at DESC";
         }
         
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute($params);
-        $items = $stmt->fetchAll();
+        
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+        
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $items = [];
+        
+        while ($row = $result->fetch_assoc()) {
+            // Add image_url for compatibility
+            $row['image_url'] = $row['primary_image'] ?? 'https://placehold.co/400x300?text=' . urlencode($row['title']);
+            $items[] = $row;
+        }
         
         return [
             'success' => true,
@@ -97,21 +120,45 @@ class ItemsService {
     public function getItem($itemId) {
         $stmt = $this->conn->prepare(
             "SELECT i.*, 
+                    c.name as category_name,
+                    c.slug as category_slug,
                     u.full_name as owner_name, 
                     u.avatar_url as owner_avatar,
                     u.email as owner_email,
                     u.phone as owner_phone,
-                    u.id as user_id
+                    u.id as owner_id
              FROM items i
-             JOIN users u ON i.user_id = u.id
+             JOIN users u ON i.owner_id = u.id
+             LEFT JOIN categories c ON i.category_id = c.id
              WHERE i.id = ?"
         );
-        $stmt->execute([$itemId]);
-        $item = $stmt->fetch();
+        $stmt->bind_param('i', $itemId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $item = $result->fetch_assoc();
         
         if (!$item) {
             return ['success' => false, 'error' => 'Item not found'];
         }
+        
+        // Get all images for this item
+        $imageStmt = $this->conn->prepare(
+            "SELECT image_url, is_primary, display_order 
+             FROM item_images 
+             WHERE item_id = ? 
+             ORDER BY is_primary DESC, display_order ASC"
+        );
+        $imageStmt->bind_param('i', $itemId);
+        $imageStmt->execute();
+        $imageResult = $imageStmt->get_result();
+        $images = [];
+        
+        while ($img = $imageResult->fetch_assoc()) {
+            $images[] = $img['image_url'];
+        }
+        
+        $item['images'] = $images;
+        $item['image_url'] = !empty($images) ? $images[0] : 'https://placehold.co/400x300?text=' . urlencode($item['title']);
         
         return [
             'success' => true,

@@ -1,0 +1,19 @@
+# Environment Variables for Render.com
+# Copy these to your Render web service → Environment tab
+
+RAILWAY_DB_HOST=turntable.proxy.rlwy.net
+RAILWAY_DB_PORT=57424
+RAILWAY_DB_USER=root
+RAILWAY_DB_PASSWORD=vgaxWyQewCgALyZTUSKazZyJbgykdJjF
+RAILWAY_DB_NAME=railway
+
+# Alternative: Full connection string
+DATABASE_URL=mysql://root:vgaxWyQewCgALyZTUSKazZyJbgykdJjF@turntable.proxy.rlwy.net:57424/railway
+
+# Instructions:
+# 1. Go to https://render.com → Your SwapIt web service
+# 2. Click "Environment" in the left sidebar
+# 3. Click "Add Environment Variable" for each variable above
+# 4. Save changes (Render will automatically redeploy)
+# 5. Wait 2-3 minutes for deployment to complete
+# 6. Test at: https://your-app.onrender.com/public/test-railway-db.php
