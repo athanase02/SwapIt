@@ -27,8 +27,20 @@ class EnhancedMessagingSystem {
         const conversationId = urlParams.get('conversation');
         const userId = urlParams.get('user');
         
-        if (conversationId && userId) {
-            await this.openConversation(parseInt(conversationId), parseInt(userId));
+        if (conversationId) {
+            // If we have conversationId, find it in loaded conversations and open it
+            setTimeout(() => {
+                const convElement = document.querySelector(`.conversation-item[data-conversation-id="${conversationId}"]`);
+                if (convElement) {
+                    convElement.click();
+                } else if (userId) {
+                    // Fallback: open with conversation ID and user ID
+                    this.openConversation(parseInt(conversationId), parseInt(userId));
+                }
+            }, 500);
+        } else if (userId) {
+            // Only user ID provided, start new conversation
+            await this.openConversation(null, parseInt(userId));
         }
     }
 
@@ -302,14 +314,19 @@ class EnhancedMessagingSystem {
 
         container.innerHTML = messages.map(msg => {
             const isSent = msg.sender_id == currentUserId;
+            const senderName = isSent ? 'You' : (msg.sender_name || this.currentReceiverName || 'User');
+            
             return `
                 <div class="message ${isSent ? 'sent' : 'received'}" data-message-id="${msg.id}">
-                    <div class="message-bubble">
-                        <div class="message-text">${this.escapeHtml(msg.message_text)}</div>
-                        <div class="message-meta">
-                            <span class="message-time">${this.formatTime(msg.created_at)}</span>
-                            ${isSent && msg.is_read ? '<i class="fas fa-check-double" style="color: #3b82f6; margin-left: 4px;" title="Read"></i>' : ''}
-                            ${isSent && !msg.is_read ? '<i class="fas fa-check" style="color: #94a3b8; margin-left: 4px;" title="Sent"></i>' : ''}
+                    <div class="message-wrapper">
+                        <div class="message-sender-name">${this.escapeHtml(senderName)}</div>
+                        <div class="message-bubble">
+                            <div class="message-text">${this.escapeHtml(msg.message_text)}</div>
+                            <div class="message-meta">
+                                <span class="message-time">${this.formatTime(msg.created_at)}</span>
+                                ${isSent && msg.is_read ? '<i class="fas fa-check-double" style="color: #ffffff; margin-left: 4px;" title="Read"></i>' : ''}
+                                ${isSent && !msg.is_read ? '<i class="fas fa-check" style="color: #ffffff; margin-left: 4px; opacity: 0.7;" title="Sent"></i>' : ''}
+                            </div>
                         </div>
                     </div>
                 </div>

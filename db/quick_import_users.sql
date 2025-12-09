@@ -1,0 +1,13 @@
+-- Quick data insert script with single-line statements
+USE si2025;
+
+INSERT INTO users (id, email, password_hash, full_name, avatar_url, phone, is_verified, account_type, last_login_at) VALUES (1, 'athanase.abayo@ashesi.edu.gh', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Athanase Abayo', 'https://i.pravatar.cc/150?img=12', '+233501234567', TRUE, 'student', NOW());
+INSERT INTO users (id, email, password_hash, full_name, avatar_url, phone, is_verified, account_type, last_login_at) VALUES (2, 'mabinty.mambu@ashesi.edu.gh', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Mabinty Mambu', 'https://i.pravatar.cc/150?img=5', '+233507654321', TRUE, 'student', NOW());
+INSERT INTO users (id, email, password_hash, full_name, avatar_url, phone, is_verified, account_type, last_login_at) VALUES (3, 'olivier.kwizera@ashesi.edu.gh', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Olivier Kwizera', 'https://i.pravatar.cc/150?img=33', '+233503456789', TRUE, 'student', NOW());
+INSERT INTO users (id, email, password_hash, full_name, avatar_url, phone, is_verified, account_type, last_login_at) VALUES (4, 'victoria.nyonato@ashesi.edu.gh', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Victoria Ama Nyonato', 'https://i.pravatar.cc/150?img=9', '+233509876543', TRUE, 'student', NOW());
+INSERT INTO users (id, email, password_hash, full_name, avatar_url, phone, is_verified, account_type, last_login_at) VALUES (5, 'admin@swapit.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'SwapIt Admin', 'https://i.pravatar.cc/150?img=60', '+233501111111', TRUE, 'admin', NOW());
+INSERT INTO users (id, email, password_hash, full_name, avatar_url, phone, is_verified, account_type, last_login_at) VALUES (6, 'kwame.mensah@ashesi.edu.gh', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Kwame Mensah', 'https://i.pravatar.cc/150?img=15', '+233502345678', TRUE, 'student', NOW());
+INSERT INTO users (id, email, password_hash, full_name, avatar_url, phone, is_verified, account_type, last_login_at) VALUES (7, 'ama.serwaa@ashesi.edu.gh', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ama Serwaa', 'https://i.pravatar.cc/150?img=20', '+233508765432', TRUE, 'student', NOW());
+INSERT INTO users (id, email, password_hash, full_name, avatar_url, phone, is_verified, account_type, last_login_at) VALUES (8, 'kofi.annan@ashesi.edu.gh', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Kofi Annan', 'https://i.pravatar.cc/150?img=25', '+233505678901', TRUE, 'student', NOW());
+
+SELECT 'Users imported!' as status, COUNT(*) as count FROM users;

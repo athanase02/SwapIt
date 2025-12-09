@@ -11,10 +11,21 @@ class RequestManager {
         this.init();
     }
 
-    init() {
+    async init() {
         this.setupEventListeners();
-        this.loadRequests();
+        await this.loadRequests();
         this.startRealTimeUpdates();
+        
+        // Check URL for request parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestId = urlParams.get('request');
+        
+        if (requestId) {
+            // Wait for requests to load, then view the specific request
+            setTimeout(() => {
+                this.viewRequestDetails(parseInt(requestId));
+            }, 500);
+        }
     }
     
     /**

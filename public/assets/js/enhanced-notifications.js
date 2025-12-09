@@ -167,39 +167,81 @@ class EnhancedNotifications {
     }
 
     getDefaultActionUrl(notif) {
-        switch (notif.type) {
-            case 'message':
-                return `messages.html?conversation=${notif.related_id}`;
-            case 'request':
-            case 'request_approved':
-            case 'request_rejected':
-                return `requests.html?request=${notif.related_id}`;
-            case 'transaction':
-                return `transactions.html?id=${notif.related_id}`;
-            case 'meeting':
-                return `transactions.html?meeting=${notif.related_id}`;
-            case 'review':
-                return `profile.html#reviews`;
-            default:
-                return 'dashboard.html';
+        // Handle message notifications - navigate to conversation
+        if (notif.type === 'message' || notif.type === 'new_message') {
+            if (notif.related_id) {
+                // related_id could be conversation_id or message_id
+                // For messages, we need to get the conversation
+                return `pages/messages.html?conversation=${notif.related_id}`;
+            }
+            return 'pages/messages.html';
         }
+        
+        // Handle request notifications - navigate to requests page
+        if (notif.type === 'request' || notif.type === 'borrow_request' || 
+            notif.type === 'request_approved' || notif.type === 'request_accepted' ||
+            notif.type === 'request_rejected' || notif.type === 'request_cancelled') {
+            if (notif.related_id) {
+                return `pages/requests.html?request=${notif.related_id}`;
+            }
+            return 'pages/requests.html';
+        }
+        
+        // Handle transaction notifications
+        if (notif.type === 'transaction' || notif.type === 'payment') {
+            return `pages/requests.html?request=${notif.related_id}`;
+        }
+        
+        // Handle meeting notifications
+        if (notif.type === 'meeting' || notif.type === 'meeting_scheduled') {
+            return `pages/requests.html?request=${notif.related_id}`;
+        }
+        
+        // Handle review notifications
+        if (notif.type === 'review' || notif.type === 'new_review') {
+            return `pages/dashboard.html#reviews`;
+        }
+        
+        // Handle return reminders
+        if (notif.type === 'return_reminder' || notif.type === 'return') {
+            return `pages/requests.html?request=${notif.related_id}`;
+        }
+        
+        // Default fallback
+        return 'pages/dashboard.html';
     }
 
     async handleNotificationClick(notificationId, actionUrl) {
         console.log('Notification clicked:', { notificationId, actionUrl });
         
-        // Mark as read
+        // Mark as read first
         await this.markAsRead(notificationId);
         
+        // Close notification panel
+        const panel = document.getElementById('notificationPanel');
+        if (panel) {
+            panel.classList.remove('show');
+        }
+        
         // Navigate to action URL if provided
-        if (actionUrl && actionUrl !== 'undefined' && actionUrl !== 'null') {
-            // Check if URL is relative or absolute
-            if (actionUrl.startsWith('http')) {
-                window.location.href = actionUrl;
-            } else {
-                // Handle relative URLs
-                window.location.href = actionUrl.startsWith('/') ? actionUrl : `../${actionUrl}`;
-            }
+        if (actionUrl && actionUrl !== 'undefined' && actionUrl !== 'null' && actionUrl !== '') {
+            // Small delay to ensure mark as read completes
+            setTimeout(() => {
+                // Check if URL is relative or absolute
+                if (actionUrl.startsWith('http')) {
+                    window.location.href = actionUrl;
+                } else {
+                    // Handle relative URLs - check if we need to go up a directory
+                    const currentPath = window.location.pathname;
+                    if (currentPath.includes('/pages/')) {
+                        // Already in pages directory, use as is
+                        window.location.href = actionUrl;
+                    } else {
+                        // Need to navigate to pages directory
+                        window.location.href = actionUrl.startsWith('/') ? actionUrl : `${actionUrl}`;
+                    }
+                }
+            }, 100);
         }
     }
 
